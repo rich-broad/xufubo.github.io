@@ -87,13 +87,13 @@
 <meta property="og:site_name" content="xufubo">
 <meta property="og:description" content="5、InnoDB内存结构本节介绍InnoDB存储引擎体系结构中内存中的主要组件。   5.1 缓冲池(buffer pool)缓冲池是内存中的一个缓冲区， InnoDB将表和索引的热点数据缓冲在这里，这样，当访问数据库数据时，就可以直接访问内存中的数据，而无需访问磁盘，这就减少了IO，提高了速度。通常，在专用的数据库服务器上，通常将多达80％的物理内存分配给InnoDB缓冲池。为了实现大容量内存操">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/image/innodb-buffer-pool-list.png">
-<meta property="og:image" content="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/image/innodb-change-buffer.png">
-<meta property="og:updated_time" content="2018-12-23T11:47:13.633Z">
+<meta property="og:image" content="http://yoursite.com/image/innodb-buffer-pool-list.png">
+<meta property="og:image" content="http://yoursite.com/image/innodb-change-buffer.png">
+<meta property="og:updated_time" content="2018-12-23T12:18:26.509Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="InnoDB内存结构">
 <meta name="twitter:description" content="5、InnoDB内存结构本节介绍InnoDB存储引擎体系结构中内存中的主要组件。   5.1 缓冲池(buffer pool)缓冲池是内存中的一个缓冲区， InnoDB将表和索引的热点数据缓冲在这里，这样，当访问数据库数据时，就可以直接访问内存中的数据，而无需访问磁盘，这就减少了IO，提高了速度。通常，在专用的数据库服务器上，通常将多达80％的物理内存分配给InnoDB缓冲池。为了实现大容量内存操">
-<meta name="twitter:image" content="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/image/innodb-buffer-pool-list.png">
+<meta name="twitter:image" content="http://yoursite.com/image/innodb-buffer-pool-list.png">
 
 
 
@@ -332,7 +332,7 @@
 <li>在头部，是最近访问过的新（“年轻”）页面子列表。  </li>
 <li>在尾部，是最近访问的旧页面子列表（替换的对象）。  </li>
 </ul>
-<p>如下：<br><img src="../image/innodb-buffer-pool-list.png" alt="buffer pool list">  </p>
+<p>如下：<br><img src="/image/innodb-buffer-pool-list.png" alt="buffer pool list">  </p>
 <p>该算法将查询中大量使用的页面维护在新页面子列表中。旧页面子列表包含较少使用的页面;这些页面将来是被逐出的对象。默认情况下，算法如下运行：  </p>
 <ul>
 <li>3/8的缓冲池专用于旧页面子列表。  </li>
@@ -506,7 +506,7 @@
 <p>缓冲池服务器状态变量和INNODB_BUFFER_POOL_STATS表也提供InnoDB Standard Monitor输出的很多指标，详见<a href="https://dev.mysql.com/doc/refman/8.0/en/innodb-information-schema-buffer-pool-tables.html#innodb-information-schema-buffer-pool-stats-example" target="_blank" rel="noopener">Example 15.10, “Querying the INNODB_BUFFER_POOL_STATS Table”</a>。  </p>
 </li>
 </ul>
-<h2 id="5-2-改变缓冲-Change-Buffer"><a href="#5-2-改变缓冲-Change-Buffer" class="headerlink" title="5.2 改变缓冲(Change Buffer)"></a>5.2 改变缓冲(Change Buffer)</h2><p>存储引擎设计中的一个挑战是写入操作期间的随机I/O。在InnoDB中，一个表包含一个聚簇索引和零个或多个辅助索引。这些索引中的每一个都是一个B+树。<em>将记录插入到表中时，首先将该记录插入到聚簇索引中，然后再插入到每个辅助索引中。与聚簇索引不同，辅助索引（也叫二级索引，我们也常常互换使用）通常不是唯一的，并且插入二级索引的顺序相对随机。同样的，删除和更新也有类似的问题。因此，所产生的I/O操作将随机分布在磁盘上。</em>为了减轻这个问题，InnoDB存储引擎使用一种称为Change Buffer的特殊数据结构（因为以前称为插入缓冲区，因此你将看到内部在很多场景下用ibuf和IBUF表示Change Buffer）。Change Buffer是一种特殊的数据结构，用于缓存对<strong>不在buffer pool中</strong>的<em>辅助索引</em>以及<em>辅助索引页面</em>的改变（两个点：不在buffer，辅助索引）。这些被缓存的改变可能来自INSERT, UPDATE, or DELETE，这些操作会在将来当这些被改变的页面因为其他操作被装载到buffer pool时被合并，稍后这些更新会被刷新到磁盘。这样就避免了从磁盘读取二级索引页到buffer pool时所需的大量随机I/O。因为它可以减少磁盘I/O，所以Change Buffer对于I/O-bound类型的工作负载很有价值，例如具有大量DML操作的应用程序（如批量插入）。<br>小结一下：Change Buffer的核心思想是将对未在buffer pool的辅助索引页面的更改缓存起来，等到这些页面被load到buffer pool时合并这些更改，从而减少大量随机I/O。这也与InnoDB的存储数据的格式决定的（InnoDB通过聚簇索引的方式组织行数据，而且通过主键排序，因此最好建的主键的特点也是这些主键随着插入在递增）。<br>Change Buffer的图示如下：<br><img src="../image/innodb-change-buffer.png" alt="Change Buffer">  </p>
+<h2 id="5-2-改变缓冲-Change-Buffer"><a href="#5-2-改变缓冲-Change-Buffer" class="headerlink" title="5.2 改变缓冲(Change Buffer)"></a>5.2 改变缓冲(Change Buffer)</h2><p>存储引擎设计中的一个挑战是写入操作期间的随机I/O。在InnoDB中，一个表包含一个聚簇索引和零个或多个辅助索引。这些索引中的每一个都是一个B+树。<em>将记录插入到表中时，首先将该记录插入到聚簇索引中，然后再插入到每个辅助索引中。与聚簇索引不同，辅助索引（也叫二级索引，我们也常常互换使用）通常不是唯一的，并且插入二级索引的顺序相对随机。同样的，删除和更新也有类似的问题。因此，所产生的I/O操作将随机分布在磁盘上。</em>为了减轻这个问题，InnoDB存储引擎使用一种称为Change Buffer的特殊数据结构（因为以前称为插入缓冲区，因此你将看到内部在很多场景下用ibuf和IBUF表示Change Buffer）。Change Buffer是一种特殊的数据结构，用于缓存对<strong>不在buffer pool中</strong>的<em>辅助索引</em>以及<em>辅助索引页面</em>的改变（两个点：不在buffer，辅助索引）。这些被缓存的改变可能来自INSERT, UPDATE, or DELETE，这些操作会在将来当这些被改变的页面因为其他操作被装载到buffer pool时被合并，稍后这些更新会被刷新到磁盘。这样就避免了从磁盘读取二级索引页到buffer pool时所需的大量随机I/O。因为它可以减少磁盘I/O，所以Change Buffer对于I/O-bound类型的工作负载很有价值，例如具有大量DML操作的应用程序（如批量插入）。<br>小结一下：Change Buffer的核心思想是将对未在buffer pool的辅助索引页面的更改缓存起来，等到这些页面被load到buffer pool时合并这些更改，从而减少大量随机I/O。这也与InnoDB的存储数据的格式决定的（InnoDB通过聚簇索引的方式组织行数据，而且通过主键排序，因此最好建的主键的特点也是这些主键随着插入在递增）。<br>Change Buffer的图示如下：<br><img src="/image/innodb-change-buffer.png" alt="Change Buffer">  </p>
 <p>系统在大部分空闲时，InnoDB主线程会定期的或在慢速关闭期间运行的清除操作会将更新的索引页写入磁盘。与每个值立即写入磁盘的情况相比，清除操作可以更有效地将一系列索引值写入磁盘块。  </p>
 <p>当有许多受影响的行和许多要更新的辅助索引时，Change buffer的合并可能需要几个小时。在此期间，磁盘I/O增加，disk-bound类的查询会变得很慢。提交事务后，或者甚至在服务器关闭并重新启动后，也可能发生Change Buffer的合并（更多信息见：<a href="https://dev.mysql.com/doc/refman/8.0/en/forcing-innodb-recovery.html" target="_blank" rel="noopener">Section 15.20.2, “Forcing InnoDB Recovery”</a>）。  </p>
 <p>在内存中，Change Buffer占用buffer pool的一部分。在磁盘上，Change Buffer是系统表空间的一部分，其中在关闭数据库服务器时缓冲索引更改。如果索引包含降序索引列或主键包含降序索引列，则Change Buffer不支持对辅助索引的更改进行缓存。  </p>
@@ -679,7 +679,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -690,7 +690,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

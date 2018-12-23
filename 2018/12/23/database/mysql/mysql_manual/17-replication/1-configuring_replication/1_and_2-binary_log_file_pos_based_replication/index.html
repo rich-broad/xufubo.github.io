@@ -370,7 +370,7 @@
 <li>1、使用mysqldump工具来创建您想要复制的所有数据库的转储。这是推荐的方法，尤其是使用InnoDB时。  </li>
 <li>2、如果您的数据库存储在二进制可移植文件中，则可以将原始数据文件复制到从站。这可以比使用mysqldump并在每个从属设备上导入文件更高效。对于像InnoDB这样的存储引擎，这是不推荐的。  </li>
 </ul>
-<p><strong><em>使用mysqldump创建数据快照</em></strong><br>先使用mysqldump工具转储主站数据，在开始复制之前将该数据导入从站中。<br>以下示例将所有数据库转储到名为dbdump.db的文件，并包含–master-data选项，它会自动附加从站上所需的CHANGE MASTER TO语句以启动复制过程：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysqldump --all-databases --master-data &gt; dbdump.db</span><br></pre></td></tr></table></figure></p>
+<p><strong><em>使用mysqldump创建数据快照</em></strong><br>先使用mysqldump工具转储主站数据，在开始复制之前将该数据导入从站中。<br>以下示例将所有数据库转储到名为dbdump.db的文件，并包含–master-data选项，它会自动附加从站上所需的CHANGE MASTER TO语句以启动复制过程：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysqldump --all-databases --master-data &gt; dbdump.db</span></span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <p><strong>注意：如果不使用–master-data，则需要手动将所有表锁定在单独的会话中。如上一小节那样</strong><br>你也可以使用mysqldump转储你需要的数据库或者表，有关更多信息，见<a href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html" target="_blank" rel="noopener">4.5.4 mysqldump — A Database Backup Program</a>。<br>要导入数据，请将转储文件复制到从站，或者在远程连接到从站时从主站访问该文件。  </p>
 </blockquote>
@@ -395,7 +395,7 @@
 <li>1、启动从站mysql服务器；  </li>
 <li>2、执行CHANGE MASTER TO设置主站的信息；<br>如果你需要将已dump的数据加载到新搭建的复制组中，那么你可以先配置好复制拓扑，然后通过将数据加载到新的主站中，数据会自动复制到从站。  </li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql -h master &lt; fulldb.dump</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql -h master &lt; fulldb.dump</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>使用现有数据设置复制 </p>
 </li>
@@ -405,7 +405,7 @@
 <ul>
 <li>1、使用 <em>–skip-slave-start</em> 选项启动从站，以便复制不会启动。  </li>
 <li><p>2、导入由mysqldump生成的转储文件：  </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql &lt; fulldb.dump</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql &lt; fulldb.dump</span></span><br></pre></td></tr></table></figure>
 <p>这里我们假设mysqldump使用了–master-data生成转储文件。  </p>
 </li>
 </ul>
@@ -414,7 +414,7 @@
 <p><strong>如果使用原始数据文件创建快照：</strong>  </p>
 <ul>
 <li><p>1、将数据文件解压缩到从站数据目录中。例如：  </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> tar xvf dbdump.tar</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> tar xvf dbdump.tar</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>2、使用 <em>–skip-slave-start</em> 选项启动从站 以便复制不会启动。  </p>
 </li>
@@ -631,7 +631,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -642,7 +642,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

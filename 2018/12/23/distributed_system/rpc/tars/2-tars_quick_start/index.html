@@ -87,16 +87,16 @@
 <meta property="og:site_name" content="xufubo">
 <meta property="og:description" content="引言在 tars install 中详细的介绍了tars的安装，部署了如下开发环境：    mysql主从环境   tars cpp开发环境(cpp rpc实现)    tars框架爱的基础服务   tars的web管理端接下来学习如何使用tars进行开发，这里的例子很简单，客户端发出hello world!，服务端返回，并在客户端输出。    编写服务端我们是在虚拟机上搭建的开发环境，为了使用w">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_apply.png">
-<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_apply_after.png">
-<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_patch.png">
-<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_path_suc.png">
-<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/servant_manage.png">
-<meta property="og:updated_time" content="2018-12-23T11:53:18.184Z">
+<meta property="og:image" content="http://yoursite.com/image/hello_svr_apply.png">
+<meta property="og:image" content="http://yoursite.com/image/hello_svr_apply_after.png">
+<meta property="og:image" content="http://yoursite.com/image/hello_svr_patch.png">
+<meta property="og:image" content="http://yoursite.com/image/hello_svr_path_suc.png">
+<meta property="og:image" content="http://yoursite.com/image/servant_manage.png">
+<meta property="og:updated_time" content="2018-12-23T12:19:48.844Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tars 快速入门">
 <meta name="twitter:description" content="引言在 tars install 中详细的介绍了tars的安装，部署了如下开发环境：    mysql主从环境   tars cpp开发环境(cpp rpc实现)    tars框架爱的基础服务   tars的web管理端接下来学习如何使用tars进行开发，这里的例子很简单，客户端发出hello world!，服务端返回，并在客户端输出。    编写服务端我们是在虚拟机上搭建的开发环境，为了使用w">
-<meta name="twitter:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_apply.png">
+<meta name="twitter:image" content="http://yoursite.com/image/hello_svr_apply.png">
 
 
 
@@ -346,7 +346,7 @@
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">APP       := TestApp</span><br><span class="line">TARGET    := HelloServer</span><br><span class="line">CONFIG    := </span><br><span class="line">STRIP_FLAG:= N</span><br><span class="line">TARS_SSL := 1 之前在安装的时候设置了该选项，因此这里也设置这个值</span><br><span class="line">INCLUDE   += </span><br><span class="line">LIB       += </span><br><span class="line"></span><br><span class="line"><span class="comment">#-----------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> /usr/local/tars/cpp/makefile/makefile.tars   <span class="comment"># 这个文件非常重要必须包含。</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>执行 make release 翻译tars文件，生成对应的.h文件和.cpp文件，同时，该命令会生成其他的文件，并拷贝到响应的目录。这里你可能会有疑问，生成.h和.cpp不就可以了吗？是的，理论上没错，因为我们这里是微服务框架，各个服务之间会发起RPC调用，其他服务会依赖于这份协议，当我们在同一台机器开发时，我们开发的tars协议翻译成的文件为了被大家可见，就会放到一个公共目录，当其他开发者依赖我们的服务时，只需要在makefile中包含生成的.mk文件，然后直接使用.h文件就好了。这个只是在使用tars框架时的一个约定，并没有对错，你也可以选择自己合适的约定。那么我们看看这个命令做了些什么：  </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost HelloServer]# make release</span><br><span class="line">update .HelloServer.d ...</span><br><span class="line">In file included from HelloServer.cpp:18:0:</span><br><span class="line">HelloImp.h:21:19: fatal error: Hello.h: No such file or directory</span><br><span class="line"><span class="meta"> #</span>include "Hello.h"</span><br><span class="line">                   ^</span><br><span class="line">compilation terminated.</span><br><span class="line">update .HelloImp.d ...</span><br><span class="line">In file included from HelloImp.cpp:17:0:</span><br><span class="line">HelloImp.h:21:19: fatal error: Hello.h: No such file or directory</span><br><span class="line"><span class="meta"> #</span>include "Hello.h"</span><br><span class="line">                   ^</span><br><span class="line">compilation terminated.</span><br><span class="line">make: Warning: File `.HelloServer.d' has modification time 4.7 s in the future</span><br><span class="line">tars2cpp  </span><br><span class="line">rm -vf Hello.h</span><br><span class="line">tars2cpp  </span><br><span class="line">/usr/local/tars/cpp/tools/tars2cpp   Hello.tars</span><br><span class="line">[Copy file  Hello.tars Hello.h [Mm]akefile  -&gt;  /home/tarsproto/TestApp/HelloServer]</span><br><span class="line">‘Hello.tars’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/Hello.tars’</span><br><span class="line">‘Hello.h’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/Hello.h’</span><br><span class="line">‘makefile’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/makefile’</span><br><span class="line">echo "INCLUDE += -I/home/tarsproto/TestApp/HelloServer"  &gt;  /home/tarsproto/TestApp/HelloServer/HelloServer.mk;</span><br><span class="line">make: warning:  Clock skew detected.  Your build may be incomplete.</span><br><span class="line">[root@localhost HelloServer]# ll</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost HelloServer]# make release</span><br><span class="line">update .HelloServer.d ...</span><br><span class="line">In file included from HelloServer.cpp:18:0:</span><br><span class="line">HelloImp.h:21:19: fatal error: Hello.h: No such file or directory</span><br><span class="line"><span class="meta"> #</span><span class="bash">include <span class="string">"Hello.h"</span></span></span><br><span class="line">                   ^</span><br><span class="line">compilation terminated.</span><br><span class="line">update .HelloImp.d ...</span><br><span class="line">In file included from HelloImp.cpp:17:0:</span><br><span class="line">HelloImp.h:21:19: fatal error: Hello.h: No such file or directory</span><br><span class="line"><span class="meta"> #</span><span class="bash">include <span class="string">"Hello.h"</span></span></span><br><span class="line">                   ^</span><br><span class="line">compilation terminated.</span><br><span class="line">make: Warning: File `.HelloServer.d' has modification time 4.7 s in the future</span><br><span class="line">tars2cpp  </span><br><span class="line">rm -vf Hello.h</span><br><span class="line">tars2cpp  </span><br><span class="line">/usr/local/tars/cpp/tools/tars2cpp   Hello.tars</span><br><span class="line">[Copy file  Hello.tars Hello.h [Mm]akefile  -&gt;  /home/tarsproto/TestApp/HelloServer]</span><br><span class="line">‘Hello.tars’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/Hello.tars’</span><br><span class="line">‘Hello.h’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/Hello.h’</span><br><span class="line">‘makefile’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/makefile’</span><br><span class="line">echo "INCLUDE += -I/home/tarsproto/TestApp/HelloServer"  &gt;  /home/tarsproto/TestApp/HelloServer/HelloServer.mk;</span><br><span class="line">make: warning:  Clock skew detected.  Your build may be incomplete.</span><br><span class="line">[root@localhost HelloServer]# ll</span><br></pre></td></tr></table></figure>
 <ul>
 <li><blockquote>
 <p>如上该命令 首先删除原来的文件：Hello.h  </p>
@@ -380,9 +380,9 @@
 </li>
 <li><p>部署 ：</p>
 <ul>
-<li>申请：注意填写的各个参数值。特别设计应用名称，服务名称，Obj名称。<br><img src="./image/hello_svr_apply.png" alt="apply">   </li>
-<li>申请之后：<br><img src="./image/hello_svr_apply_after.png" alt="after">  </li>
-<li>发布：<br><img src="./image/hello_svr_patch.png" alt="patch"><br><img src="./image/hello_svr_path_suc.png" alt="patch_suc">   </li>
+<li>申请：注意填写的各个参数值。特别设计应用名称，服务名称，Obj名称。<br><img src="/image/hello_svr_apply.png" alt="apply">   </li>
+<li>申请之后：<br><img src="/image/hello_svr_apply_after.png" alt="after">  </li>
+<li>发布：<br><img src="/image/hello_svr_patch.png" alt="patch"><br><img src="/image/hello_svr_path_suc.png" alt="patch_suc">   </li>
 </ul>
 </li>
 </ol>
@@ -398,7 +398,7 @@
 <p>如上是一个最简单的客户端。其中很重要的就是：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">comm.stringToProxy(<span class="string">"TestApp.HelloServer.HelloObj@tcp -h 192.168.58.128 -t 60000 -p 10008"</span> , prx);</span><br></pre></td></tr></table></figure></p>
 <p>该句设置了将要调用的服务端servant信息：ip、端口等。这个信息可以在如下地方获取：  </p>
 <blockquote>
-<p>web管理端 -&gt; servant管理：<br> <img src="./image/servant_manage.png" alt="servant管理">   </p>
+<p>web管理端 -&gt; servant管理：<br> <img src="/image/servant_manage.png" alt="servant管理">   </p>
 </blockquote>
 <p>在这里你可能会问：这太不合理了，在互联网服务端，经常涉及到服务的扩容和迁移，IP、端口等变了怎么办？难道要重新编译发布？肯定不是这样的啦，框架肯定会有服务发现机制。这里我们只是构建一个最简单的例子，随着学习的深入，你会了解到框架如何做到服务发现。  </p>
 <ol start="3">
@@ -547,7 +547,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -558,7 +558,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

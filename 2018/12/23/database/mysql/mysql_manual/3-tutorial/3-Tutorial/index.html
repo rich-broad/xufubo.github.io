@@ -324,8 +324,8 @@
       
         <h1 id="Tutorial"><a href="#Tutorial" class="headerlink" title="Tutorial"></a>Tutorial</h1><p>本章主要介绍通过mysql这个程序链接到MySQL服务器，并对服务器进行使用。mysql程序是一个终端交互程序，用于链接到MySQL服务器，提交查询并查看结果。mysql也可在批处理模式下使用：先将查询放在一个文件中，然后告诉 mysql执行文件的内容。本章介绍这两种使用方式。本章只是一个简单的入门教程。要查看mysql提供的列表，请使用mysql –help。<br>本章主要是对mysql简单的使用。首先有个感性的认识。  </p>
 <hr>
-<h2 id="1、连接和断开服务器"><a href="#1、连接和断开服务器" class="headerlink" title="1、连接和断开服务器"></a>1、连接和断开服务器</h2><p>连接时通常需要指定要链接的主机、端口、用户名、密码。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql -h host -u user –P 3306 -p </span><br><span class="line">Enter password: ********</span><br></pre></td></tr></table></figure></p>
-<p>如果客户端与服务器在一台机器上，可以：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql -u user -p</span><br></pre></td></tr></table></figure></p>
+<h2 id="1、连接和断开服务器"><a href="#1、连接和断开服务器" class="headerlink" title="1、连接和断开服务器"></a>1、连接和断开服务器</h2><p>连接时通常需要指定要链接的主机、端口、用户名、密码。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql -h host -u user –P 3306 -p </span></span><br><span class="line">Enter password: ********</span><br></pre></td></tr></table></figure></p>
+<p>如果客户端与服务器在一台机器上，可以：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql -u user -p</span></span><br></pre></td></tr></table></figure></p>
 <p>键入QUIT来退出mysql程序。   </p>
 <hr>
 <h2 id="2、输入查询"><a href="#2、输入查询" class="headerlink" title="2、输入查询"></a>2、输入查询</h2><p>MySQL可以包含多个数据库，如上与服务器建立连接后并未选择任何数据库。此时依然可以与mysqld进行交互。例如像MySQL服务器询问版本和当前日期：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">VERSION</span>(), <span class="keyword">CURRENT_DATE</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">version</span>(), <span class="keyword">current_date</span>;</span><br><span class="line"><span class="keyword">SeLeCt</span> <span class="keyword">vErSiOn</span>(), <span class="keyword">current_DATE</span>;</span><br></pre></td></tr></table></figure></p>
@@ -509,18 +509,18 @@
 <p>了解表的结构：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DESCRIBE</span> pet;</span><br></pre></td></tr></table></figure></p>
 <p>也可以使用DESC作为简写，还可以使用SHOW CREATE TABLE tab_name来看某个表的定义。   </p>
 <hr>
-<h2 id="5、在批处理模式下使用mysql"><a href="#5、在批处理模式下使用mysql" class="headerlink" title="5、在批处理模式下使用mysql"></a>5、在批处理模式下使用mysql</h2><p>在前面的部分中，以交互方式使用mysql输入语句并查看结果。也可以在批处理模式下运行mysql。为此，将要运行的语句放在一个文件中，然后告诉mysql从文件中读取其输入：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql &lt; batch-file</span><br></pre></td></tr></table></figure></p>
-<p>如果需要在命令行中指定连接参数，命令可能如下所示：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql -h host -u user -p &lt; batch-file </span><br><span class="line">Enter password: ********</span><br></pre></td></tr></table></figure></p>
+<h2 id="5、在批处理模式下使用mysql"><a href="#5、在批处理模式下使用mysql" class="headerlink" title="5、在批处理模式下使用mysql"></a>5、在批处理模式下使用mysql</h2><p>在前面的部分中，以交互方式使用mysql输入语句并查看结果。也可以在批处理模式下运行mysql。为此，将要运行的语句放在一个文件中，然后告诉mysql从文件中读取其输入：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql &lt; batch-file</span></span><br></pre></td></tr></table></figure></p>
+<p>如果需要在命令行中指定连接参数，命令可能如下所示：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql -h host -u user -p &lt; batch-file </span></span><br><span class="line">Enter password: ********</span><br></pre></td></tr></table></figure></p>
 <p>当以这种方式使用mysql时，你将要创建一个脚本文件，然后执行该脚本。<br>如果你希望即使其中的某些语句产生错误脚本也继续执行，则应使用 –force命令行选项。<br>为什么要使用脚本？以下是几个原因：  </p>
 <ul>
 <li>反复（例如每天或每周）运行查询，使其成为一个脚本，可以在每次执行它时避免重新输入。</li>
 <li>可以通过复制和编辑脚本文件来生成与现有查询类似的新查询。</li>
 <li>在开发查询时，批处理模式也很有用，特别是对于多行语句或多语句序列。如果你犯了一个错误，你不需要重新输入一切。只需编辑你的脚本来纠正错误，然后告诉mysql再次执行它。</li>
 <li><p>如果有一个产生大量输出的查询，你可以通过如下方式处理，而不是看着它从屏幕顶部滚动：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql &lt; batch-file | more</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql &lt; batch-file | more</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>可以将输出捕获到文件中并进一步处理：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql &lt; batch-file &gt; mysql.out</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span><span class="bash"> mysql &lt; batch-file &gt; mysql.out</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>可以将脚本分发给其他人，以便他们也可以运行语句。</p>
 </li>
@@ -689,7 +689,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">categories</span>
                 </a>
               </div>
@@ -700,7 +700,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
