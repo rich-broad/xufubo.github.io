@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="语言结构我们在使用一门语言、一种工具的时候，明白它的语言结构是很重要的，以避免某些奇怪的错误发生。本章主要学习在使用MySQL中编写SQL语句时要用到的以下元素的规则：    字面值，如字符串和数字   标识符，如数据库，表和列名等   关键字和保留字   用户定义变量和系统变量   注释     1、字面值本节描述了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xufubo">
+<meta property="og:url" content="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/9-language_structure/9-Language Structure/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="语言结构我们在使用一门语言、一种工具的时候，明白它的语言结构是很重要的，以避免某些奇怪的错误发生。本章主要学习在使用MySQL中编写SQL语句时要用到的以下元素的规则：    字面值，如字符串和数字   标识符，如数据库，表和列名等   关键字和保留字   用户定义变量和系统变量   注释     1、字面值本节描述了如何在MySQL中写字面值。包括字符串、数值、十六进制值、位值、布尔值和NULL">
+<meta property="og:updated_time" content="2018-11-14T15:06:03.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="xufubo">
+<meta name="twitter:description" content="语言结构我们在使用一门语言、一种工具的时候，明白它的语言结构是很重要的，以避免某些奇怪的错误发生。本章主要学习在使用MySQL中编写SQL语句时要用到的以下元素的规则：    字面值，如字符串和数字   标识符，如数据库，表和列名等   关键字和保留字   用户定义变量和系统变量   注释     1、字面值本节描述了如何在MySQL中写字面值。包括字符串、数值、十六进制值、位值、布尔值和NULL">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/9-language_structure/9-Language Structure/"/>
+
+
+
+
+
+  <title> | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/9-language_structure/9-Language Structure/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-19T23:25:11+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="语言结构"><a href="#语言结构" class="headerlink" title="语言结构"></a>语言结构</h1><p>我们在使用一门语言、一种工具的时候，明白它的语言结构是很重要的，以避免某些奇怪的错误发生。本章主要学习在使用MySQL中编写SQL语句时要用到的以下元素的规则：  </p>
+<ul>
+<li>字面值，如字符串和数字  </li>
+<li>标识符，如数据库，表和列名等  </li>
+<li>关键字和保留字  </li>
+<li>用户定义变量和系统变量  </li>
+<li>注释  </li>
+</ul>
+<hr>
+<h2 id="1、字面值"><a href="#1、字面值" class="headerlink" title="1、字面值"></a>1、字面值</h2><p>本节描述了如何在MySQL中写字面值。包括字符串、数值、十六进制值、位值、布尔值和NULL。本节还包含MySQL在处理这些基本类型时的各种细微差别。  </p>
+<h3 id="1-1-字符串字面值"><a href="#1-1-字符串字面值" class="headerlink" title="1.1 字符串字面值"></a>1.1 字符串字面值</h3><p>字符串是用单引号或者双引号引起来的字符序列，彼此相邻的字符串链接成单个字符串，例如下列是等价的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;a string&apos;和&apos;a&apos; &apos; &apos; &apos;string&apos;是等价的</span><br></pre></td></tr></table></figure></p>
+<p>如果启用了SQL模式ANSI_QUOTES，则只能在单引号内引用字符串，因为双引号内引用的字符串将被解释为标识符。<br>字符串分为二进制字符串和非二进制字符串，二进制字符串的单元为字节，非二进制字符串的单元为字符（有些编码，一个字符用多个字节表示，因此不一定为一个字节），二进制字符串排序时比较的为字符串中各个字节的数字值，非二进制字符串比较的为各个字符对应的数值码值（可见，对于非二进制字符串，不同字符集下，同一个字符串底层存储可以不同，同一个码值也可以不同，因此排序大小也就不同了）。二进制字符串可以理解为字节流。字符串文字可以包含一个可选的字符集引导器和COLLATE子句，以将其指定为特定的字符集和排序规则:<br>[_charset_name]’string’ [COLLATE collation_name]<br>例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> _latin1<span class="string">'string'</span>; </span><br><span class="line"><span class="keyword">SELECT</span> _binary<span class="string">'string'</span>; </span><br><span class="line"><span class="keyword">SELECT</span> _utf8<span class="string">'string'</span> <span class="keyword">COLLATE</span> utf8_danish_ci;</span><br></pre></td></tr></table></figure></p>
+<p>时候MySQL就将字符串按指定的字符集编码，例子如下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select _latin1'许富博';</span><br><span class="line">+<span class="comment">--------------------+</span></span><br><span class="line">| è®¸å¯Œåš          |</span><br><span class="line">+<span class="comment">--------------------+</span></span><br><span class="line">| è®¸å¯Œåš          |</span><br><span class="line">+<span class="comment">--------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> _gbk<span class="string">'许富博'</span>;</span><br><span class="line">+<span class="comment">--------------+</span></span><br><span class="line">| 璁稿瘜鍗     |</span><br><span class="line">+<span class="comment">--------------+</span></span><br><span class="line">| 璁稿瘜鍗     |</span><br><span class="line">+<span class="comment">--------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="string">``</span><span class="string">`  </span></span><br><span class="line"><span class="string">为什么作图第一个为乱码呢？因为MySQL将字符按照latin1编码，而我的屏幕是UTF8编码，这样，第一个就是乱码了。再比如，你用gbk，依然是乱码.  </span></span><br><span class="line"><span class="string">你也可以使用N'literal'(or n'literal') 创建国家字符集的字符串。例如，如果国家字符集为utf8，则以下等价：  </span></span><br><span class="line"><span class="string">`</span><span class="string">``</span><span class="keyword">sql</span></span><br><span class="line"><span class="keyword">SELECT</span> N<span class="string">'some text'</span>;</span><br><span class="line"><span class="keyword">SELECT</span> n<span class="string">'some text'</span>;</span><br><span class="line"><span class="keyword">SELECT</span> _utf8<span class="string">'some text'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>有关这些字符串语法形式的信息,见<a href="https://dev.mysql.com/doc/refman/8.0/en/charset-national.html" target="_blank" rel="noopener">The National Character Set</a>，<a href="https://dev.mysql.com/doc/refman/8.0/en/charset-introducer.html" target="_blank" rel="noopener">Character Set Introducers</a>。<br>在字符串中，某些序列具有特殊的含义，除非启用了SQL模式NO_BACKSLASH_ESCAPES。这些序列都以反斜杠（\）开头，称为转义字符。MySQL识别下边的转义字符。对不在表中的其他转义序列，会忽略反斜线，像没有被转义一样。例如：\x表示x。转义序列区分大小写。例如， \b被解释为退格，但 \B被解释为B。MySQL依据系统变量 character_set_connection指定的字符集对转义进行处理。即使在前面指定了不同字符集导引器的字符串也是如此。  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/7-backup_and_recovery/7-Backup_and_Recovery/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/11-data_type/1-Numeric Types/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#语言结构"><span class="nav-number">1.</span> <span class="nav-text">语言结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、字面值"><span class="nav-number">1.1.</span> <span class="nav-text">1、字面值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-字符串字面值"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 字符串字面值</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

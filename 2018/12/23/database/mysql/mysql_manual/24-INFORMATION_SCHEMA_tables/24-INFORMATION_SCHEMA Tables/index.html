@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,数据库,MySQL元数据,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="INFORMATION_SCHEMA的表INFORMATION_SCHEMA提供对数据库元数据的访问 ，这些元数据又称为数据字典或者系统目录。INFORMATION_SCHEMA是每个MySQL实例中的一个数据库，它存储有关MySQL服务器维护的所有其他数据库对象的信息。INFORMATION_SCHEMA数据库包含多个只读表。它们实际上是视图，而不是基表，因此没有与它们关联的文件，并且也无法在它">
+<meta name="keywords" content="MySQL,数据库,MySQL元数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="INFORMATION_SCHEMA 表">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/24-INFORMATION_SCHEMA_tables/24-INFORMATION_SCHEMA Tables/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="INFORMATION_SCHEMA的表INFORMATION_SCHEMA提供对数据库元数据的访问 ，这些元数据又称为数据字典或者系统目录。INFORMATION_SCHEMA是每个MySQL实例中的一个数据库，它存储有关MySQL服务器维护的所有其他数据库对象的信息。INFORMATION_SCHEMA数据库包含多个只读表。它们实际上是视图，而不是基表，因此没有与它们关联的文件，并且也无法在它">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-23T11:48:19.608Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="INFORMATION_SCHEMA 表">
+<meta name="twitter:description" content="INFORMATION_SCHEMA的表INFORMATION_SCHEMA提供对数据库元数据的访问 ，这些元数据又称为数据字典或者系统目录。INFORMATION_SCHEMA是每个MySQL实例中的一个数据库，它存储有关MySQL服务器维护的所有其他数据库对象的信息。INFORMATION_SCHEMA数据库包含多个只读表。它们实际上是视图，而不是基表，因此没有与它们关联的文件，并且也无法在它">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/24-INFORMATION_SCHEMA_tables/24-INFORMATION_SCHEMA Tables/">
+
+
+
+
+
+  <title>INFORMATION_SCHEMA 表 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/24-INFORMATION_SCHEMA_tables/24-INFORMATION_SCHEMA Tables/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">INFORMATION_SCHEMA 表</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T18:06:59+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL-manual/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL manual</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="INFORMATION-SCHEMA的表"><a href="#INFORMATION-SCHEMA的表" class="headerlink" title="INFORMATION_SCHEMA的表"></a>INFORMATION_SCHEMA的表</h1><p>INFORMATION_SCHEMA提供对数据库元数据的访问 ，这些元数据又称为数据字典或者系统目录。INFORMATION_SCHEMA是每个MySQL实例中的一个数据库，它存储有关MySQL服务器维护的所有其他数据库对象的信息。INFORMATION_SCHEMA数据库包含多个只读表。它们实际上是视图，而不是基表，因此没有与它们关联的文件，并且也无法在它们上设置触发器。此外，没有该名称的数据库目录。INFORMATION_SCHEMA中的表（视图）只能select，而不能insert、update、delete语句。<br>INFORMATION_SCHEMA也是show语句的替代方案，使用INFORMATION_SCHEMA替代show具有如下优点：  </p>
+<ul>
+<li>它符合Codd的规则，因为所有的访问都是在表上完成的。  </li>
+<li>你可以使用熟悉的SELECT语句语法，只需要学习一些表名和列名。  </li>
+<li>实现者无需担心添加关键字。（这个比较好，只需要学习表和列的定义就可以了）  </li>
+<li>你可以在select时对结果进行筛选、排序等，通过你想要的形式查询。  </li>
+<li>这种技术与其他数据库系统更具互操作性。<br>每个MySQL用户都有权访问这些表，但只能看到表中与用户具有适当访问权限的对象相对应的行。<br>INFORMATION_SCHEMA从多个数据库搜索信息的查询可能需要很长时间并影响性能。这一点要注意。<br>现在我们看看mysql8.0.11的INFORMATION_SCHEMA数据库中都有哪些表。  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> information_schema;</span><br><span class="line"><span class="keyword">show</span> <span class="keyword">tables</span>;</span><br><span class="line">+<span class="comment">---------------------------------------+</span></span><br><span class="line">| Tables_in_information_schema          |</span><br><span class="line">+<span class="comment">---------------------------------------+</span></span><br><span class="line">| CHARACTER_SETS                        |</span><br><span class="line">| COLLATIONS                            |</span><br><span class="line">| COLLATION_CHARACTER_SET_APPLICABILITY |</span><br><span class="line">| COLUMNS                               |</span><br><span class="line">| COLUMN_PRIVILEGES                     |</span><br><span class="line">| COLUMN_STATISTICS                     |</span><br><span class="line">| ENGINES                               |</span><br><span class="line">| EVENTS                                |</span><br><span class="line">| FILES                                 |</span><br><span class="line">| INNODB_BUFFER_PAGE                    |</span><br><span class="line">| INNODB_BUFFER_PAGE_LRU                |</span><br><span class="line">| INNODB_BUFFER_POOL_STATS              |</span><br><span class="line">| INNODB_CACHED_INDEXES                 |</span><br><span class="line">| INNODB_CMP                            |</span><br><span class="line">| INNODB_CMPMEM                         |</span><br><span class="line">| INNODB_CMPMEM_RESET                   |</span><br><span class="line">| INNODB_CMP_PER_INDEX                  |</span><br><span class="line">| INNODB_CMP_PER_INDEX_RESET            |</span><br><span class="line">| INNODB_CMP_RESET                      |</span><br><span class="line">| INNODB_COLUMNS                        |</span><br><span class="line">| INNODB_DATAFILES                      |</span><br><span class="line">| INNODB_FIELDS                         |</span><br><span class="line">| INNODB_FOREIGN                        |</span><br><span class="line">| INNODB_FOREIGN_COLS                   |</span><br><span class="line">| INNODB_FT_BEING_DELETED               |</span><br><span class="line">| INNODB_FT_CONFIG                      |</span><br><span class="line">| INNODB_FT_DEFAULT_STOPWORD            |</span><br><span class="line">| INNODB_FT_DELETED                     |</span><br><span class="line">| INNODB_FT_INDEX_CACHE                 |</span><br><span class="line">| INNODB_FT_INDEX_TABLE                 |</span><br><span class="line">| INNODB_INDEXES                        |</span><br><span class="line">| INNODB_METRICS                        |</span><br><span class="line">| INNODB_TABLES                         |</span><br><span class="line">| INNODB_TABLESPACES                    |</span><br><span class="line">| INNODB_TABLESPACES_BRIEF              |</span><br><span class="line">| INNODB_TABLESTATS                     |</span><br><span class="line">| INNODB_TEMP_TABLE_INFO                |</span><br><span class="line">| INNODB_TRX                            |</span><br><span class="line">| INNODB_VIRTUAL                        |</span><br><span class="line">| KEYWORDS                              |</span><br><span class="line">| KEY_COLUMN_USAGE                      |</span><br><span class="line">| OPTIMIZER_TRACE                       |</span><br><span class="line">| PARAMETERS                            |</span><br><span class="line">| PARTITIONS                            |</span><br><span class="line">| PLUGINS                               |</span><br><span class="line">| PROCESSLIST                           |</span><br><span class="line">| PROFILING                             |</span><br><span class="line">| REFERENTIAL_CONSTRAINTS               |</span><br><span class="line">| RESOURCE_GROUPS                       |</span><br><span class="line">| ROUTINES                              |</span><br><span class="line">| SCHEMATA                              |</span><br><span class="line">| SCHEMA_PRIVILEGES                     |</span><br><span class="line">| STATISTICS                            |</span><br><span class="line">| ST_GEOMETRY_COLUMNS                   |</span><br><span class="line">| ST_SPATIAL_REFERENCE_SYSTEMS          |</span><br><span class="line">| TABLES                                |</span><br><span class="line">| TABLESPACES                           |</span><br><span class="line">| TABLE_CONSTRAINTS                     |</span><br><span class="line">| TABLE_PRIVILEGES                      |</span><br><span class="line">| TRIGGERS                              |</span><br><span class="line">| USER_PRIVILEGES                       |</span><br><span class="line">| VIEWS                                 |</span><br><span class="line">+<span class="comment">---------------------------------------+</span></span><br><span class="line">62 rows in <span class="keyword">set</span> (<span class="number">0.08</span> sec)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="1、CHARACTER-SETS"><a href="#1、CHARACTER-SETS" class="headerlink" title="1、CHARACTER_SETS"></a>1、CHARACTER_SETS</h2><p>CHARACTER_SETS表提供可用字符集的信息。以下语句是等价的：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> INFORMATION_SCHEMA.CHARACTER_SETS</span><br><span class="line">  [<span class="keyword">WHERE</span> CHARACTER_SET_NAME <span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="built_in">CHARACTER</span> <span class="keyword">SET</span></span><br><span class="line">  [<span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br></pre></td></tr></table></figure></p>
+<h2 id="2、COLLATIONS"><a href="#2、COLLATIONS" class="headerlink" title="2、COLLATIONS"></a>2、COLLATIONS</h2><p>COLLATIONS表提供了有关每个字符集的排序规则的信息。以下语句是等价的：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> COLLATION_NAME <span class="keyword">FROM</span> INFORMATION_SCHEMA.COLLATIONS</span><br><span class="line">  [<span class="keyword">WHERE</span> COLLATION_NAME <span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">COLLATION</span></span><br><span class="line">  [<span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br></pre></td></tr></table></figure></p>
+<h2 id="3、COLLATION-CHARACTER-SET-APPLICABILITY"><a href="#3、COLLATION-CHARACTER-SET-APPLICABILITY" class="headerlink" title="3、COLLATION_CHARACTER_SET_APPLICABILITY"></a>3、COLLATION_CHARACTER_SET_APPLICABILITY</h2><p>COLLATION_CHARACTER_SET_APPLICABILITY表指示什么字符集适用于什么排序规则。这些列等同于我们从SHOW COLLATION中获得的前两个字段。  </p>
+<h2 id="4、COLUMNS"><a href="#4、COLUMNS" class="headerlink" title="4、COLUMNS"></a>4、COLUMNS</h2><p>COLUMNS表提供有关表中列的信息。如下语句基本等同：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT</span><br><span class="line">  <span class="keyword">FROM</span> INFORMATION_SCHEMA.COLUMNS</span><br><span class="line">  <span class="keyword">WHERE</span> table_name = <span class="string">'tbl_name'</span></span><br><span class="line">  [<span class="keyword">AND</span> table_schema = <span class="string">'db_name'</span>]</span><br><span class="line">  [<span class="keyword">AND</span> column_name <span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">COLUMNS</span></span><br><span class="line">  <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  [<span class="keyword">FROM</span> db_name]</span><br><span class="line">  [<span class="keyword">LIKE</span> <span class="string">'wild'</span>]  </span><br><span class="line">查询一下哪些表中有<span class="keyword">id</span>列：  </span><br><span class="line">mysql&gt; <span class="keyword">select</span> TABLE_NAME, TABLE_SCHEMA  <span class="keyword">from</span> <span class="keyword">columns</span> <span class="keyword">where</span> column_name=<span class="string">'id'</span>;</span><br><span class="line">+<span class="comment">----------------------+--------------------+</span></span><br><span class="line">| TABLE_NAME           | TABLE_SCHEMA       |</span><br><span class="line">+<span class="comment">----------------------+--------------------+</span></span><br><span class="line">| COLLATIONS           | information_schema |</span><br><span class="line">| INNODB_FOREIGN       | information_schema |</span><br><span class="line">| INNODB_FOREIGN_COLS  | information_schema |</span><br><span class="line">| PROCESSLIST          | information_schema |</span><br><span class="line">| slave_relay_log_info | mysql              |</span><br><span class="line">| slave_worker_info    | mysql              |</span><br><span class="line">| t2                   | test               |</span><br><span class="line">+<span class="comment">----------------------+--------------------+</span></span><br><span class="line">7 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h2 id="5、COLUMN-PRIVILEGES"><a href="#5、COLUMN-PRIVILEGES" class="headerlink" title="5、COLUMN_PRIVILEGES"></a>5、COLUMN_PRIVILEGES</h2><p>COLUMN_PRIVILEGES表提供了有关列权限的信息。这些信息来自mysql.columns_priv授权表。  </p>
+<h2 id="6、COLUMN-STATISTICS"><a href="#6、COLUMN-STATISTICS" class="headerlink" title="6、COLUMN_STATISTICS"></a>6、COLUMN_STATISTICS</h2><p>COLUMN_STATISTICS表是一个视图，用于访问column_statistics数据字典表中的信息，该表存储有关列值的直方图统计信息。  </p>
+<h2 id="7、ENGINES"><a href="#7、ENGINES" class="headerlink" title="7、ENGINES"></a>7、ENGINES</h2><p>ENGINES表提供了关于存储引擎的信息。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from ENGINES;</span><br><span class="line">+<span class="comment">--------------------+---------+----------------------------------------------------------------+--------------+------+------------+</span></span><br><span class="line">| ENGINE             | SUPPORT | <span class="keyword">COMMENT</span>                                                        | TRANSACTIONS | XA   | SAVEPOINTS |</span><br><span class="line">+<span class="comment">--------------------+---------+----------------------------------------------------------------+--------------+------+------------+</span></span><br><span class="line">| <span class="keyword">ARCHIVE</span>            | YES     | <span class="keyword">Archive</span> <span class="keyword">storage</span> <span class="keyword">engine</span>                                         | <span class="keyword">NO</span>           | <span class="keyword">NO</span>   | <span class="keyword">NO</span>         |</span><br><span class="line">| CSV                | YES     | CSV <span class="keyword">storage</span> <span class="keyword">engine</span>                                             | <span class="keyword">NO</span>           | <span class="keyword">NO</span>   | <span class="keyword">NO</span>         |</span><br><span class="line">| PERFORMANCE_SCHEMA | YES     | <span class="keyword">Performance</span> <span class="keyword">Schema</span>                                             | <span class="keyword">NO</span>           | <span class="keyword">NO</span>   | <span class="keyword">NO</span>         |</span><br><span class="line">| <span class="keyword">InnoDB</span>             | <span class="keyword">DEFAULT</span> | Supports transactions, <span class="keyword">row</span>-<span class="keyword">level</span> locking, <span class="keyword">and</span> <span class="keyword">foreign</span> <span class="keyword">keys</span>     | YES          | YES  | YES        |</span><br><span class="line">| <span class="keyword">MEMORY</span>             | YES     | <span class="keyword">Hash</span> based, <span class="keyword">stored</span> <span class="keyword">in</span> <span class="keyword">memory</span>, useful <span class="keyword">for</span> <span class="keyword">temporary</span> <span class="keyword">tables</span>      | <span class="keyword">NO</span>           | <span class="keyword">NO</span>   | <span class="keyword">NO</span>         |</span><br><span class="line">| MyISAM             | YES     | MyISAM <span class="keyword">storage</span> <span class="keyword">engine</span>                                          | <span class="keyword">NO</span>           | <span class="keyword">NO</span>   | <span class="keyword">NO</span>         |</span><br><span class="line">| FEDERATED          | <span class="keyword">NO</span>      | Federated MySQL <span class="keyword">storage</span> <span class="keyword">engine</span>                                 | <span class="literal">NULL</span>         | <span class="literal">NULL</span> | <span class="literal">NULL</span>       |</span><br><span class="line">| MRG_MYISAM         | YES     | Collection <span class="keyword">of</span> identical MyISAM <span class="keyword">tables</span>                          | <span class="keyword">NO</span>           | <span class="keyword">NO</span>   | <span class="keyword">NO</span>         |</span><br><span class="line">| BLACKHOLE          | YES     | /dev/<span class="literal">null</span> <span class="keyword">storage</span> <span class="keyword">engine</span> (anything you write <span class="keyword">to</span> it disappears) | <span class="keyword">NO</span>           | <span class="keyword">NO</span>   | <span class="keyword">NO</span>         |</span><br><span class="line">+<span class="comment">--------------------+---------+----------------------------------------------------------------+--------------+------+------------+</span></span><br><span class="line"><span class="number">9</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.02</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h2 id="8、EVENTS"><a href="#8、EVENTS" class="headerlink" title="8、EVENTS"></a>8、EVENTS</h2><p>EVENTS表提供了关于预定事件的信息。例如：<br>用户jon@ghidora创建一个名为e_daily的事件，并在几分钟后使用ALTER EVENT语句修改它:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="keyword">test</span>;</span><br><span class="line">DELIMITER |</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EVENT</span> e_daily</span><br><span class="line">    <span class="keyword">ON</span> SCHEDULE</span><br><span class="line">      EVERY <span class="number">1</span> <span class="keyword">DAY</span></span><br><span class="line">    <span class="keyword">COMMENT</span> <span class="string">'Saves total number of sessions then clears the table each day'</span></span><br><span class="line">    <span class="keyword">DO</span></span><br><span class="line">      <span class="keyword">BEGIN</span></span><br><span class="line">        <span class="keyword">INSERT</span> <span class="keyword">INTO</span> site_activity.totals (<span class="built_in">time</span>, total)</span><br><span class="line">          <span class="keyword">SELECT</span> <span class="keyword">CURRENT_TIMESTAMP</span>, <span class="keyword">COUNT</span>(*)</span><br><span class="line">            <span class="keyword">FROM</span> site_activity.sessions;</span><br><span class="line">        <span class="keyword">DELETE</span> <span class="keyword">FROM</span> site_activity.sessions;</span><br><span class="line">      <span class="keyword">END</span> |</span><br><span class="line"></span><br><span class="line">DELIMITER ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">EVENT</span> e_daily</span><br><span class="line">    <span class="keyword">ENABLE</span>;</span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT * FROM INFORMATION_SCHEMA.EVENTS WHERE EVENT_NAME = 'e_daily' AND EVENT_SCHEMA = 'test'\G;</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">       EVENT_CATALOG: def</span><br><span class="line">        EVENT_SCHEMA: test</span><br><span class="line">          EVENT_NAME: e_daily</span><br><span class="line">             DEFINER: root@localhost</span><br><span class="line">           TIME_ZONE: SYSTEM</span><br><span class="line">          EVENT_BODY: SQL</span><br><span class="line">    EVENT_DEFINITION: <span class="keyword">BEGIN</span></span><br><span class="line">        <span class="keyword">INSERT</span> <span class="keyword">INTO</span> site_activity.totals (<span class="built_in">time</span>, total)</span><br><span class="line">          <span class="keyword">SELECT</span> <span class="keyword">CURRENT_TIMESTAMP</span>, <span class="keyword">COUNT</span>(*)</span><br><span class="line">            <span class="keyword">FROM</span> site_activity.sessions;</span><br><span class="line">        <span class="keyword">DELETE</span> <span class="keyword">FROM</span> site_activity.sessions;</span><br><span class="line">      <span class="keyword">END</span></span><br><span class="line">          EVENT_TYPE: RECURRING</span><br><span class="line">          EXECUTE_AT: <span class="literal">NULL</span></span><br><span class="line">      INTERVAL_VALUE: <span class="number">1</span></span><br><span class="line">      INTERVAL_FIELD: <span class="keyword">DAY</span></span><br><span class="line">            SQL_MODE: ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION</span><br><span class="line">              STARTS: <span class="number">2018</span><span class="number">-06</span><span class="number">-03</span> <span class="number">00</span>:<span class="number">14</span>:<span class="number">07</span></span><br><span class="line">                ENDS: <span class="literal">NULL</span></span><br><span class="line">              <span class="keyword">STATUS</span>: ENABLED</span><br><span class="line">       ON_COMPLETION: <span class="keyword">NOT</span> <span class="keyword">PRESERVE</span></span><br><span class="line">             CREATED: <span class="number">2018</span><span class="number">-06</span><span class="number">-03</span> <span class="number">00</span>:<span class="number">14</span>:<span class="number">07</span></span><br><span class="line">        LAST_ALTERED: <span class="number">2018</span><span class="number">-06</span><span class="number">-03</span> <span class="number">00</span>:<span class="number">14</span>:<span class="number">07</span></span><br><span class="line">       LAST_EXECUTED: <span class="number">2018</span><span class="number">-06</span><span class="number">-02</span> <span class="number">16</span>:<span class="number">14</span>:<span class="number">07</span></span><br><span class="line">       EVENT_COMMENT: Saves total <span class="built_in">number</span> <span class="keyword">of</span> sessions <span class="keyword">then</span> clears the <span class="keyword">table</span> <span class="keyword">each</span> <span class="keyword">day</span></span><br><span class="line">          ORIGINATOR: <span class="number">1</span></span><br><span class="line">CHARACTER_SET_CLIENT: utf8mb4</span><br><span class="line">COLLATION_CONNECTION: utf8mb4_0900_ai_ci</span><br><span class="line">  DATABASE_COLLATION: utf8_general_ci</span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h2 id="9、FILES"><a href="#9、FILES" class="headerlink" title="9、FILES"></a>9、FILES</h2><p>FILES表提供有关存储MySQL表空间数据的文件的信息。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt;SELECT FILE_ID, FILE_NAME, FILE_TYPE, TABLESPACE_NAME, FREE_EXTENTS, TOTAL_EXTENTS,</span><br><span class="line">EXTENT_SIZE, INITIAL_SIZE, MAXIMUM_SIZE, AUTOEXTEND_SIZE, DATA_FREE, STATUS ENGINE</span><br><span class="line">FROM INFORMATION_SCHEMA.FILES \G</span><br></pre></td></tr></table></figure></p>
+<h2 id="10、KEY-COLUMN-USAGE"><a href="#10、KEY-COLUMN-USAGE" class="headerlink" title="10、KEY_COLUMN_USAGE"></a>10、KEY_COLUMN_USAGE</h2><p>KEY_COLUMN_USAGE表描述了哪些键列有约束条件。即这个列上有索引，而且还有其他约束。例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="keyword">test</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t1</span><br><span class="line">(</span><br><span class="line">    s1 <span class="built_in">INT</span>,</span><br><span class="line">    s2 <span class="built_in">INT</span>,</span><br><span class="line">    s3 <span class="built_in">INT</span>,</span><br><span class="line">    PRIMARY <span class="keyword">KEY</span>(s3)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t3</span><br><span class="line">(</span><br><span class="line">    s1 <span class="built_in">INT</span>,</span><br><span class="line">    s2 <span class="built_in">INT</span>,</span><br><span class="line">    s3 <span class="built_in">INT</span>,</span><br><span class="line">    <span class="keyword">KEY</span>(s1),</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> CO <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span> (s2) <span class="keyword">REFERENCES</span> t1(s3)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span>;</span><br><span class="line">mysql&gt; select * from KEY_COLUMN_USAGE where TABLE_SCHEMA='test' \G;</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">           CONSTRAINT_CATALOG: def</span><br><span class="line">            CONSTRAINT_SCHEMA: test</span><br><span class="line">              CONSTRAINT_NAME: PRIMARY</span><br><span class="line">                TABLE_CATALOG: def</span><br><span class="line">                 TABLE_SCHEMA: test</span><br><span class="line">                   TABLE_NAME: t1</span><br><span class="line">                  COLUMN_NAME: s3</span><br><span class="line">             ORDINAL_POSITION: 1</span><br><span class="line">POSITION_IN_UNIQUE_CONSTRAINT: NULL</span><br><span class="line">      REFERENCED_TABLE_SCHEMA: NULL</span><br><span class="line">        REFERENCED_TABLE_NAME: NULL</span><br><span class="line">       REFERENCED_COLUMN_NAME: NULL</span><br><span class="line">*************************** 2. row ***************************</span><br><span class="line">           CONSTRAINT_CATALOG: def</span><br><span class="line">            CONSTRAINT_SCHEMA: test</span><br><span class="line">              CONSTRAINT_NAME: CO</span><br><span class="line">                TABLE_CATALOG: def</span><br><span class="line">                 TABLE_SCHEMA: test</span><br><span class="line">                   TABLE_NAME: t3</span><br><span class="line">                  COLUMN_NAME: s2</span><br><span class="line">             ORDINAL_POSITION: 1</span><br><span class="line">POSITION_IN_UNIQUE_CONSTRAINT: 1</span><br><span class="line">      REFERENCED_TABLE_SCHEMA: test</span><br><span class="line">        REFERENCED_TABLE_NAME: t1</span><br><span class="line">       REFERENCED_COLUMN_NAME: s3</span><br><span class="line">2 rows in <span class="keyword">set</span>, <span class="number">2</span> <span class="keyword">warnings</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>如果约束是外键，那么将显示外键列，而不是外键引用的列。  </p>
+<h2 id="11、KEYWORDS"><a href="#11、KEYWORDS" class="headerlink" title="11、KEYWORDS"></a>11、KEYWORDS</h2><p>KEYWORDS表列出了MySQL考虑的关键字。并且有一个表示该关键字是否保留的字段。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> INFORMATION_SCHEMA.KEYWORDS;</span><br><span class="line"><span class="keyword">SELECT</span> WORD <span class="keyword">FROM</span> INFORMATION_SCHEMA.KEYWORDS <span class="keyword">WHERE</span> RESERVED = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">SELECT</span> WORD <span class="keyword">FROM</span> INFORMATION_SCHEMA.KEYWORDS <span class="keyword">WHERE</span> RESERVED = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> WORD <span class="keyword">FROM</span> INFORMATION_SCHEMA.KEYWORDS <span class="keyword">WHERE</span> RESERVED;</span><br><span class="line"><span class="keyword">SELECT</span> WORD <span class="keyword">FROM</span> INFORMATION_SCHEMA.KEYWORDS <span class="keyword">WHERE</span> <span class="keyword">NOT</span> RESERVED;</span><br></pre></td></tr></table></figure></p>
+<h2 id="12、OPTIMIZER-TRACE"><a href="#12、OPTIMIZER-TRACE" class="headerlink" title="12、OPTIMIZER_TRACE"></a>12、OPTIMIZER_TRACE</h2><p>OPTIMIZER_TRACE表提供了优化器跟踪功能产生的信息。要启用跟踪，请使用 optimizer_trace系统变量。  </p>
+<h2 id="13、PARAMETERS"><a href="#13、PARAMETERS" class="headerlink" title="13、PARAMETERS"></a>13、PARAMETERS</h2><p>PARAMETERS表提供有关存储过程和函数参数的信息，以及有关存储函数的返回值的信息。  </p>
+<h2 id="14、PARTITIONS"><a href="#14、PARTITIONS" class="headerlink" title="14、PARTITIONS"></a>14、PARTITIONS</h2><p>PARTITIONS表提供有关表分区的信息。有关分区表的信息，见<a href="https://dev.mysql.com/doc/refman/8.0/en/partitioning.html" target="_blank" rel="noopener">分区</a>。<br>例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tp (</span><br><span class="line">    c1 <span class="built_in">INT</span>,</span><br><span class="line">    c2 <span class="built_in">INT</span>,</span><br><span class="line">    c3 <span class="built_in">VARCHAR</span>(<span class="number">25</span>)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> <span class="keyword">HASH</span>(c1 + c2)</span><br><span class="line"><span class="keyword">PARTITIONS</span> <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT DISTINCT PARTITION_EXPRESSION</span><br><span class="line">     &gt;     FROM INFORMATION_SCHEMA.PARTITIONS</span><br><span class="line">     &gt;     WHERE TABLE_NAME='tp' AND TABLE_SCHEMA='test';</span><br><span class="line">+<span class="comment">----------------------+</span></span><br><span class="line">| PARTITION_EXPRESSION |</span><br><span class="line">+<span class="comment">----------------------+</span></span><br><span class="line">| c1 + c2              |</span><br><span class="line">+<span class="comment">----------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.09</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h2 id="15、PLUGINS"><a href="#15、PLUGINS" class="headerlink" title="15、PLUGINS"></a>15、PLUGINS</h2><p>PLUGINS表提供了有关服务器插件的信息。例如如下语句是等价的：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">  PLUGIN_NAME, PLUGIN_STATUS, PLUGIN_TYPE,</span><br><span class="line">  PLUGIN_LIBRARY, PLUGIN_LICENSE</span><br><span class="line"><span class="keyword">FROM</span> INFORMATION_SCHEMA.PLUGINS;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> PLUGINS;</span><br></pre></td></tr></table></figure></p>
+<h2 id="16、PROCESSLIST"><a href="#16、PROCESSLIST" class="headerlink" title="16、PROCESSLIST"></a>16、PROCESSLIST</h2><p>PROCESSLIST表提供有关哪些线程正在运行的信息。例如，如下语句是等价的：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> INFORMATION_SCHEMA.PROCESSLIST</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">FULL</span> <span class="keyword">PROCESSLIST</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="17、PROFILING"><a href="#17、PROFILING" class="headerlink" title="17、PROFILING"></a>17、PROFILING</h2><p>PROFILING表提供语句分析信息。将来会在mysql中删除，改用<a href="https://dev.mysql.com/doc/refman/8.0/en/performance-schema.html" target="_blank" rel="noopener">Chapter 25, MySQL Performance</a>。  </p>
+<h2 id="18、REFERENTIAL-CONSTRAINTS"><a href="#18、REFERENTIAL-CONSTRAINTS" class="headerlink" title="18、REFERENTIAL_CONSTRAINTS"></a>18、REFERENTIAL_CONSTRAINTS</h2><p>REFERENTIAL_CONSTRAINTS表提供有关外键的信息。  </p>
+<h2 id="19、RESOURCE-GROUPS"><a href="#19、RESOURCE-GROUPS" class="headerlink" title="19、RESOURCE_GROUPS"></a>19、RESOURCE_GROUPS</h2><p>RESOURCE_GROUPS表是一个视图，用于访问resource_groups定义资源组的数据字典表中的信息。  </p>
+<h2 id="20、ROUTINES"><a href="#20、ROUTINES" class="headerlink" title="20、ROUTINES"></a>20、ROUTINES</h2><p>ROUTINES表提供有关存储例程的信息（包括存储过程和函数）。ROUTINES表不包含用户定义的函数（UDF）。  </p>
+<h2 id="21、SCHEMATA"><a href="#21、SCHEMATA" class="headerlink" title="21、SCHEMATA"></a>21、SCHEMATA</h2><p>schema是数据库，因此SCHEMATA表提供有关数据库的信息。例如下列语句是等价的：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> SCHEMA_NAME <span class="keyword">AS</span> <span class="string">`Database`</span></span><br><span class="line">  <span class="keyword">FROM</span> INFORMATION_SCHEMA.SCHEMATA</span><br><span class="line">  [<span class="keyword">WHERE</span> SCHEMA_NAME <span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">DATABASES</span></span><br><span class="line">  [<span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br></pre></td></tr></table></figure></p>
+<h2 id="22、SCHEMA-PRIVILEGES"><a href="#22、SCHEMA-PRIVILEGES" class="headerlink" title="22、SCHEMA_PRIVILEGES"></a>22、SCHEMA_PRIVILEGES</h2><p>SCHEMA_PRIVILEGES表提供有关schema（数据库）特权的信息。这些信息来自mysql.db授权表。例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> SCHEMA_PRIVILEGES;</span><br><span class="line">+<span class="comment">-----------------------------+---------------+--------------------+-------------------------+--------------+</span></span><br><span class="line">| GRANTEE                     | TABLE_CATALOG | TABLE_SCHEMA       | PRIVILEGE_TYPE          | IS_GRANTABLE |</span><br><span class="line">+<span class="comment">-----------------------------+---------------+--------------------+-------------------------+--------------+</span></span><br><span class="line">| 'mysql.sys'@'localhost'     | def           | sys                | TRIGGER                 | NO           |</span><br><span class="line">| 'mysql.session'@'localhost' | def           | performance_schema | <span class="keyword">SELECT</span>                  | <span class="keyword">NO</span>           |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">SELECT</span>                  | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">INSERT</span>                  | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">UPDATE</span>                  | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">DELETE</span>                  | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">CREATE</span>                  | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">DROP</span>                    | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">REFERENCES</span>              | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">INDEX</span>                   | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">ALTER</span>                   | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">TABLES</span> | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">LOCK</span> <span class="keyword">TABLES</span>             | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">EXECUTE</span>                 | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">CREATE</span> <span class="keyword">VIEW</span>             | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">SHOW</span> <span class="keyword">VIEW</span>               | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">CREATE</span> ROUTINE          | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">ALTER</span> ROUTINE           | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">EVENT</span>                   | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                  | <span class="keyword">def</span>           | <span class="keyword">test</span>               | <span class="keyword">TRIGGER</span>                 | YES          |</span><br><span class="line">+<span class="comment">-----------------------------+---------------+--------------------+-------------------------+--------------+</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="23、STATISTICS"><a href="#23、STATISTICS" class="headerlink" title="23、STATISTICS"></a>23、STATISTICS</h2><p>STATISTICS表提供有关表索引的信息。如下语句是等价的：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> INFORMATION_SCHEMA.STATISTICS</span><br><span class="line">  <span class="keyword">WHERE</span> table_name = <span class="string">'tbl_name'</span></span><br><span class="line">  <span class="keyword">AND</span> table_schema = <span class="string">'db_name'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">INDEX</span></span><br><span class="line">  <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  <span class="keyword">FROM</span> db_name</span><br></pre></td></tr></table></figure></p>
+<h2 id="24、ST-GEOMETRY-COLUMNS"><a href="#24、ST-GEOMETRY-COLUMNS" class="headerlink" title="24、ST_GEOMETRY_COLUMNS"></a>24、ST_GEOMETRY_COLUMNS</h2><p>ST_GEOMETRY_COLUMNS表提供了有关存储空间数据的表列的信息。</p>
+<h2 id="25、ST-SPATIAL-REFERENCE-SYSTEMS"><a href="#25、ST-SPATIAL-REFERENCE-SYSTEMS" class="headerlink" title="25、ST_SPATIAL_REFERENCE_SYSTEMS"></a>25、ST_SPATIAL_REFERENCE_SYSTEMS</h2><p>ST_SPATIAL_REFERENCE_SYSTEMS表提供了有关空间数据的可用空间参照系的信息。  </p>
+<h2 id="26、TABLES"><a href="#26、TABLES" class="headerlink" title="26、TABLES"></a>26、TABLES</h2><p>TABLES表提供有关数据库中表的信息。例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> table_name <span class="keyword">FROM</span> INFORMATION_SCHEMA.TABLES</span><br><span class="line">  <span class="keyword">WHERE</span> table_schema = <span class="string">'db_name'</span></span><br><span class="line">  [<span class="keyword">AND</span> table_name <span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">TABLES</span></span><br><span class="line">  <span class="keyword">FROM</span> db_name</span><br><span class="line">  [<span class="keyword">LIKE</span> <span class="string">'wild'</span>]</span><br></pre></td></tr></table></figure></p>
+<h2 id="27、TABLESPACES"><a href="#27、TABLESPACES" class="headerlink" title="27、TABLESPACES"></a>27、TABLESPACES</h2><p>TABLESPACES表提供有关活动表空间的信息。<br><strong><em>说明：TABLESPACES表不提供有关InnoDB表空间的信息。对于InnoDB表空间的元数据，请参阅INNODB_TABLESPACES和 INNODB_DATAFILES。INFORMATION_SCHEMA.FILES表也提供InnoDB表空间的元数据。</em></strong>  </p>
+<h2 id="28、TABLE-CONSTRAINTS"><a href="#28、TABLE-CONSTRAINTS" class="headerlink" title="28、TABLE_CONSTRAINTS"></a>28、TABLE_CONSTRAINTS</h2><p>TABLE_CONSTRAINTS表描述哪些表有约束。  </p>
+<h2 id="29、TABLE-PRIVILEGES"><a href="#29、TABLE-PRIVILEGES" class="headerlink" title="29、TABLE_PRIVILEGES"></a>29、TABLE_PRIVILEGES</h2><p>TABLE_PRIVILEGES表提供有关表特权的信息。这些信息来自mysql.tables_priv授权表。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> TABLE_PRIVILEGES;</span><br><span class="line">+<span class="comment">-----------------------------+---------------+--------------+------------+----------------+--------------+</span></span><br><span class="line">| GRANTEE                     | TABLE_CATALOG | TABLE_SCHEMA | TABLE_NAME | PRIVILEGE_TYPE | IS_GRANTABLE |</span><br><span class="line">+<span class="comment">-----------------------------+---------------+--------------+------------+----------------+--------------+</span></span><br><span class="line">| 'mysql.sys'@'localhost'     | def           | sys          | sys_config | <span class="keyword">SELECT</span>         | <span class="keyword">NO</span>           |</span><br><span class="line">| <span class="string">'mysql.session'</span>@<span class="string">'localhost'</span> | <span class="keyword">def</span>           | mysql        | <span class="keyword">user</span>       | <span class="keyword">SELECT</span>         | <span class="keyword">NO</span>           |</span><br><span class="line">+<span class="comment">-----------------------------+---------------+--------------+------------+----------------+--------------+</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="30、TRIGGERS"><a href="#30、TRIGGERS" class="headerlink" title="30、TRIGGERS"></a>30、TRIGGERS</h2><p>TRIGGERS表提供了有关触发器的信息。要查看有关表格触发器的信息，您必须具有该表格的TRIGGER特权。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT * FROM INFORMATION_SCHEMA.TRIGGERS</span><br><span class="line">       WHERE TRIGGER_SCHEMA='test' AND TRIGGER_NAME='ins_sum'\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">           TRIGGER_CATALOG: def</span><br><span class="line">            TRIGGER_SCHEMA: test</span><br><span class="line">              TRIGGER_NAME: ins_sum</span><br><span class="line">        EVENT_MANIPULATION: <span class="keyword">INSERT</span></span><br><span class="line">      EVENT_OBJECT_CATALOG: <span class="keyword">def</span></span><br><span class="line">       EVENT_OBJECT_SCHEMA: <span class="keyword">test</span></span><br><span class="line">        EVENT_OBJECT_TABLE: <span class="keyword">account</span></span><br><span class="line">              ACTION_ORDER: <span class="number">1</span></span><br><span class="line">          ACTION_CONDITION: <span class="literal">NULL</span></span><br><span class="line">          ACTION_STATEMENT: <span class="keyword">SET</span> @<span class="keyword">sum</span> = @<span class="keyword">sum</span> + NEW.amount</span><br><span class="line">        ACTION_ORIENTATION: <span class="keyword">ROW</span></span><br><span class="line">             ACTION_TIMING: <span class="keyword">BEFORE</span></span><br><span class="line">ACTION_REFERENCE_OLD_TABLE: <span class="literal">NULL</span></span><br><span class="line">ACTION_REFERENCE_NEW_TABLE: <span class="literal">NULL</span></span><br><span class="line">  ACTION_REFERENCE_OLD_ROW: <span class="keyword">OLD</span></span><br><span class="line">  ACTION_REFERENCE_NEW_ROW: <span class="keyword">NEW</span></span><br><span class="line">                   CREATED: <span class="number">2017</span><span class="number">-03</span><span class="number">-30</span> <span class="number">20</span>:<span class="number">29</span>:<span class="number">39.06</span></span><br><span class="line">                  SQL_MODE: ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION</span><br><span class="line">                   DEFINER: me@localhost</span><br><span class="line">      CHARACTER_SET_CLIENT: utf8</span><br><span class="line">      COLLATION_CONNECTION: utf8_general_ci</span><br><span class="line">        DATABASE_COLLATION: utf8mb4_0900_ai_ci</span><br></pre></td></tr></table></figure></p>
+<h2 id="31、USER-PRIVILEGES"><a href="#31、USER-PRIVILEGES" class="headerlink" title="31、USER_PRIVILEGES"></a>31、USER_PRIVILEGES</h2><p>USER_PRIVILEGES表提供有关全局权限的信息。这些信息来自mysql.user授权表。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> USER_PRIVILEGES;</span><br><span class="line">+<span class="comment">--------------------------------+---------------+----------------------------+--------------+</span></span><br><span class="line">| GRANTEE                        | TABLE_CATALOG | PRIVILEGE_TYPE             | IS_GRANTABLE |</span><br><span class="line">+<span class="comment">--------------------------------+---------------+----------------------------+--------------+</span></span><br><span class="line">| 'mysql.infoschema'@'localhost' | def           | <span class="keyword">SELECT</span>                     | <span class="keyword">NO</span>           |</span><br><span class="line">| <span class="string">'mysql.session'</span>@<span class="string">'localhost'</span>    | <span class="keyword">def</span>           | SUPER                      | <span class="keyword">NO</span>           |</span><br><span class="line">| <span class="string">'mysql.sys'</span>@<span class="string">'localhost'</span>        | <span class="keyword">def</span>           | <span class="keyword">USAGE</span>                      | <span class="keyword">NO</span>           |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">SELECT</span>                     | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">INSERT</span>                     | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">UPDATE</span>                     | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">DELETE</span>                     | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">CREATE</span>                     | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">DROP</span>                       | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | RELOAD                     | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">SHUTDOWN</span>                   | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | PROCESS                    | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">FILE</span>                       | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">REFERENCES</span>                 | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">INDEX</span>                      | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">ALTER</span>                      | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">SHOW</span> <span class="keyword">DATABASES</span>             | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | SUPER                      | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">TABLES</span>    | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">LOCK</span> <span class="keyword">TABLES</span>                | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">EXECUTE</span>                    | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">REPLICATION</span> <span class="keyword">SLAVE</span>          | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">REPLICATION</span> <span class="keyword">CLIENT</span>         | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">CREATE</span> <span class="keyword">VIEW</span>                | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">SHOW</span> <span class="keyword">VIEW</span>                  | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">CREATE</span> ROUTINE             | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">ALTER</span> ROUTINE              | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">CREATE</span> <span class="keyword">USER</span>                | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">EVENT</span>                      | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">TRIGGER</span>                    | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">CREATE</span> <span class="keyword">TABLESPACE</span>          | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">CREATE</span> <span class="keyword">ROLE</span>                | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | <span class="keyword">DROP</span> <span class="keyword">ROLE</span>                  | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | XA_RECOVER_ADMIN           | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | SYSTEM_VARIABLES_ADMIN     | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | SET_USER_ID                | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | ROLE_ADMIN                 | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | RESOURCE_GROUP_USER        | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | RESOURCE_GROUP_ADMIN       | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | REPLICATION_SLAVE_ADMIN    | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | PERSIST_RO_VARIABLES_ADMIN | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | GROUP_REPLICATION_ADMIN    | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | ENCRYPTION_KEY_ADMIN       | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | CONNECTION_ADMIN           | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | BINLOG_ADMIN               | YES          |</span><br><span class="line">| <span class="string">'root'</span>@<span class="string">'localhost'</span>             | <span class="keyword">def</span>           | BACKUP_ADMIN               | YES          |</span><br><span class="line">| <span class="string">'test'</span>@<span class="string">'%'</span>                     | <span class="keyword">def</span>           | <span class="keyword">USAGE</span>                      | <span class="keyword">NO</span>           |</span><br><span class="line">+<span class="comment">--------------------------------+---------------+----------------------------+--------------+</span></span><br><span class="line"><span class="number">47</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h2 id="32、VIEWS"><a href="#32、VIEWS" class="headerlink" title="32、VIEWS"></a>32、VIEWS</h2><p>VIEWS表提供关于数据库中视图的信息。你必须具有SHOW VIEW权限才能访问此表。  </p>
+<h2 id="33、InnoDB相关的INFORMATION-SCHEMA表"><a href="#33、InnoDB相关的INFORMATION-SCHEMA表" class="headerlink" title="33、InnoDB相关的INFORMATION_SCHEMA表"></a>33、InnoDB相关的INFORMATION_SCHEMA表</h2><p>InnoDB的表如下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> TABLE_NAME <span class="keyword">from</span> <span class="keyword">TABLES</span> <span class="keyword">where</span> TABLE_NAME <span class="keyword">like</span> <span class="string">'INNODB_%'</span>;</span><br><span class="line">+<span class="comment">----------------------------+</span></span><br><span class="line">| TABLE_NAME                 |</span><br><span class="line">+<span class="comment">----------------------------+</span></span><br><span class="line">| INNODB_BUFFER_PAGE         |</span><br><span class="line">| INNODB_BUFFER_PAGE_LRU     |</span><br><span class="line">| INNODB_BUFFER_POOL_STATS   |</span><br><span class="line">| INNODB_CACHED_INDEXES      |</span><br><span class="line">| INNODB_CMP                 |</span><br><span class="line">| INNODB_CMPMEM              |</span><br><span class="line">| INNODB_CMPMEM_RESET        |</span><br><span class="line">| INNODB_CMP_PER_INDEX       |</span><br><span class="line">| INNODB_CMP_PER_INDEX_RESET |</span><br><span class="line">| INNODB_CMP_RESET           |</span><br><span class="line">| INNODB_COLUMNS             |</span><br><span class="line">| INNODB_DATAFILES           |</span><br><span class="line">| INNODB_FIELDS              |</span><br><span class="line">| INNODB_FOREIGN             |</span><br><span class="line">| INNODB_FOREIGN_COLS        |</span><br><span class="line">| INNODB_FT_BEING_DELETED    |</span><br><span class="line">| INNODB_FT_CONFIG           |</span><br><span class="line">| INNODB_FT_DEFAULT_STOPWORD |</span><br><span class="line">| INNODB_FT_DELETED          |</span><br><span class="line">| INNODB_FT_INDEX_CACHE      |</span><br><span class="line">| INNODB_FT_INDEX_TABLE      |</span><br><span class="line">| INNODB_INDEXES             |</span><br><span class="line">| INNODB_METRICS             |</span><br><span class="line">| INNODB_TABLES              |</span><br><span class="line">| INNODB_TABLESPACES         |</span><br><span class="line">| INNODB_TABLESPACES_BRIEF   |</span><br><span class="line">| INNODB_TABLESTATS          |</span><br><span class="line">| INNODB_TEMP_TABLE_INFO     |</span><br><span class="line">| INNODB_TRX                 |</span><br><span class="line">| INNODB_VIRTUAL             |</span><br><span class="line">+<span class="comment">----------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>接下来将一一学习。  </p>
+<h3 id="33-1-INNODB-BUFFER-PAGE"><a href="#33-1-INNODB-BUFFER-PAGE" class="headerlink" title="33.1 INNODB_BUFFER_PAGE"></a>33.1 INNODB_BUFFER_PAGE</h3><p>INNODB_BUFFER_PAGE表保存有关InnoDB缓冲池中每个页面的信息。<br><strong><em>警告：查询INNODB_BUFFER_PAGE表可能会导致显着的性能开销。不要在生产系统上查询此表，除非你知道你的查询可能具有的性能影响，并确定它可以接受。</em></strong><br>我们先看看这个表的定义：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show create table INNODB_BUFFER_PAGE;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">TABLE</span> <span class="string">`INNODB_BUFFER_PAGE`</span> (</span><br><span class="line">  <span class="string">`POOL_ID`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`BLOCK_ID`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`SPACE`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`PAGE_NUMBER`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`PAGE_TYPE`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`FLUSH_TYPE`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`FIX_COUNT`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`IS_HASHED`</span> <span class="built_in">varchar</span>(<span class="number">3</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`NEWEST_MODIFICATION`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`OLDEST_MODIFICATION`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`ACCESS_TIME`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`TABLE_NAME`</span> <span class="built_in">varchar</span>(<span class="number">1024</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`INDEX_NAME`</span> <span class="built_in">varchar</span>(<span class="number">1024</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`NUMBER_RECORDS`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`DATA_SIZE`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`COMPRESSED_SIZE`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`PAGE_STATE`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`IO_FIX`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`IS_OLD`</span> <span class="built_in">varchar</span>(<span class="number">3</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`FREE_PAGE_CLOCK`</span> <span class="built_in">bigint</span>(<span class="number">21</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span></span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">MEMORY</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，它是个临时表。<br>该表中的列的解释如下：  </p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POOL_ID</td>
+<td>缓冲池ID。用于区分多个缓冲池实例的标识符。</td>
+</tr>
+<tr>
+<td>BLOCK_ID</td>
+<td>缓冲池块ID。</td>
+</tr>
+<tr>
+<td>SPACE</td>
+<td>表空间ID，使用与INNODB_TABLES.SPACE中相同的值</td>
+</tr>
+<tr>
+<td>PAGE_NUMBER</td>
+<td>页号</td>
+</tr>
+<tr>
+<td>PAGE_TYPE</td>
+<td>页面类型。允许的值为：</td>
+</tr>
+<tr>
+<td>FLUSH_TYPE</td>
+<td>Flush 类型</td>
+</tr>
+<tr>
+<td>FIX_COUNT</td>
+<td>在缓冲池中使用此块的线程数。当为零时，该区块可以被释放。</td>
+</tr>
+<tr>
+<td>IS_HASHED</td>
+<td>哈希索引是否构建在此页面上。</td>
+</tr>
+<tr>
+<td>NEWEST_MODIFICATION</td>
+<td></td>
+</tr>
+<tr>
+<td>OLDEST_MODIFICATION</td>
+<td></td>
+</tr>
+<tr>
+<td>ACCESS_TIME</td>
+<td></td>
+</tr>
+<tr>
+<td>TABLE_NAME</td>
+<td></td>
+</tr>
+<tr>
+<td>INDEX_NAME</td>
+<td></td>
+</tr>
+<tr>
+<td>NUMBER_RECORDS</td>
+<td></td>
+</tr>
+<tr>
+<td>DATA_SIZE</td>
+<td></td>
+</tr>
+<tr>
+<td>COMPRESSED_SIZE</td>
+<td></td>
+</tr>
+<tr>
+<td>PAGE_STATE</td>
+<td></td>
+</tr>
+<tr>
+<td>IO_FIX</td>
+<td></td>
+</tr>
+<tr>
+<td>IS_OLD</td>
+<td></td>
+</tr>
+<tr>
+<td>FREE_PAGE_CLOCK</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+            <a href="/tags/MySQL元数据/" rel="tag"># MySQL元数据</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/database/mysql/mysql_manual/11-data_type/1-Numeric Types/" rel="next" title="MySQL 数值类型">
+                <i class="fa fa-chevron-left"></i> MySQL 数值类型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/README/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#INFORMATION-SCHEMA的表"><span class="nav-number">1.</span> <span class="nav-text">INFORMATION_SCHEMA的表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、CHARACTER-SETS"><span class="nav-number">1.1.</span> <span class="nav-text">1、CHARACTER_SETS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、COLLATIONS"><span class="nav-number">1.2.</span> <span class="nav-text">2、COLLATIONS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、COLLATION-CHARACTER-SET-APPLICABILITY"><span class="nav-number">1.3.</span> <span class="nav-text">3、COLLATION_CHARACTER_SET_APPLICABILITY</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、COLUMNS"><span class="nav-number">1.4.</span> <span class="nav-text">4、COLUMNS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5、COLUMN-PRIVILEGES"><span class="nav-number">1.5.</span> <span class="nav-text">5、COLUMN_PRIVILEGES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6、COLUMN-STATISTICS"><span class="nav-number">1.6.</span> <span class="nav-text">6、COLUMN_STATISTICS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7、ENGINES"><span class="nav-number">1.7.</span> <span class="nav-text">7、ENGINES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8、EVENTS"><span class="nav-number">1.8.</span> <span class="nav-text">8、EVENTS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9、FILES"><span class="nav-number">1.9.</span> <span class="nav-text">9、FILES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10、KEY-COLUMN-USAGE"><span class="nav-number">1.10.</span> <span class="nav-text">10、KEY_COLUMN_USAGE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11、KEYWORDS"><span class="nav-number">1.11.</span> <span class="nav-text">11、KEYWORDS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12、OPTIMIZER-TRACE"><span class="nav-number">1.12.</span> <span class="nav-text">12、OPTIMIZER_TRACE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13、PARAMETERS"><span class="nav-number">1.13.</span> <span class="nav-text">13、PARAMETERS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14、PARTITIONS"><span class="nav-number">1.14.</span> <span class="nav-text">14、PARTITIONS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15、PLUGINS"><span class="nav-number">1.15.</span> <span class="nav-text">15、PLUGINS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16、PROCESSLIST"><span class="nav-number">1.16.</span> <span class="nav-text">16、PROCESSLIST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17、PROFILING"><span class="nav-number">1.17.</span> <span class="nav-text">17、PROFILING</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#18、REFERENTIAL-CONSTRAINTS"><span class="nav-number">1.18.</span> <span class="nav-text">18、REFERENTIAL_CONSTRAINTS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#19、RESOURCE-GROUPS"><span class="nav-number">1.19.</span> <span class="nav-text">19、RESOURCE_GROUPS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#20、ROUTINES"><span class="nav-number">1.20.</span> <span class="nav-text">20、ROUTINES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#21、SCHEMATA"><span class="nav-number">1.21.</span> <span class="nav-text">21、SCHEMATA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#22、SCHEMA-PRIVILEGES"><span class="nav-number">1.22.</span> <span class="nav-text">22、SCHEMA_PRIVILEGES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#23、STATISTICS"><span class="nav-number">1.23.</span> <span class="nav-text">23、STATISTICS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#24、ST-GEOMETRY-COLUMNS"><span class="nav-number">1.24.</span> <span class="nav-text">24、ST_GEOMETRY_COLUMNS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#25、ST-SPATIAL-REFERENCE-SYSTEMS"><span class="nav-number">1.25.</span> <span class="nav-text">25、ST_SPATIAL_REFERENCE_SYSTEMS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#26、TABLES"><span class="nav-number">1.26.</span> <span class="nav-text">26、TABLES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#27、TABLESPACES"><span class="nav-number">1.27.</span> <span class="nav-text">27、TABLESPACES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#28、TABLE-CONSTRAINTS"><span class="nav-number">1.28.</span> <span class="nav-text">28、TABLE_CONSTRAINTS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#29、TABLE-PRIVILEGES"><span class="nav-number">1.29.</span> <span class="nav-text">29、TABLE_PRIVILEGES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#30、TRIGGERS"><span class="nav-number">1.30.</span> <span class="nav-text">30、TRIGGERS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#31、USER-PRIVILEGES"><span class="nav-number">1.31.</span> <span class="nav-text">31、USER_PRIVILEGES</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#32、VIEWS"><span class="nav-number">1.32.</span> <span class="nav-text">32、VIEWS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#33、InnoDB相关的INFORMATION-SCHEMA表"><span class="nav-number">1.33.</span> <span class="nav-text">33、InnoDB相关的INFORMATION_SCHEMA表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#33-1-INNODB-BUFFER-PAGE"><span class="nav-number">1.33.1.</span> <span class="nav-text">33.1 INNODB_BUFFER_PAGE</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

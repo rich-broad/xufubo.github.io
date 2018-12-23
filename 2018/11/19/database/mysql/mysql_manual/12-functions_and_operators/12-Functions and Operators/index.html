@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="函数和操作符表达式可以在SQL语句的很多部分使用，表达式中可以包含函数调用。例如在ORDER BY、SELECT、DELETE、UPDATE、HAVING等。但是需要注意，默认情况下，函数名称和其后面的括号之间不能有空格。这有助于MySQL解析器区分函数调用和对与函数名称相同的表或列的引用。但是，允许函数参数之间有空格">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xufubo">
+<meta property="og:url" content="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/12-functions_and_operators/12-Functions and Operators/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="函数和操作符表达式可以在SQL语句的很多部分使用，表达式中可以包含函数调用。例如在ORDER BY、SELECT、DELETE、UPDATE、HAVING等。但是需要注意，默认情况下，函数名称和其后面的括号之间不能有空格。这有助于MySQL解析器区分函数调用和对与函数名称相同的表或列的引用。但是，允许函数参数之间有空格。为了允许函数之间有空格，要配置–sql-mode=IGNORE_SPACE来告">
+<meta property="og:updated_time" content="2018-11-14T15:06:03.494Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="xufubo">
+<meta name="twitter:description" content="函数和操作符表达式可以在SQL语句的很多部分使用，表达式中可以包含函数调用。例如在ORDER BY、SELECT、DELETE、UPDATE、HAVING等。但是需要注意，默认情况下，函数名称和其后面的括号之间不能有空格。这有助于MySQL解析器区分函数调用和对与函数名称相同的表或列的引用。但是，允许函数参数之间有空格。为了允许函数之间有空格，要配置–sql-mode=IGNORE_SPACE来告">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/12-functions_and_operators/12-Functions and Operators/"/>
+
+
+
+
+
+  <title> | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/12-functions_and_operators/12-Functions and Operators/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-19T23:25:11+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="函数和操作符"><a href="#函数和操作符" class="headerlink" title="函数和操作符"></a>函数和操作符</h1><p>表达式可以在SQL语句的很多部分使用，表达式中可以包含函数调用。例如在ORDER BY、SELECT、DELETE、UPDATE、HAVING等。但是需要注意，默认情况下，函数名称和其后面的括号之间不能有空格。这有助于MySQL解析器区分函数调用和对与函数名称相同的表或列的引用。但是，允许函数参数之间有空格。为了允许函数之间有空格，要配置–sql-mode=IGNORE_SPACE来告诉MySQL服务器在函数名称后面使用空格。单个客户端程序可以在mysql_real_connect()的时候使用CLIENT_IGNORE_SPACE 选项来获得此行为。在任一种情况下，所有函数名都将成为保留字。<br>本节学习mysql的函数和操作符。具体该怎么学习呢？挨个学习每个函数没什么意义，主要是从宏观上把我mysql的函数和操作符即可，至于细节，则直接查看<a href="https://dev.mysql.com/doc/refman/8.0/en/functions.html" target="_blank" rel="noopener">mysql官方手册</a>。  </p>
+<hr>
+<h2 id="1、函数和操作符指引"><a href="#1、函数和操作符指引" class="headerlink" title="1、函数和操作符指引"></a>1、函数和操作符指引</h2><p>见<a href="https://dev.mysql.com/doc/refman/8.0/en/func-op-summary-ref.html" target="_blank" rel="noopener">12.1 Function and Operator Reference</a>。  </p>
+<hr>
+<h2 id="2、表达式求值中的类型转换"><a href="#2、表达式求值中的类型转换" class="headerlink" title="2、表达式求值中的类型转换"></a>2、表达式求值中的类型转换</h2><h2 id="3、操作符"><a href="#3、操作符" class="headerlink" title="3、操作符"></a>3、操作符</h2><p>mysql支持的操作符如下表：  </p>
+<table>
+<thead>
+<tr>
+<th>名字</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AND, &amp;&amp;</td>
+<td>逻辑与</td>
+</tr>
+<tr>
+<td>=</td>
+<td>赋值（作为SET 语句的一部分 ，或作为语句中的SET子句的 一部分UPDATE）</td>
+</tr>
+<tr>
+<td>:=</td>
+<td>赋值</td>
+</tr>
+<tr>
+<td>BETWEEN … AND …</td>
+<td>检查一个值是否在一个范围内</td>
+</tr>
+<tr>
+<td>BINARY</td>
+<td>将字符串转换为二进制字符串</td>
+</tr>
+<tr>
+<td>&amp;</td>
+<td>按位与</td>
+</tr>
+<tr>
+<td>~</td>
+<td>按位取反</td>
+</tr>
+<tr>
+<td>\</td>
+<td></td>
+<td>按位或</td>
+</tr>
+<tr>
+<td>^</td>
+<td>按位XOR</td>
+</tr>
+<tr>
+<td>CASE</td>
+<td>case操作符</td>
+</tr>
+<tr>
+<td>DIV</td>
+<td>整数除法</td>
+</tr>
+<tr>
+<td>/</td>
+<td>除以操作符</td>
+</tr>
+<tr>
+<td>=</td>
+<td>等于</td>
+</tr>
+<tr>
+<td>&lt;=&gt;</td>
+<td>用于安全的比较NULL</td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>大于</td>
+</tr>
+<tr>
+<td>&gt;=</td>
+<td>大于等于</td>
+</tr>
+<tr>
+<td>IS</td>
+<td>用于测试某个值是不是boolean值，例如：1 IS TRUE，0 IS FALSE</td>
+</tr>
+<tr>
+<td>IS NOT</td>
+<td>用于测试某个值是不是boolean值</td>
+</tr>
+<tr>
+<td>IS NOT NULL</td>
+<td>NOT NULL值测试</td>
+</tr>
+<tr>
+<td>IS NULL</td>
+<td>NULL值测试</td>
+</tr>
+<tr>
+<td>-&gt;</td>
+<td>相当于JSON_EXTRACT（），返回json数据中的某个值</td>
+</tr>
+<tr>
+<td>-&gt;&gt;</td>
+<td>相当于JSON_UNQUOTE(JSON_EXTRACT())，也是返回json的某个值</td>
+</tr>
+<tr>
+<td>&lt;&lt;</td>
+<td>左移</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>小于</td>
+</tr>
+<tr>
+<td>&lt;=</td>
+<td>小于等于</td>
+</tr>
+<tr>
+<td>LIKE</td>
+<td>简单的模式匹配</td>
+</tr>
+<tr>
+<td>-</td>
+<td>减</td>
+</tr>
+<tr>
+<td>%, MOD</td>
+<td>求余</td>
+</tr>
+<tr>
+<td>NOT, !</td>
+<td>非</td>
+</tr>
+<tr>
+<td>NOT BETWEEN … AND …</td>
+<td>检查一个值是否不在一个值范围内</td>
+</tr>
+<tr>
+<td>!=, &lt;&gt;</td>
+<td>不等于</td>
+</tr>
+<tr>
+<td>NOT LIKE</td>
+<td>不像，与LIKE相反</td>
+</tr>
+<tr>
+<td>NOT REGEXP</td>
+<td>字符串是否不匹配正则表达式</td>
+</tr>
+<tr>
+<td>\</td>
+<td>\</td>
+<td>, OR</td>
+<td>逻辑或</td>
+</tr>
+<tr>
+<td>+</td>
+<td>加</td>
+</tr>
+<tr>
+<td>REGEXP</td>
+<td>字符串是否匹配正则表达式</td>
+</tr>
+<tr>
+<td>&gt;&gt;</td>
+<td>右移</td>
+</tr>
+<tr>
+<td>RLIKE</td>
+<td>字符串是否匹配正则表达式</td>
+</tr>
+<tr>
+<td>SOUNDS LIKE</td>
+<td>expr1 SOUNDS LIKE expr2等价于SOUNDEX(expr1) = SOUNDEX(expr2)</td>
+</tr>
+<tr>
+<td>*</td>
+<td>乘法</td>
+</tr>
+<tr>
+<td>-</td>
+<td>符号 取反</td>
+</tr>
+<tr>
+<td>XOR</td>
+<td>逻辑XOR</td>
+</tr>
+</tbody>
+</table>
+<p>以上表格是mysql的操作符，接下来对其中我们不熟悉的操作符，或者mysql特有的操作符进行说明。如果有没有列出的操作符，请查看mysql手册。  </p>
+<h3 id="3-1-操作符优先级"><a href="#3-1-操作符优先级" class="headerlink" title="3.1 操作符优先级"></a>3.1 操作符优先级</h3><p>运算符优先级显示在以下列表中，从最高优先级到最低优先级。显示在一行上的运算符具有相同的优先级。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">INTERVAL</span><br><span class="line">BINARY, COLLATE</span><br><span class="line">!</span><br><span class="line">- (符号取反), ~ (按位取反)</span><br><span class="line">^</span><br><span class="line">*, /, DIV, %, MOD</span><br><span class="line">-, +</span><br><span class="line">&lt;&lt;, &gt;&gt;</span><br><span class="line">&amp;</span><br><span class="line">|</span><br><span class="line">= (比较运算符), &lt;=&gt;, &gt;=, &gt;, &lt;=, &lt;, &lt;&gt;, !=, IS, LIKE, REGEXP, IN</span><br><span class="line">BETWEEN, CASE, WHEN, THEN, ELSE</span><br><span class="line">NOT</span><br><span class="line">AND, &amp;&amp;</span><br><span class="line">XOR</span><br><span class="line">OR, ||</span><br><span class="line">= (赋值), :=</span><br></pre></td></tr></table></figure></p>
+<p>一些运算符的含义取决于SQL模式：  </p>
+<ul>
+<li>默认情况下，|| 是逻辑OR运算符。在 PIPES_AS_CONCAT启用的情况下， ||是字符串连接，优先级位于^和一元运算符之间。  </li>
+<li>默认情况下，!优先级高于NOT。在HIGH_NOT_PRECEDENCE启用的情况下，!和NOT具有相同的优先级。  </li>
+</ul>
+<h3 id="3-2-比较函数和操作符"><a href="#3-2-比较函数和操作符" class="headerlink" title="3.2 比较函数和操作符"></a>3.2 比较函数和操作符</h3><p>这里主要列出mysql特有的操作符和函数。  </p>
+<ul>
+<li><p>&lt;=&gt;: 该运算符与=运算符执行相等比较，但如果两个操作数均为NULL，则返回1而不是NULL;如果一个操作数为NULL，则返回0而不是NULL。  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="number">1</span> &lt;=&gt; <span class="number">1</span>, <span class="literal">NULL</span> &lt;=&gt; <span class="literal">NULL</span>, <span class="number">1</span> &lt;=&gt; <span class="literal">NULL</span>;</span><br><span class="line">    -&gt; 1, 1, 0</span><br><span class="line"><span class="keyword">SELECT</span> <span class="number">1</span> = <span class="number">1</span>, <span class="literal">NULL</span> = <span class="literal">NULL</span>, <span class="number">1</span> = <span class="literal">NULL</span>;</span><br><span class="line">    -&gt; 1, NULL, NULL</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>IS boolean_value: 根据布尔值测试值，其中boolean_value可以为TRUE，FALSE或UNKNOWN。    </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="number">1</span> <span class="keyword">IS</span> <span class="literal">TRUE</span>, <span class="number">0</span> <span class="keyword">IS</span> <span class="literal">FALSE</span>, <span class="literal">NULL</span> <span class="keyword">IS</span> <span class="keyword">UNKNOWN</span>;</span><br><span class="line">    -&gt; 1, 1, 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>IS NOT boolean_value: 根据布尔值测试值，其中boolean_value可以为TRUE，FALSE或UNKNOWN。  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="number">1</span> <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">UNKNOWN</span>, <span class="number">0</span> <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">UNKNOWN</span>, <span class="literal">NULL</span> <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">UNKNOWN</span>;</span><br><span class="line">    -&gt; 1, 1, 0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>COALESCE(value,…): 返回列表中的第一个非NULL值，如果没有非NULL值，则返回NULL。  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COALESCE</span>(<span class="literal">NULL</span>,<span class="number">1</span>);</span><br><span class="line">    -&gt; 1</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COALESCE</span>(<span class="literal">NULL</span>,<span class="literal">NULL</span>,<span class="literal">NULL</span>);</span><br><span class="line">    -&gt; NULL</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>GREATEST(value1,value2,…): 返回多个参数的最大（最大值）参数，比较规则与LEAST()相同。    </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">GREATEST</span>(<span class="number">2</span>,<span class="number">0</span>);</span><br><span class="line">   -&gt; 2</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">GREATEST</span>(<span class="number">34.0</span>,<span class="number">3.0</span>,<span class="number">5.0</span>,<span class="number">767.0</span>);</span><br><span class="line">   -&gt; 767.0</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">GREATEST</span>(<span class="string">'B'</span>,<span class="string">'A'</span>,<span class="string">'C'</span>);</span><br><span class="line">   -&gt; 'C'</span><br></pre></td></tr></table></figure>
+<p>只要任一参数为NULL，GREATEST（）将返回NULL。  </p>
+</li>
+<li><p>ISNULL(expr)：If expr is NULL, ISNULL() returns 1, otherwise it returns 0。与IS NULL作用相同。  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">ISNULL</span>(<span class="number">1</span>+<span class="number">1</span>);</span><br><span class="line">   -&gt; 0</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">ISNULL</span>(<span class="number">1</span>/<span class="number">0</span>);</span><br><span class="line">   -&gt; 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>INTERVAL(N,N1,N2,N3,…)：如果N&lt;N1，则返回0;如果N&lt;N2，则返回1,N&lt;N3,则返回2，以此类推;如果N为NULL，则返回-1。所有参数都被视为整数。要求N1 &lt;N2 &lt;N3 &lt;… &lt;Nn，此函数才能正常工作。这是因为使用了二分搜索。  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">INTERVAL</span>(<span class="number">23</span>, <span class="number">1</span>, <span class="number">15</span>, <span class="number">17</span>, <span class="number">30</span>, <span class="number">44</span>, <span class="number">200</span>);</span><br><span class="line">   -&gt; 3</span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">INTERVAL</span>(<span class="number">10</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">1000</span>);</span><br><span class="line">   -&gt; 2</span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">INTERVAL</span>(<span class="number">22</span>, <span class="number">23</span>, <span class="number">30</span>, <span class="number">44</span>, <span class="number">200</span>);</span><br><span class="line">   -&gt; 0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>LEAST(value1,value2,…)：使用两个或更多参数，返回最小（最小值）参数。使用以下规则比较参数：  </p>
+<blockquote>
+<ul>
+<li>如果任一参数为NULL，则结果为NULL。不需要比较。  </li>
+<li>如果所有参数都是整数值，则将它们作为整数进行比较。  </li>
+<li>如果至少有一个参数是双精度（double），则它们将作为双精度值(double)进行比较。否则，如果至少有一个参数是DECIMAL值，则将它们作为DECIMAL值进行比较。  </li>
+<li>如果参数包含数字和字符串的混合，则将其作为数字进行比较。  </li>
+<li>如果任一参数是非二进制（字符）字符串，则将参数作为非二进制字符串进行比较。  </li>
+<li>在所有其他情况下，参数将作为二进制字符串进行比较。  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">LEAST</span>(<span class="number">2</span>,<span class="number">0</span>);</span><br><span class="line">       -&gt; 0</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">LEAST</span>(<span class="number">34.0</span>,<span class="number">3.0</span>,<span class="number">5.0</span>,<span class="number">767.0</span>);</span><br><span class="line">       -&gt; 3.0</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">LEAST</span>(<span class="string">'B'</span>,<span class="string">'A'</span>,<span class="string">'C'</span>);</span><br><span class="line">       -&gt; 'A'</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<h3 id="3-3-逻辑操作符"><a href="#3-3-逻辑操作符" class="headerlink" title="3.3 逻辑操作符"></a>3.3 逻辑操作符</h3><p>AND, &amp;&amp;；NOT, !；||, OR；XOR都很熟悉，不再详述。  </p>
+<h3 id="3-4-赋值操作符"><a href="#3-4-赋值操作符" class="headerlink" title="3.4 赋值操作符"></a>3.4 赋值操作符</h3><p>包含=和:=，不再详细介绍。  </p>
+<hr>
+<h2 id="4、控制流函数"><a href="#4、控制流函数" class="headerlink" title="4、控制流函数"></a>4、控制流函数</h2><p>控制流函数和操作符如下表：  </p>
+<table>
+<thead>
+<tr>
+<th>名字</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CASE</td>
+<td>Case 操作符</td>
+</tr>
+<tr>
+<td>IF()</td>
+<td>If/else construct</td>
+</tr>
+<tr>
+<td>IFNULL()</td>
+<td>Null if/else construct</td>
+</tr>
+<tr>
+<td>NULLIF()</td>
+<td>Return NULL if expr1 = expr2</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>CASE value WHEN [compare_value] THEN result [WHEN [compare_value] THEN result …] [ELSE result] END<br>CASE WHEN [condition] THEN result [WHEN [condition] THEN result …] [ELSE result] END</li>
+</ul>
+<ul>
+<li>IF(expr1,expr2,expr3)  </li>
+</ul>
+<ul>
+<li>IFNULL(expr1,expr2)  </li>
+</ul>
+<ul>
+<li>NULLIF(expr1,expr2)  </li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/11-data_type/2-Date and Time Types/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/13-SQL_statement_syntax/13-SQL Statement Syntax/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#函数和操作符"><span class="nav-number">1.</span> <span class="nav-text">函数和操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、函数和操作符指引"><span class="nav-number">1.1.</span> <span class="nav-text">1、函数和操作符指引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、表达式求值中的类型转换"><span class="nav-number">1.2.</span> <span class="nav-text">2、表达式求值中的类型转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、操作符"><span class="nav-number">1.3.</span> <span class="nav-text">3、操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-操作符优先级"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 操作符优先级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-比较函数和操作符"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 比较函数和操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-逻辑操作符"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 逻辑操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-赋值操作符"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4 赋值操作符</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、控制流函数"><span class="nav-number">1.4.</span> <span class="nav-text">4、控制流函数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

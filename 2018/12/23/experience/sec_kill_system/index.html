@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式系统,幂等性,秒杀系统,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1 概述随着移动互联网的发展，网络用户数越来越多，通常为了通过网络营销某个产品的时候，往往会搞秒杀、抽奖等活动。对于后台而言，对于服务端而言，抽奖和秒杀具有相同的特点，参与人数和物品是不对等的，即大量用户竞争少量物品。而且往往在很短的时间点爆发。   2 秒杀业务为什么难做为了搞清楚秒杀或者抽奖系统为什么难做，我们先看一下秒杀或者抽奖的一般业务流程：     进入抽奖或者秒杀逻辑；      检查">
+<meta name="keywords" content="分布式系统,幂等性,秒杀系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="秒杀系统思考">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/experience/sec_kill_system/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="1 概述随着移动互联网的发展，网络用户数越来越多，通常为了通过网络营销某个产品的时候，往往会搞秒杀、抽奖等活动。对于后台而言，对于服务端而言，抽奖和秒杀具有相同的特点，参与人数和物品是不对等的，即大量用户竞争少量物品。而且往往在很短的时间点爆发。   2 秒杀业务为什么难做为了搞清楚秒杀或者抽奖系统为什么难做，我们先看一下秒杀或者抽奖的一般业务流程：     进入抽奖或者秒杀逻辑；      检查">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-23T11:54:37.130Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="秒杀系统思考">
+<meta name="twitter:description" content="1 概述随着移动互联网的发展，网络用户数越来越多，通常为了通过网络营销某个产品的时候，往往会搞秒杀、抽奖等活动。对于后台而言，对于服务端而言，抽奖和秒杀具有相同的特点，参与人数和物品是不对等的，即大量用户竞争少量物品。而且往往在很短的时间点爆发。   2 秒杀业务为什么难做为了搞清楚秒杀或者抽奖系统为什么难做，我们先看一下秒杀或者抽奖的一般业务流程：     进入抽奖或者秒杀逻辑；      检查">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/experience/sec_kill_system/">
+
+
+
+
+
+  <title>秒杀系统思考 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/experience/sec_kill_system/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">秒杀系统思考</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T18:58:35+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/经验之谈/" itemprop="url" rel="index">
+                    <span itemprop="name">经验之谈</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1 概述"></a>1 概述</h1><p>随着移动互联网的发展，网络用户数越来越多，通常为了通过网络营销某个产品的时候，往往会搞秒杀、抽奖等活动。对于后台而言，对于服务端而言，抽奖和秒杀具有相同的特点，参与人数和物品是不对等的，即大量用户竞争少量物品。而且往往在很短的时间点爆发。  </p>
+<h1 id="2-秒杀业务为什么难做"><a href="#2-秒杀业务为什么难做" class="headerlink" title="2 秒杀业务为什么难做"></a>2 秒杀业务为什么难做</h1><p>为了搞清楚秒杀或者抽奖系统为什么难做，我们先看一下秒杀或者抽奖的一般业务流程：  </p>
+<ul>
+<li><ol>
+<li>进入抽奖或者秒杀逻辑；  </li>
+</ol>
+</li>
+<li><ol start="2">
+<li>检查参数，校验资格；  </li>
+</ol>
+</li>
+<li><ol start="3">
+<li>扣除资格；  </li>
+</ol>
+</li>
+<li><ol start="4">
+<li>抽奖或者发放物品。  </li>
+</ol>
+</li>
+</ul>
+<p>如上四个步骤中最为重要的是资格校验、扣除；发放奖品（涉及到对同一个数据的写）。为了安全起见，通常我们会先扣除资格，但是这常常会造成很不好的体验：  </p>
+<ul>
+<li><ol>
+<li>系统总是繁忙，几次过后，奖品没有了。  </li>
+</ol>
+</li>
+<li><ol start="2">
+<li>积分扣除了，奖品没有得到（因为先扣除积分，而积分是具体某个用户的数据，这个数据不会是热点数据，而奖品库存却是一个数据。因此可能出现很多用户扣除了积分，奖品却没有了），体验很不好。  </li>
+</ol>
+</li>
+<li><ol start="3">
+<li>补过积分后，奖品没有了，让人很失望。    </li>
+</ol>
+</li>
+</ul>
+<p>可见，秒杀或者抽奖系统对比于其他系统来说具有如下特点：  </p>
+<ol>
+<li>im系统，例如qq或者微博，每个人都读自己的数据（好友列表、群列表、个人信息）；  </li>
+<li>微博系统，每个人读你关注的人的数据，一个人读多个人的数据；  </li>
+<li>秒杀系统，库存只有一份，所有人会在集中的时间读和写这些数据，多个人读一个数据。  </li>
+</ol>
+<p>例如：小米手机每周二的秒杀，可能手机只有1万部，但瞬时进入的流量可能是几百几千万。<br>又如：12306抢票，票是有限的，库存一份，瞬时流量非常多，都读相同的库存。<strong>读写冲突，锁非常严重</strong>，任何强大的数据库服务器都不可能解决这个问题。这是秒杀业务难的地方。那我们怎么优化秒杀业务的架构呢，即：如何减少压到数据库的流量呢？  </p>
+<h1 id="3-优化原则"><a href="#3-优化原则" class="headerlink" title="3 优化原则"></a>3 优化原则</h1><ol>
+<li><strong>将请求尽量拦截在系统上游</strong>（不要让锁冲突落到数据库上去）。传统秒杀系统之所以挂，请求都压倒了后端数据层，数据读写锁冲突严重，并发高响应慢，几乎所有请求都超时，流量虽大，下单成功的有效流量甚小。以12306为例，一趟火车其实只有2000张票，200w个人来买，基本没有人能买成功，请求有效率为0。  </li>
+<li><strong>充分利用缓存</strong>（其目的也是为了不让大量无效请求落到数据库层），秒杀买票，这是一个典型的读多些少的应用场景，大部分请求是车次查询，票查询，下单和支付才是写请求。一趟火车其实只有2000张票，200w个人来买，最多2000个人下单成功，其他人都是查询库存，写比例只有0.1%，读比例占99.9%，非常适合使用缓存、读写分离来优化。  </li>
+</ol>
+<h1 id="4-常见的系统架构"><a href="#4-常见的系统架构" class="headerlink" title="4 常见的系统架构"></a>4 常见的系统架构</h1><p>秒杀系统常见的系统架构从大的角度看，分为几部分：  </p>
+<ol>
+<li>浏览器端，最上层，会执行到一些JS代码。  </li>
+<li>站点层，也叫接入层。这一层会访问后端数据，拼html页面返回给浏览器。  </li>
+<li>服务层，向上游屏蔽底层数据细节，提供数据访问。  </li>
+<li>数据层，最终的库存是存在这里的，mysql是一个典型（当然还有会缓存）。   </li>
+</ol>
+<h2 id="5-具体如何优化"><a href="#5-具体如何优化" class="headerlink" title="5 具体如何优化"></a>5 具体如何优化</h2><h2 id="5-1-浏览器层"><a href="#5-1-浏览器层" class="headerlink" title="5.1 浏览器层"></a>5.1 浏览器层</h2><p>我们都参加过线上抽奖或者秒杀活动，通常的情景是这样的，秒杀开始，我们点击按钮，点击之后，系统卡住了，作为用户，我们很着急，越卡我们越点，一直点点点。但是有用么？平白无故的增加了系统的负载。但是用户不管啊，她就是点点点。一个用户点三次，平白无故增加了67%负载。那么我们该怎么办呢？  </p>
+<ul>
+<li><ol>
+<li>从用户体验的角度，用户点击秒杀之后，按钮置灰，并友好的提示用户，耐心等待，禁止用户重复提交请求。  </li>
+</ol>
+</li>
+<li><ol start="2">
+<li>从技术层面，限制用户在x秒之内只能提交一次请求，app层面同理。  </li>
+</ol>
+</li>
+</ul>
+<p>以上两个简单的改动为我们的系统拦截住了大部分无效的请求，不过请求还是太多，而且这种策略只能拦截普通用户，对于程序员或者其他专业用户，这种策略是无效的。我们只能通过其他手段拦截。这个拦截只能在第二层 – 站点层进行。  </p>
+<h2 id="5-2-站点层"><a href="#5-2-站点层" class="headerlink" title="5.2 站点层"></a>5.2 站点层</h2><p>这一层主要是防止程序员写for循环来秒杀，不过这类业务也有明显的特点，必须用户登录，那么我们就可以借此做文章，例如，每个用户2秒（这个数字可以通过自己数据库最大处理的TPS和自己预估的QPS来计算）只能透过一个请求。其余的请求直接拒绝404？这恐怕影响用户体验，我们可以做页面缓存，其余的请求都响应同一个页面。这样做的代价就是在站点接入层需要消耗存储，通常是nosql系统。如此，就可以在不伤害用体验的情况下将无效请求做了进一步拦截。  </p>
+<p>按照常理来说，现在已经可以了，但是如果有些黑客控制了肉鸡，掌握了很多uid，这时我们现在的限流又无效了。按照目前的策略，在接入层拦截不住了。  </p>
+<h2 id="5-3-服务层拦截（最终的兜底逻辑）"><a href="#5-3-服务层拦截（最终的兜底逻辑）" class="headerlink" title="5.3 服务层拦截（最终的兜底逻辑）"></a>5.3 服务层拦截（最终的兜底逻辑）</h2><p>对于服务层，我清楚的知道本次活动有多少个物品，也知道自己数据库的处理能力，比如，我知道我的库存有10000个，那我肯定不会将1000000个请求放到数据库层，我会设计请求队列，只放10000个请求到我的队列中，然后将这些请求放到我的数据库层。然后其他的请求我都返回已抢完，下次再来。这样，对于到了数据库层的流量已经非常少了。   对于读请求，可以使用内存cache，不管是memcached还是redis，单机抗个每秒几万应该都是没什么问题的。如此限流，只有非常少的写请求，和非常少的读缓存mis的请求会透到数据层去。（我们可以在库存更新后更新各个缓存的库存值。不过有时会不及时）  </p>
+<h1 id="6-小结"><a href="#6-小结" class="headerlink" title="6 小结"></a>6 小结</h1><p>可以看到，对于秒杀系统，最核心的就是两点：  </p>
+<ul>
+<li>尽量将请求拦截在系统上游（越上游越好）  </li>
+<li>读多写少的常用多使用缓存（为上一个目标服务）  </li>
+</ul>
+<h1 id="7-问题"><a href="#7-问题" class="headerlink" title="7 问题"></a>7 问题</h1><p>通过限流、队列、缓存等措施保证了秒杀系统的稳定运行，但是也带来了一些其他的问题：  </p>
+<ul>
+<li><ol>
+<li>使用缓存，带来的问题就是用户读到的数据不是最新的，而且不同用户读到的数据不一定相同，不过对于秒杀场景，这个不一致可接受。  </li>
+</ol>
+</li>
+</ul>
+<h1 id="8-扣除资格、发放物品（减少库存）部分采用分布式架构还是非分布式架构"><a href="#8-扣除资格、发放物品（减少库存）部分采用分布式架构还是非分布式架构" class="headerlink" title="8 扣除资格、发放物品（减少库存）部分采用分布式架构还是非分布式架构"></a>8 扣除资格、发放物品（减少库存）部分采用分布式架构还是非分布式架构</h1><h2 id="8-1-单机模式"><a href="#8-1-单机模式" class="headerlink" title="8.1 单机模式"></a>8.1 单机模式</h2><p>这个要看具体情况了，如果自己的秒杀活动通过如上几步限流，请求量很小了，那么这两个可以在一个数据库的多张表上操作，做成一个数据库事务。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Start</span> <span class="keyword">transaction</span></span><br><span class="line"><span class="keyword">Update</span> 积分=积分-xxx <span class="keyword">where</span> 积分&gt;xxx</span><br><span class="line"><span class="keyword">Update</span> 限量=限量<span class="number">-1</span> <span class="keyword">where</span> 限量&gt;<span class="number">0</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">accept</span> <span class="keyword">rows</span> = <span class="number">1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">Insert</span> 道具流水</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">Commit</span></span><br></pre></td></tr></table></figure></p>
+<p>然后再写一个定时任务，往扫描发货表里物品进行发货。整个逻辑完全由DB控制，没有接口调用，任何一步出错，都可以实现回滚。</p>
+<h2 id="8-2-分布式架构"><a href="#8-2-分布式架构" class="headerlink" title="8.2 分布式架构"></a>8.2 分布式架构</h2><p>如果用户数非常多，分布式架构也可以（多了很多RPC调用，会增加失败的几率，但是没别的办法）。这时，扣除积分是一个独立的服务，扣除成功后，将这个用户加入要发放物品的请求队列中。这样到了数据库层的流量也是可控的很少的。当然了，扣除积分这个接口的设计要注意<strong>幂等性</strong>。  </p>
+<p>流程如下：  </p>
+<ul>
+<li><ol>
+<li>用户请求到达服务器端后，首先去检查用户是否有资格。  </li>
+</ol>
+</li>
+<li><ol start="2">
+<li>如果有则扣除积分（扣除积分和回滚资格的接口要具有幂等性，可以重试）。  </li>
+</ol>
+</li>
+<li><ol start="3">
+<li>扣除用户资格（扣除资格和回滚资格的接口要具有幂等性，可以重试）。  </li>
+</ol>
+</li>
+<li><ol start="4">
+<li>将三步都成功的写入请求队列。  </li>
+</ol>
+</li>
+<li><ol start="5">
+<li>处理队列中的请求。  </li>
+</ol>
+</li>
+</ul>
+<p>分布式架构的时候要注意接口的设计，特别是幂等性。  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式系统/" rel="tag"># 分布式系统</a>
+          
+            <a href="/tags/幂等性/" rel="tag"># 幂等性</a>
+          
+            <a href="/tags/秒杀系统/" rel="tag"># 秒杀系统</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/experience/idempotence_func/" rel="next" title="接口幂等性">
+                <i class="fa fa-chevron-left"></i> 接口幂等性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/go/go_program/1-install/" rel="prev" title="Linux下安装Go">
+                Linux下安装Go <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-概述"><span class="nav-number">1.</span> <span class="nav-text">1 概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-秒杀业务为什么难做"><span class="nav-number">2.</span> <span class="nav-text">2 秒杀业务为什么难做</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-优化原则"><span class="nav-number">3.</span> <span class="nav-text">3 优化原则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-常见的系统架构"><span class="nav-number">4.</span> <span class="nav-text">4 常见的系统架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-具体如何优化"><span class="nav-number">4.1.</span> <span class="nav-text">5 具体如何优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-浏览器层"><span class="nav-number">4.2.</span> <span class="nav-text">5.1 浏览器层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-站点层"><span class="nav-number">4.3.</span> <span class="nav-text">5.2 站点层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-服务层拦截（最终的兜底逻辑）"><span class="nav-number">4.4.</span> <span class="nav-text">5.3 服务层拦截（最终的兜底逻辑）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-小结"><span class="nav-number">5.</span> <span class="nav-text">6 小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-问题"><span class="nav-number">6.</span> <span class="nav-text">7 问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-扣除资格、发放物品（减少库存）部分采用分布式架构还是非分布式架构"><span class="nav-number">7.</span> <span class="nav-text">8 扣除资格、发放物品（减少库存）部分采用分布式架构还是非分布式架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-单机模式"><span class="nav-number">7.1.</span> <span class="nav-text">8.1 单机模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-2-分布式架构"><span class="nav-number">7.2.</span> <span class="nav-text">8.2 分布式架构</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

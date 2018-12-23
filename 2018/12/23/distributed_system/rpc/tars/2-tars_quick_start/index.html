@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式系统,RPC框架,tars,高性能,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="引言在 tars install 中详细的介绍了tars的安装，部署了如下开发环境：    mysql主从环境   tars cpp开发环境(cpp rpc实现)    tars框架爱的基础服务   tars的web管理端接下来学习如何使用tars进行开发，这里的例子很简单，客户端发出hello world!，服务端返回，并在客户端输出。    编写服务端我们是在虚拟机上搭建的开发环境，为了使用w">
+<meta name="keywords" content="分布式系统,RPC框架,tars,高性能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tars 快速入门">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="引言在 tars install 中详细的介绍了tars的安装，部署了如下开发环境：    mysql主从环境   tars cpp开发环境(cpp rpc实现)    tars框架爱的基础服务   tars的web管理端接下来学习如何使用tars进行开发，这里的例子很简单，客户端发出hello world!，服务端返回，并在客户端输出。    编写服务端我们是在虚拟机上搭建的开发环境，为了使用w">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_apply.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_apply_after.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_patch.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_path_suc.png">
+<meta property="og:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/servant_manage.png">
+<meta property="og:updated_time" content="2018-12-23T11:53:18.184Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tars 快速入门">
+<meta name="twitter:description" content="引言在 tars install 中详细的介绍了tars的安装，部署了如下开发环境：    mysql主从环境   tars cpp开发环境(cpp rpc实现)    tars框架爱的基础服务   tars的web管理端接下来学习如何使用tars进行开发，这里的例子很简单，客户端发出hello world!，服务端返回，并在客户端输出。    编写服务端我们是在虚拟机上搭建的开发环境，为了使用w">
+<meta name="twitter:image" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/image/hello_svr_apply.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/">
+
+
+
+
+
+  <title>tars 快速入门 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tars 快速入门</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T18:57:38+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/rpc-tars/" itemprop="url" rel="index">
+                    <span itemprop="name">rpc-tars</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>在 <a href="./tars_install.md">tars install</a> 中详细的介绍了tars的安装，部署了如下开发环境：  </p>
+<ul>
+<li>mysql主从环境  </li>
+<li>tars cpp开发环境(cpp rpc实现)   </li>
+<li>tars框架爱的基础服务  </li>
+<li>tars的web管理端<br>接下来学习如何使用tars进行开发，这里的例子很简单，客户端发出hello world!，服务端返回，并在客户端输出。  </li>
+</ul>
+<h2 id="编写服务端"><a href="#编写服务端" class="headerlink" title="编写服务端"></a>编写服务端</h2><p>我们是在虚拟机上搭建的开发环境，为了使用windows上的编辑器，我们打算使用虚拟机vmware的共享文件夹功能，vmware默认情况下，共享文件夹过载在：/mnt/hgfs/下，我这里使用的是：/mnt/hgfs/CentOSOne/，并创建了自己学习的目录，最后得到如下目录：  </p>
+<ol>
+<li><p>cd /mnt/hgfs/CentOSOne/tars_study/HelloServer  </p>
+</li>
+<li><p>创建tars协议文件：Hello.tars，内容如下：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">module TestApp</span><br><span class="line">&#123;</span><br><span class="line">interface Hello</span><br><span class="line">&#123;</span><br><span class="line">    int test();</span><br><span class="line">    int testHello(string sReq, out string sRsp);</span><br><span class="line">&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编写makefile：  </p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">APP       := TestApp</span><br><span class="line">TARGET    := HelloServer</span><br><span class="line">CONFIG    := </span><br><span class="line">STRIP_FLAG:= N</span><br><span class="line">TARS_SSL := 1 之前在安装的时候设置了该选项，因此这里也设置这个值</span><br><span class="line">INCLUDE   += </span><br><span class="line">LIB       += </span><br><span class="line"></span><br><span class="line"><span class="comment">#-----------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> /usr/local/tars/cpp/makefile/makefile.tars   <span class="comment"># 这个文件非常重要必须包含。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行 make release 翻译tars文件，生成对应的.h文件和.cpp文件，同时，该命令会生成其他的文件，并拷贝到响应的目录。这里你可能会有疑问，生成.h和.cpp不就可以了吗？是的，理论上没错，因为我们这里是微服务框架，各个服务之间会发起RPC调用，其他服务会依赖于这份协议，当我们在同一台机器开发时，我们开发的tars协议翻译成的文件为了被大家可见，就会放到一个公共目录，当其他开发者依赖我们的服务时，只需要在makefile中包含生成的.mk文件，然后直接使用.h文件就好了。这个只是在使用tars框架时的一个约定，并没有对错，你也可以选择自己合适的约定。那么我们看看这个命令做了些什么：  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost HelloServer]# make release</span><br><span class="line">update .HelloServer.d ...</span><br><span class="line">In file included from HelloServer.cpp:18:0:</span><br><span class="line">HelloImp.h:21:19: fatal error: Hello.h: No such file or directory</span><br><span class="line"><span class="meta"> #</span>include "Hello.h"</span><br><span class="line">                   ^</span><br><span class="line">compilation terminated.</span><br><span class="line">update .HelloImp.d ...</span><br><span class="line">In file included from HelloImp.cpp:17:0:</span><br><span class="line">HelloImp.h:21:19: fatal error: Hello.h: No such file or directory</span><br><span class="line"><span class="meta"> #</span>include "Hello.h"</span><br><span class="line">                   ^</span><br><span class="line">compilation terminated.</span><br><span class="line">make: Warning: File `.HelloServer.d' has modification time 4.7 s in the future</span><br><span class="line">tars2cpp  </span><br><span class="line">rm -vf Hello.h</span><br><span class="line">tars2cpp  </span><br><span class="line">/usr/local/tars/cpp/tools/tars2cpp   Hello.tars</span><br><span class="line">[Copy file  Hello.tars Hello.h [Mm]akefile  -&gt;  /home/tarsproto/TestApp/HelloServer]</span><br><span class="line">‘Hello.tars’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/Hello.tars’</span><br><span class="line">‘Hello.h’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/Hello.h’</span><br><span class="line">‘makefile’ -&gt; ‘/home/tarsproto/TestApp/HelloServer/makefile’</span><br><span class="line">echo "INCLUDE += -I/home/tarsproto/TestApp/HelloServer"  &gt;  /home/tarsproto/TestApp/HelloServer/HelloServer.mk;</span><br><span class="line">make: warning:  Clock skew detected.  Your build may be incomplete.</span><br><span class="line">[root@localhost HelloServer]# ll</span><br></pre></td></tr></table></figure>
+<ul>
+<li><blockquote>
+<p>如上该命令 首先删除原来的文件：Hello.h  </p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>利用工具tars2cpp生成Hello.h 文件。  </p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>copy文件到/home/tarsproto/TestApp/HelloServer, 改目录中的文件如下：  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost util]# ll  /home/tarsproto/TestApp/HelloServer/ </span><br><span class="line">total 36</span><br><span class="line">-rwxr-xr-x. 1 root root 23886 Oct 19 15:59 Hello.h</span><br><span class="line">-rw-r--r--. 1 root root    49 Oct 19 15:59 HelloServer.mk</span><br><span class="line">-rwxr-xr-x. 1 root root   831 Oct 19 15:59 Hello.tars</span><br><span class="line">-rwxr-xr-x. 1 root root   392 Oct 19 15:59 makefile</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ul>
+</li>
+</ol>
+<p>其中HelloServer.mk很重要，调用该服务的其他服务需要包含该mk文件。   </p>
+<ol start="5">
+<li>编写服务端<br>在HelloServer下包含如下文件：  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost HelloServer]# ls</span><br><span class="line">HelloImp.cpp  HelloImp.h  HelloServer.cpp  HelloServer.h  Hello.tars  makefile</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>各个文件内容如下：<br><strong>HelloServer.h:</strong><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> _HelloServer_H_</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _HelloServer_H_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"servant/Application.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> tars;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloServer</span> :</span> <span class="keyword">public</span> Application</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~HelloServer() &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">destroyApp</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> HelloServer g_app;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+<p><strong>HelloServer.cpp:</strong><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"HelloServer.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"HelloImp.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line">HelloServer g_app;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> HelloServer::initialize()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//initialize application here:</span></span><br><span class="line">    addServant&lt;HelloImp&gt;(ServerConfig::Application + <span class="string">"."</span> + ServerConfig::ServerName + <span class="string">".HelloObj"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> HelloServer::destroyApp()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//destroy application here:</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        g_app.main(argc, argv);</span><br><span class="line">        g_app.waitForShutdown();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (<span class="built_in">std</span>::exception&amp; e)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cerr</span> &lt;&lt; <span class="string">"std::exception:"</span> &lt;&lt; e.what() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (...)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cerr</span> &lt;&lt; <span class="string">"unknown exception."</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">///////////////////////////////////////////////////////////</span></span><br></pre></td></tr></table></figure></p>
+<p>在文件HelloServer中，如下这一句是非常重要的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addServant&lt;HelloImp&gt;(ServerConfig::Application + <span class="string">"."</span> + ServerConfig::ServerName + <span class="string">".HelloObj"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>这一句就决定了部署时该服务监听的servant名字。为：TestApp.HelloServer.HelloObj， 同时，实现业务逻辑的类名为：HelloImp。 </p>
+<p>RPC接口的实现文件：HelloImp.cpp  HelloImp.h内容如下：<br><strong>HelloImp.h：</strong><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> _HelloImp_H_</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _HelloImp_H_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"servant/Application.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"Hello.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HelloImp</span> :</span> <span class="keyword">public</span> TestApp::Hello</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~HelloImp() &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">test</span><span class="params">(tars::TarsCurrentPtr current)</span> </span>&#123; <span class="keyword">return</span> <span class="number">0</span>;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">int</span> <span class="title">testHello</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;sReq, <span class="built_in">std</span>::<span class="built_in">string</span> &amp;sRsp, tars::TarsCurrentPtr current)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+<p><strong>HelloImp.cpp：</strong><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"HelloImp.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"servant/Application.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">void</span> HelloImp::initialize()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//initialize servant here:</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> HelloImp::destroy()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//destroy servant here:</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> HelloImp::testHello(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;sReq, <span class="built_in">std</span>::<span class="built_in">string</span> &amp;sRsp, tars::TarsCurrentPtr current)</span><br><span class="line">&#123;</span><br><span class="line">    TLOGDEBUG(<span class="string">"HelloImp::testHellosReq:"</span>&lt;&lt;sReq&lt;&lt;<span class="built_in">endl</span>);</span><br><span class="line">    sRsp = sReq;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ol start="6">
+<li><p>编译： make，生成HelloServer  </p>
+</li>
+<li><p>部署 ：</p>
+<ul>
+<li>申请：注意填写的各个参数值。特别设计应用名称，服务名称，Obj名称。<br><img src="./image/hello_svr_apply.png" alt="apply">   </li>
+<li>申请之后：<br><img src="./image/hello_svr_apply_after.png" alt="after">  </li>
+<li>发布：<br><img src="./image/hello_svr_patch.png" alt="patch"><br><img src="./image/hello_svr_path_suc.png" alt="patch_suc">   </li>
+</ul>
+</li>
+</ol>
+<p>如上就完成了服务端的编写。接下来编写客户端。  </p>
+<h2 id="编写客户端"><a href="#编写客户端" class="headerlink" title="编写客户端"></a>编写客户端</h2><ol>
+<li><p>编写makefile</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">APP       := TestApp</span><br><span class="line">TARGET    := TestHelloServer</span><br><span class="line">CONFIG    := </span><br><span class="line">STRIP_FLAG:= N</span><br><span class="line">TARS_SSL := 1</span><br><span class="line">INCLUDE   += </span><br><span class="line">LIB       += </span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> /home/tarsproto/TestApp/HelloServer/HelloServer.mk  <span class="comment"># 这个一定要包含，之前说过的</span></span><br><span class="line"><span class="keyword">include</span> /usr/local/tars/cpp/makefile/makefile.tars    <span class="comment"># 这个也要包含</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编写客户端 </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"servant/Communicator.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"Hello.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> TestApp;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> tars;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> ** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Communicator comm;   <span class="comment">// 客户端通信器</span></span><br><span class="line">    <span class="keyword">try</span></span><br><span class="line">    &#123;</span><br><span class="line">        HelloPrx prx;</span><br><span class="line">        <span class="comment">// 获得服务端代理</span></span><br><span class="line">        comm.stringToProxy(<span class="string">"TestApp.HelloServer.HelloObj@tcp -h 192.168.58.128 -t 60000 -p 10008"</span> , prx);</span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="function"><span class="built_in">string</span> <span class="title">sReq</span><span class="params">(<span class="string">"hello, world!"</span>)</span></span>;</span><br><span class="line">            <span class="function"><span class="built_in">string</span> <span class="title">sRsp</span><span class="params">(<span class="string">""</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> iRet = prx-&gt;testHello(sReq, sRsp);</span><br><span class="line">            <span class="built_in">cout</span> &lt;&lt; <span class="string">"iRet:"</span> &lt;&lt; iRet &lt;&lt; <span class="built_in">endl</span> &lt;&lt; <span class="string">"sReq:"</span> &lt;&lt; sReq &lt;&lt; <span class="built_in">endl</span> &lt;&lt; <span class="string">"sRsp:"</span> &lt;&lt; sRsp &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span>(exception &amp;ex)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">cerr</span> &lt;&lt; <span class="string">"ex:"</span> &lt;&lt; ex.what() &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span>(...)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">cerr</span> &lt;&lt; <span class="string">"unknown exception."</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span>(exception&amp; e)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cerr</span> &lt;&lt; <span class="string">"exception:"</span> &lt;&lt; e.what() &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (...)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">cerr</span> &lt;&lt; <span class="string">"unknown exception."</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>如上是一个最简单的客户端。其中很重要的就是：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">comm.stringToProxy(<span class="string">"TestApp.HelloServer.HelloObj@tcp -h 192.168.58.128 -t 60000 -p 10008"</span> , prx);</span><br></pre></td></tr></table></figure></p>
+<p>该句设置了将要调用的服务端servant信息：ip、端口等。这个信息可以在如下地方获取：  </p>
+<blockquote>
+<p>web管理端 -&gt; servant管理：<br> <img src="./image/servant_manage.png" alt="servant管理">   </p>
+</blockquote>
+<p>在这里你可能会问：这太不合理了，在互联网服务端，经常涉及到服务的扩容和迁移，IP、端口等变了怎么办？难道要重新编译发布？肯定不是这样的啦，框架肯定会有服务发现机制。这里我们只是构建一个最简单的例子，随着学习的深入，你会了解到框架如何做到服务发现。  </p>
+<ol start="3">
+<li>编译执行<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost Client]# make</span><br><span class="line">[root@localhost Client]# ./TestHelloServer </span><br><span class="line">2018-10-21 14:42:44|CommunicatorEpoll::run id:19765</span><br><span class="line">iRet:0</span><br><span class="line">sReq:hello, world!</span><br><span class="line">sRsp:hello, world!</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>如此，一个完整的客户端和服务端就编写完成了。这个例子的目的就是快速感受一下  </p>
+<h2 id="小节"><a href="#小节" class="headerlink" title="小节"></a>小节</h2><p>以上是我们手动创建的，其实，这些基础的文件可以通过在安装框架时安装的脚本自动生成，如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/tars/cpp/script/create_tars_server.sh TestApp HelloServer Hello</span><br></pre></td></tr></table></figure></p>
+<p>以上命令将生成如下目录和文件：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">目录：</span><br><span class="line">TestApp/</span><br><span class="line">TestApp/HelloServer</span><br><span class="line">文件：</span><br><span class="line">HelloImp.cpp  HelloImp.h  HelloServer.cpp  HelloServer.h  Hello.tars  makefile</span><br></pre></td></tr></table></figure></p>
+<p>你自己可以看看，在这里不再赘述。  </p>
+<h2 id="部署中遇到的问题"><a href="#部署中遇到的问题" class="headerlink" title="部署中遇到的问题"></a>部署中遇到的问题</h2><p>之前搭建好了开发学习环境，后来在关机之前，将虚拟机挂起了，但是当我再次重启的时候，虚拟机没有网卡，后来重新挂起虚拟机，然后又执行可以了，但是我发现web管理端访问有问题，自己去排查，发现web管理端的进程是在运行的。那肯定就是web管理端调用的服务有问题。通过ps aux | grep tars 发现，tarsnode服务没有启动，后来发现是我的/etc/hosts没有生效，然后重启网络：service network  restart， 启动tarsnode，ok了。  </p>
+<p>这里想说明的是，遇到问题要层层分析，不要慌乱。  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式系统/" rel="tag"># 分布式系统</a>
+          
+            <a href="/tags/RPC框架/" rel="tag"># RPC框架</a>
+          
+            <a href="/tags/tars/" rel="tag"># tars</a>
+          
+            <a href="/tags/高性能/" rel="tag"># 高性能</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/rpc/tars/1-tars_install/" rel="next" title="tars install">
+                <i class="fa fa-chevron-left"></i> tars install
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/rpc/tars/3-cpp_dev_specification/" rel="prev" title="tars cpp开发指南">
+                tars cpp开发指南 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#编写服务端"><span class="nav-number">1.1.</span> <span class="nav-text">编写服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写客户端"><span class="nav-number">1.2.</span> <span class="nav-text">编写客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小节"><span class="nav-number">1.3.</span> <span class="nav-text">小节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署中遇到的问题"><span class="nav-number">1.4.</span> <span class="nav-text">部署中遇到的问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

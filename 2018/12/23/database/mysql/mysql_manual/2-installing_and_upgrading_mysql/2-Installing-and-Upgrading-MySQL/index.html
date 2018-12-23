@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,数据库,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="安装和更新MySQL本章主要学习MySQL的下载、安装、升级。和其他软件的安装一样，mysql的安装通常也包括如下几个步骤：    1、确定mysql是否支持你的平台。地址。 2、选择要安装的发行版和版本(二进制还是源码)。 3、下载你计划安装的发行版。 4、安装发行版。 5、进行必要的安装后设置。 6、如果要运行mysql基准测试脚本，系统必须安装perl，支持perl脚本的运行。本章主要介绍在">
+<meta name="keywords" content="MySQL,数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL安装和升级">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/2-installing_and_upgrading_mysql/2-Installing-and-Upgrading-MySQL/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="安装和更新MySQL本章主要学习MySQL的下载、安装、升级。和其他软件的安装一样，mysql的安装通常也包括如下几个步骤：    1、确定mysql是否支持你的平台。地址。 2、选择要安装的发行版和版本(二进制还是源码)。 3、下载你计划安装的发行版。 4、安装发行版。 5、进行必要的安装后设置。 6、如果要运行mysql基准测试脚本，系统必须安装perl，支持perl脚本的运行。本章主要介绍在">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-23T11:45:44.229Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL安装和升级">
+<meta name="twitter:description" content="安装和更新MySQL本章主要学习MySQL的下载、安装、升级。和其他软件的安装一样，mysql的安装通常也包括如下几个步骤：    1、确定mysql是否支持你的平台。地址。 2、选择要安装的发行版和版本(二进制还是源码)。 3、下载你计划安装的发行版。 4、安装发行版。 5、进行必要的安装后设置。 6、如果要运行mysql基准测试脚本，系统必须安装perl，支持perl脚本的运行。本章主要介绍在">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/2-installing_and_upgrading_mysql/2-Installing-and-Upgrading-MySQL/">
+
+
+
+
+
+  <title>MySQL安装和升级 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/database/mysql/mysql_manual/2-installing_and_upgrading_mysql/2-Installing-and-Upgrading-MySQL/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL安装和升级</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T17:52:46+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL-manual/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL manual</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="安装和更新MySQL"><a href="#安装和更新MySQL" class="headerlink" title="安装和更新MySQL"></a>安装和更新MySQL</h1><p>本章主要学习MySQL的下载、安装、升级。和其他软件的安装一样，mysql的安装通常也包括如下几个步骤：  </p>
+<ul>
+<li>1、确定mysql是否支持你的平台。<a href="https://www.mysql.com/support/supportedplatforms/database.html" target="_blank" rel="noopener">地址</a>。</li>
+<li>2、选择要安装的发行版和版本(二进制还是源码)。</li>
+<li>3、下载你计划安装的发行版。</li>
+<li>4、安装发行版。</li>
+<li>5、进行必要的安装后设置。</li>
+<li>6、如果要运行mysql基准测试脚本，系统必须安装perl，支持perl脚本的运行。<br>本章主要介绍在UNIX、Linux、BSD，windows，OS X上的安装，不过通常情况下，我们的服务器都是安装在Linux上，因此我们主要对mysql在Linux上的安装进行详细的学习。</li>
+</ul>
+<hr>
+<h2 id="1、通用安装指南"><a href="#1、通用安装指南" class="headerlink" title="1、通用安装指南"></a>1、通用安装指南</h2><h3 id="1-1-选定版本和发行版"><a href="#1-1-选定版本和发行版" class="headerlink" title="1.1 选定版本和发行版"></a>1.1 选定版本和发行版</h3><p>本节学习mysql的通用安装指南。介绍安装mysql需要的通用信息。在安装mysql之前，先决定使用哪种版本和分发格式（二进制或源代码）。MySQL通常包含两种版本，开发版和GA版本，GA版本也称为稳定版本，生产环境一般不要安装开发版本，要安装GA版本。<br>mysql8.0的命名方案使用由三个数字和一个可选的后缀组成的版本名称; 例如：mysql-8.0.1-dmr。发行版名称中的数字解释如下：  </p>
+<ul>
+<li>第一个数字（8）是主版本号。</li>
+<li>第二个数字（0）是次版本号。综合来看，主和次数字构成发布系列号码。系列号描述了稳定的功能集。</li>
+<li>第三个数字（1）是发布系列中的版本号。主要表示bug的修复，并不增加新的功能集。对于每个新的修补程序，这个数字都会增加。在大多数情况下，最新版本是最好的选择。<br>可选的后缀表示了该版本的稳定性。具体如下：  </li>
+<li>dmr表示开发版本（DMR）。该版本会增加/删除功能。</li>
+<li>rc表示预发布版（RC）。该版本通过了MySQL的所有内部测试。RC版本中仍可能引入新功能，但重点转移到修复bug以稳定本系列之前引入的功能。</li>
+<li>没有后缀表示GA或生产版本，可以用于生产环境。<br>即：DMR–&gt;RC–&gt;GA版。<br>选择了要安装的mysql版本后，就需要决定安装的发行版了，对于大多数用户而言，二进制发行版通常是正确的选择。但是在某些情况下，需要从源代码进行安装。  </li>
+<li>你想在某个指定的位置安装mysql，而不是标准的位置。</li>
+<li>你希望配置mysqld，其中可能不包含标准二进制分发版中的功能。以下是常见的额外选项：  <blockquote>
+<ul>
+<li>通过-DWITH_LIBWRAP=1来支持TCP包装器</li>
+<li>-DWITH_ZLIB={system|bundled}，指定压缩特性</li>
+<li>-DWITH_DEBUG=1，支持debug</li>
+<li>更多额外的信息，参见<a href="https://dev.mysql.com/doc/refman/8.0/en/source-configuration-options.html" target="_blank" rel="noopener">MySQL Source-Configuration Options</a>.</li>
+</ul>
+</blockquote>
+</li>
+<li>你希望配置mysqld在标准二进制分发版中不包含的某些功能。</li>
+<li>你想要定制自己的mysql，修改其内核代码。</li>
+<li>源代码分发包含比二进制分发更多的测试和示例。</li>
+</ul>
+<h3 id="1-2-获得mysql"><a href="#1-2-获得mysql" class="headerlink" title="1.2 获得mysql"></a>1.2 获得mysql</h3><p> 确定了要安装的mysql版本和发行版之后，就去获得它，有如下几种途径：  </p>
+<ul>
+<li>下载最近几个版本mysql：<a href="http://dev.mysql.com/downloads/" target="_blank" rel="noopener">http://dev.mysql.com/downloads/</a></li>
+<li>完整的列表：<a href="http://dev.mysql.com/downloads/mirrors.html" target="_blank" rel="noopener">http://dev.mysql.com/downloads/mirrors.html</a></li>
+<li>获取最新的开发源码：<a href="https://dev.mysql.com/doc/refman/8.0/en/installing-development-tree.html" target="_blank" rel="noopener">2.8.3 Installing MySQL Using a Development Source Tree</a></li>
+</ul>
+<h3 id="1-3-校验包的完整性"><a href="#1-3-校验包的完整性" class="headerlink" title="1.3 校验包的完整性"></a>1.3 校验包的完整性</h3><p>下载完成之后，需要检查你安装包的完整性。主要有三种方法：  </p>
+<ul>
+<li>MD5校验和</li>
+<li>使用GNU Privacy Guard的GnuPG加密签名</li>
+<li>对于RPM软件包，内置RPM完整性验证机制<br><strong><em>验证MD5：</em></strong><br>在你下载了一个MySQL包之后，你应该确保它的MD5校验和与MySQL下载页面上提供的校验和匹配。每个操作系统都带有自己的md5程序，通常为md5sum。如果你的系统没有计算md5的工具，可以从google上下载安装。例如在linux上：  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> md5sum mysql-standard-8.0.13-linux-i686.tar.gz</span><br><span class="line">aaab65abbec64d5e907dcd41b8699945  mysql-standard-8.0.13-linux-i686.tar.gz</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong><em>使用GnuPG进行签名校验：</em></strong><br>该方法比md5更加可靠，但是需要更多的工作。GnuPG通常都会安装在linux上，如果没有安装，参见：<a href="http://www.gnupg.org/" target="_blank" rel="noopener">http://www.gnupg.org/</a> 。  </p>
+<ul>
+<li>具体如何验证，请参考官方网址<a href="https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html" target="_blank" rel="noopener">使用GnuPG进行签名检查</a> 。  </li>
+</ul>
+<p>通常情况下，我们使用md5来校验即可。<br><strong><em>使用RPM进行签名检查：</em></strong><br>对于RPM软件包，没有单独的签名。RPM软件包具有内置的GPG签名和MD5校验和。您可以通过运行以下命令来验证软件包：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shell&gt; rpm --checksig package_name.rpm</span><br><span class="line">shell&gt; rpm --checksig MySQL-server-8.0.13-0.linux_glibc2.5.i386.rpm</span><br><span class="line">MySQL-server-8.0.13-0.linux_glibc2.5.i386.rpm: md5 gpg OK</span><br></pre></td></tr></table></figure></p>
+<p>更多的校验方法，可从mysql手册上获得。  </p>
+<h3 id="1-4-安装布局"><a href="#1-4-安装布局" class="headerlink" title="1.4 安装布局"></a>1.4 安装布局</h3><p>不同的安装类型，不同的系统，布局不同，具体见官方手册<a href="https://dev.mysql.com/doc/refman/8.0/en/installation-layouts.html" target="_blank" rel="noopener">安装布局</a>。我们后边会详细学习源码的安装。并且学习源码安装的布局。</p>
+<h2 id="2、源码安装mysql"><a href="#2、源码安装mysql" class="headerlink" title="2、源码安装mysql"></a>2、源码安装mysql</h2><h3 id="2-1-源码安装"><a href="#2-1-源码安装" class="headerlink" title="2.1 源码安装"></a>2.1 源码安装</h3><p>在使用源码安装mysql之前，请先检查Oracle是否为你的平台生成了预编译的二进制分发版本，以及是否适合你的需求，因为Oracle官方花费了大量的精力来优化和构建mysql的二进制版本。有两种方式从源代码安装mysql：   </p>
+<ul>
+<li>使用标准的MySQL源码分发。即：mysql-VERSION.tar.gz, mysql-VERSION.zip这种文件，源代码文件不包含平台信息，二进制文件会包含平台信息，例如：pc-linux-i686、winx64</li>
+<li>使用MySQL开发树。<br>为了源码安装mysql，你需要自己从源码编译，从源代码安装MySQL需要多种工具。具体要求如下：  </li>
+<li>CMake  </li>
+<li>好的make程序，建议使用GNU make 3.75或更高版本</li>
+<li>mysql 8.0使用了C++ 11功能。对于常用的GCC而言，要求版本大于等于4.8</li>
+<li>MySQL C API需要使用C++或C99编译器来编译</li>
+<li><p>mysql依赖Boost，最好下载自带boost库的mysql源码版本。在使用CMake编译时，需要在调用CMake时通过WITH_BOOST选项来告诉构建系统Boost文件所在的位置：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> cmake . -DWITH_BOOST=/usr/local/boost_version_number</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ncurses 库</p>
+</li>
+<li>足够的内存</li>
+<li>为了运行测试脚本，需要安装Perl。</li>
+<li>对于标准的分发版，需要解压工具。</li>
+<li>对于使用mysql开发树，需要Git，bison 2.1或者更高版本，对于Solaris，还需要m4。<br><strong><em>源代码安装mysql后的布局</em></strong><br><strong><em>默认情况下</em></strong>，从源代码编译安装完成后，位于<em>/usr/local/mysql</em>下。安装目录下的组件与二进制发行版相同。如下：  </li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>目录</th>
+<th>目录的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bin</td>
+<td>mysqld，client，其他工具程序</td>
+</tr>
+<tr>
+<td>docs</td>
+<td>MySQL手册的Info格式</td>
+</tr>
+<tr>
+<td>man</td>
+<td>Unix手册页</td>
+</tr>
+<tr>
+<td>include</td>
+<td>include头文件</td>
+</tr>
+<tr>
+<td>lib</td>
+<td>库</td>
+</tr>
+<tr>
+<td>share</td>
+<td>错误消息，数据字典和用于数据库安装的SQL</td>
+</tr>
+<tr>
+<td>support-files</td>
+<td>其他支持文件</td>
+</tr>
+</tbody>
+</table>
+<p>为了源码编译安装mysql，我们需要先讲已有的mysql卸载。但是不同的安装方式，卸载方式也不同。MySQL的安装主要有三种方式：二进制包安装（Using Generic Binaries）、操作系统的包安装工具的安装、源码安装。  </p>
+<p><strong>操作系统的包安装工具的安装方式的MySQL卸载：</strong><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">rpm -qa | grep -i mysql</span><br><span class="line">service mysql status</span><br><span class="line">service mysql stop</span><br><span class="line"><span class="meta">#</span> 卸载各类组件</span><br><span class="line">rpm -ev MySQL-devel-5.6.23-1.linux_glibc2.5</span><br><span class="line">......</span><br><span class="line">rpm -ev MySQL-client-5.6.23-1.linux_glibc2.5</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 删除mysql对应的文件夹</span><br><span class="line">find / -name mysql</span><br><span class="line">rm -rf ....</span><br><span class="line"><span class="meta">#</span> 确认是否卸载干净</span><br><span class="line">rpm -qa | grep -i mysql</span><br></pre></td></tr></table></figure></p>
+<p><strong>二进制包/源码安装方式的MySQL卸载：</strong><br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 如果是采用二进制包安装的MySQL，那么你用下面命令是找不到任何MySQL组件的。</span><br><span class="line">rpm -qa | grep -i mysql</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 检查mysql进程状态</span><br><span class="line">/etc/init.d/mysql.server status</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 停止mysql</span><br><span class="line">/etc/init.d/mysql.server stop</span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span> 删除mysql对应的文件夹</span><br><span class="line">find / -name mysql</span><br><span class="line">rm -rf ....</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 删除配置文件</span><br><span class="line">/etc/my.cnf 或/etc/init.d/mysql.server等</span><br></pre></td></tr></table></figure></p>
+<p>可选的删除mysql用户和组。<br>要配置与默认值不同的安装位置，参见<a href="https://dev.mysql.com/doc/refman/8.0/en/source-configuration-options.html" target="_blank" rel="noopener">2.8.4 MySQL Source-Configuration Options</a>。<br>下边我们写了一个从标准的分发版安装mysql的脚本，具体更加的信息，可以参考mysql的官网：<br>该脚本结合了mysql官方手册的2.8和2.9节的内容，主要做的工作是mysql源码的编译、安装和安装后的初始化工作。<br>本脚本中选择的为标准的发行版：mysql-boost-8.0.11.tar.gz，下载之后，我们放在了/tmp下，在/tmp下的脚本为install_mysql.sh，其内容如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>/bin/bash</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>#####################################################################</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span>          该脚本用于在CentOS7上源码安装MySQL 8.0(包含boost)</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span>#####################################################################</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 测试必要的软件是否安装</span><br><span class="line">if [ `rpm -qa | grep 'ncurses' | wc -l` -ne 0 ];</span><br><span class="line">then</span><br><span class="line">	echo  "ncurses is installed\n"</span><br><span class="line">else</span><br><span class="line">	echo "ncurses is not installed\n"</span><br><span class="line">	exit 1</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ `rpm -qa | grep 'gcc' | wc -l` -ne 0 ];</span><br><span class="line">then</span><br><span class="line">	echo  "gcc is installed\n"</span><br><span class="line">else</span><br><span class="line">	echo "gcc is not installed\n"</span><br><span class="line">	exit 1</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ `rpm -qa | grep 'make' | wc -l` -ne 0 ];</span><br><span class="line">then</span><br><span class="line">	echo  "make is installed\n"</span><br><span class="line">else</span><br><span class="line">	echo "make is not installed\n"</span><br><span class="line">	exit 1</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ `rpm -qa | grep 'cmake' | wc -l` -ne 0 ];</span><br><span class="line">then</span><br><span class="line">	echo  "cmake is installed\n"</span><br><span class="line">else</span><br><span class="line">	echo "cmake is not installed\n"</span><br><span class="line">	exit 1</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if [ `rpm -qa | grep 'perl' | wc -l` -ne 0 ];</span><br><span class="line">then</span><br><span class="line">	echo  "perl is installed\n"</span><br><span class="line">else</span><br><span class="line">	echo "perl is not installed\n"</span><br><span class="line">	exit 1</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 安装准备</span><br><span class="line">groupadd mysql</span><br><span class="line">useradd -r -g mysql -s /bin/false mysql</span><br><span class="line"><span class="meta">#</span> 开始构建和安装</span><br><span class="line">tar zxvf mysql-boost-8.0.11.tar.gz</span><br><span class="line">cd mysql-8.0.11</span><br><span class="line">mkdir bld</span><br><span class="line">cd bld</span><br><span class="line">cmake .. -DWITH_BOOST=../boost/boost_1_66_0</span><br><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 初始化数据目录</span><br><span class="line"><span class="meta">#</span># 将位置更改为MySQL安装目录的顶级目录，通常是 /usr/local/mysql</span><br><span class="line">cd /usr/local/mysql</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 创建一个目录，该目录的位置可以提供给 secure_file_priv系统变量,这限制了对特定目录的导入/导出操作：</span><br><span class="line">mkdir mysql-files</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 将目录的所有权授予 mysql用户和组所有权 mysql，并为该目录设置正确的权限：</span><br><span class="line">chown mysql:mysql mysql-files</span><br><span class="line">chmod 750 mysql-files</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 初始化数据目录，包括mysql包含初始MySQL授权表的 数据库，以确定用户如何连接到服务器。</span><br><span class="line">bin/mysqld --initialize --user=mysql</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 如果希望服务器能够自动支持安全连接，请使用 mysql_ssl_rsa_setup实用程序创建默认的SSL和RSA文件：</span><br><span class="line">bin/mysql_ssl_rsa_setup</span><br><span class="line">bin/mysqld_safe --user=mysql &amp;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 支持Linux标准的service mysql start/systemctl start mysqld</span><br><span class="line">cp support-files/mysql.server /etc/init.d/mysql.server</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 如上安装完成之后输出如下信息：</span><br><span class="line"><span class="meta">#</span> -- Installing: /usr/local/mysql/support-files/mysql.server</span><br><span class="line"><span class="meta">#</span> 2018-05-20T16:32:41.424291Z 0 [System] [MY-013169] [Server] /usr/local/mysql/bin/mysqld (mysqld 8.0.11) initializing of server in progress as process 127500</span><br><span class="line"><span class="meta">#</span> 2018-05-20T16:32:44.343746Z 5 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: %Ktmpy7jtl5!</span><br><span class="line"><span class="meta">#</span> 2018-05-20T16:32:45.358071Z 0 [System] [MY-013170] [Server] /usr/local/mysql/bin/mysqld (mysqld 8.0.11) initializing of server has completed</span><br><span class="line"><span class="meta">#</span> Logging to '/usr/local/mysql/data/localhost.localdomain.err'.</span><br><span class="line"><span class="meta">#</span> [root@localhost tmp]# 2018-05-20T16:32:47.981912Z mysqld_safe Starting mysqld daemon with databases from /usr/local/mysql/data</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 注意：其中为root用户生成了临时密码，%Ktmpy7jtl5!，在稍后的登陆中必须使用该密码，登录之后立刻为root分配新密码，然后才能使用。</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 其中，最后一步为可选的手动拷贝</span><br><span class="line"><span class="meta">#</span> [root@localhost mysql]# cp support-files/mysql.server /etc/init.d/mysql.server</span><br><span class="line"><span class="meta">#</span> 这个拷贝是为了支持service mysql.server start语句。</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 登录</span><br><span class="line"><span class="meta">#</span>[root@localhost mysql]# mysql -uroot -p%Ktmpy7jtl5!</span><br><span class="line"><span class="meta">#</span> mysql: [Warning] Using a password on the command line interface can be insecure.</span><br><span class="line"><span class="meta">#</span> Welcome to the MySQL monitor.  Commands end with ; or \g.</span><br><span class="line"><span class="meta">#</span> Your MySQL connection id is 8</span><br><span class="line"><span class="meta">#</span> Server version: 8.0.11</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Oracle is a registered trademark of Oracle Corporation and/or its</span><br><span class="line"><span class="meta">#</span> affiliates. Other names may be trademarks of their respective</span><br><span class="line"><span class="meta">#</span> owners.</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> mysql&gt; </span><br><span class="line"><span class="meta">#</span> 设置新密码：ALTER USER 'root'@'localhost' IDENTIFIED BY 'mysql';</span><br><span class="line"><span class="meta">#</span> 首次安装登录之后，必须执行如上语句，重置root用户的密码，否则会出现如下错误：</span><br><span class="line"><span class="meta">#</span> ERROR 1820 (HY000): You must reset your password using ALTER USER statement before executing this statement.</span><br><span class="line"><span class="meta">#</span> 改变密码不过期：ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>###############################################################################</span><br><span class="line"><span class="meta">#</span> 注意和小结：</span><br><span class="line"><span class="meta">#</span> 在初始化数据目录时，如果使用--initialize，则会生成随机初始的root密码。在这种情</span><br><span class="line"><span class="meta">#</span> 况下，密码被标记为过期，你将需要选择一个新的密码。</span><br><span class="line"><span class="meta">#</span> 使用--initialize-insecure选项，不会为root生成密码;假设你在将服务器投入生产之前</span><br><span class="line"><span class="meta">#</span> 将会及时为帐户分配密码。</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 如果使用--initialize，则如下登录：</span><br><span class="line"><span class="meta">#</span> mysql -u root -p</span><br><span class="line"><span class="meta">#</span> 如果你不知道此密码，请查看服务器错误日志。</span><br><span class="line"><span class="meta">#</span> 登录之后必须设置新密码才可使用：ALTER USER 'root'@'localhost' IDENTIFIED BY 'mysql';</span><br><span class="line"><span class="meta">#</span> FLUSH PRIVILEGES;</span><br><span class="line"><span class="meta">#</span> 对于新版的MySQL 5.7.4及以后，设置密码不过期：</span><br><span class="line"><span class="meta">#</span> ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> 如果用 --initialize-insecure，则如下登录：</span><br><span class="line"><span class="meta">#</span> mysql -u root --skip-password</span><br><span class="line"><span class="meta">#</span> 连接后，分配一个新的root 密码：</span><br><span class="line"><span class="meta">#</span> ALTER USER 'root'@'%' IDENTIFIED BY 'new_password';</span><br><span class="line"><span class="meta">#</span> ALTER USER 'root'@'%' PASSWORD EXPIRE NEVER;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>###############################################################################</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 看看mysql从哪里读取配置文件呢：</span><br><span class="line"><span class="meta">#</span> [root@localhost bld]# mysql --verbose --help | grep -A 1 'Default options'</span><br><span class="line"><span class="meta">#</span> Default options are read from the following files in the given order:</span><br><span class="line"><span class="meta">#</span> /etc/my.cnf /etc/mysql/my.cnf /usr/local/mysql/etc/my.cnf ~/.my.cnf </span><br><span class="line"><span class="meta">#</span> [root@localhost tmp]#</span><br></pre></td></tr></table></figure></p>
+<p>至此，MySQL安装完成，并且可以正常使用了，具体安装过程中的各种配置，可以参考<a href="https://dev.mysql.com/doc/refman/8.0/en/installing.html" target="_blank" rel="noopener">官方手册</a></p>
+<hr>
+<h3 id="2-2-mysql源码配置选项"><a href="#2-2-mysql源码配置选项" class="headerlink" title="2.2 mysql源码配置选项"></a>2.2 mysql源码配置选项</h3><p>上边的脚本进行了mysql的源码安装，在编译的过程中，很多选项是可以指定的，接下对这些配置选项详细描述。<br>CMake程序提供了对MySQL源代码分发安装的大量控制。为了查看提供了哪些编译方面的控制，你可以在mysql源码标准发布版解压后的目录下执行如下命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> cmake .. -L   # overview(概观)</span><br><span class="line"><span class="meta">shell&gt;</span> cmake .. -LH  # overview with help text</span><br><span class="line"><span class="meta">shell&gt;</span> cmake .. -LAH # all params with help text（全部选项）</span><br><span class="line"><span class="meta">shell&gt;</span> ccmake ..     # interactive display</span><br><span class="line"><span class="meta">#</span> 例如：cmake .. -L 的输出为：</span><br><span class="line">-- Running cmake version 2.8.12.2</span><br><span class="line">-- Configuring with MAX_INDEXES = 64U</span><br><span class="line">-- CMAKE_GENERATOR: Unix Makefiles</span><br><span class="line">-- SIZEOF_VOIDP 8</span><br><span class="line">-- MySQL 8.0.11</span><br><span class="line">-- Packaging as: mysql-8.0.11-Linux-x86_64</span><br><span class="line">-- Found /usr/include/boost/version.hpp </span><br><span class="line">-- BOOST_VERSION_NUMBER is #define BOOST_VERSION 105300</span><br><span class="line">CMake Warning at cmake/boost.cmake:285 (MESSAGE):</span><br><span class="line">  Boost minor version found is 53 we need 66</span><br><span class="line">Call Stack (most recent call first):</span><br><span class="line">  CMakeLists.txt:671 (INCLUDE)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- BOOST_INCLUDE_DIR /usr/include</span><br><span class="line">-- LOCAL_BOOST_DIR </span><br><span class="line">-- LOCAL_BOOST_ZIP </span><br><span class="line">-- Could not find (the correct version of) boost.</span><br><span class="line">-- MySQL currently requires boost_1_66_0</span><br><span class="line"></span><br><span class="line">CMake Error at cmake/boost.cmake:100 (MESSAGE):</span><br><span class="line">  You can download it with -DDOWNLOAD_BOOST=1 -DWITH_BOOST=&lt;directory&gt;</span><br><span class="line"></span><br><span class="line">  This CMake script will look for boost in &lt;directory&gt;.  If it is not there,</span><br><span class="line">  it will download and unpack it (in that directory) for you.</span><br><span class="line"></span><br><span class="line">  If you are inside a firewall, you may need to use an https proxy:</span><br><span class="line"></span><br><span class="line">  export https_proxy=http://example.com:80</span><br><span class="line"></span><br><span class="line">Call Stack (most recent call first):</span><br><span class="line">  cmake/boost.cmake:288 (COULD_NOT_FIND_BOOST)</span><br><span class="line">  CMakeLists.txt:671 (INCLUDE)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- Configuring incomplete, errors occurred!</span><br><span class="line">See also "/tmp/mysql-8.0.11/CMakeFiles/CMakeOutput.log".</span><br><span class="line">See also "/tmp/mysql-8.0.11/CMakeFiles/CMakeError.log".</span><br><span class="line">-- Cache values</span><br><span class="line">ALTERNATIVE_GCC:FILEPATH=ALTERNATIVE_GCC-NOTFOUND</span><br><span class="line">ALTERNATIVE_GPP:FILEPATH=ALTERNATIVE_GPP-NOTFOUND</span><br><span class="line">CMAKE_BUILD_TYPE:STRING=RelWithDebInfo</span><br><span class="line">CMAKE_INSTALL_PREFIX:PATH=/usr/local/mysql</span><br><span class="line">COMMUNITY_BUILD:BOOL=ON</span><br><span class="line">DOWNLOAD_BOOST:BOOL=OFF</span><br><span class="line">DOWNLOAD_BOOST_TIMEOUT:STRING=600</span><br><span class="line">ENABLED_PROFILING:BOOL=ON</span><br><span class="line">ENABLE_GCOV:BOOL=OFF</span><br><span class="line">ENABLE_GPROF:BOOL=OFF</span><br><span class="line">ENABLE_MEMCACHED_SASL:BOOL=OFF</span><br><span class="line">ENABLE_MEMCACHED_SASL_PWDB:BOOL=OFF</span><br><span class="line">FEATURE_SET:STRING=community</span><br><span class="line">INSTALL_LAYOUT:STRING=STANDALONE</span><br><span class="line">INSTALL_STATIC_LIBRARIES:BOOL=ON</span><br><span class="line">LINK_RANDOMIZE:BOOL=OFF</span><br><span class="line">LINK_RANDOMIZE_SEED:STRING=mysql</span><br><span class="line">MYSQL_DATADIR:PATH=/usr/local/mysql/data</span><br><span class="line">MYSQL_KEYRINGDIR:PATH=/usr/local/mysql/keyring</span><br><span class="line">MY_GCC_COMPILER:FILEPATH=/usr/bin/gcc</span><br><span class="line">MY_UNAME:FILEPATH=/usr/bin/uname</span><br><span class="line">REPRODUCIBLE_BUILD:BOOL=OFF</span><br><span class="line">TMPDIR:PATH=P_tmpdir</span><br><span class="line">USE_LD_GOLD:BOOL=ON</span><br><span class="line">WITH_ARCHIVE_STORAGE_ENGINE:BOOL=ON</span><br><span class="line">WITH_ASAN:BOOL=OFF</span><br><span class="line">WITH_AUTHENTICATION_LDAP:BOOL=OFF</span><br><span class="line">WITH_BLACKHOLE_STORAGE_ENGINE:BOOL=ON</span><br><span class="line">WITH_BOOST:PATH=</span><br><span class="line">WITH_CLIENT_PROTOCOL_TRACING:BOOL=ON</span><br><span class="line">WITH_DEBUG:BOOL=OFF</span><br><span class="line">WITH_DEFAULT_COMPILER_OPTIONS:BOOL=ON</span><br><span class="line">WITH_DEFAULT_FEATURE_SET:BOOL=ON</span><br><span class="line">WITH_EDITLINE:STRING=bundled</span><br><span class="line">WITH_FEDERATED_STORAGE_ENGINE:BOOL=ON</span><br><span class="line">WITH_ICU:STRING=bundled</span><br><span class="line">WITH_INNOBASE_STORAGE_ENGINE:BOOL=ON</span><br><span class="line">WITH_INNODB_MEMCACHED:BOOL=OFF</span><br><span class="line">WITH_LZ4:STRING=bundled</span><br><span class="line">WITH_LZMA:STRING=bundled</span><br><span class="line">WITH_MSAN:BOOL=OFF</span><br><span class="line">WITH_RAPID:BOOL=OFF</span><br><span class="line">WITH_RE2:STRING=bundled</span><br><span class="line">WITH_SSL:STRING=system</span><br><span class="line">WITH_TEST_TRACE_PLUGIN:BOOL=OFF</span><br><span class="line">WITH_TSAN:BOOL=OFF</span><br><span class="line">WITH_UBSAN:BOOL=OFF</span><br><span class="line">WITH_UNIT_TESTS:BOOL=ON</span><br><span class="line">WITH_VALGRIND:BOOL=OFF</span><br><span class="line">WITH_ZLIB:STRING=bundled</span><br></pre></td></tr></table></figure></p>
+<p>在上边的编译过程中，如果cmake失败，那么你可能需要重新配置，通过使用不同选项再次运行它。如果你重新配置了，请注意以下事项：  </p>
+<ul>
+<li>如果在运行cmake之前已经运行过cmake，它可能会使用先前收集的信息。这些信息存储在CMakeCache.txt中。当CMake启动时，它会查找该文件并假设其中的信息仍然是正确的。但是，当你重新配置时，这个假设是错误的的。</li>
+<li>每次运行CMake时，都必须再次运行make来重新编译。但是，你可能希望先删除先前版本中的旧对象文件，因为它们是使用不同的配置选项编译的。<br>要防止使用旧对象文件或配置信息，请在重新运行CMake之前在Unix上的构建目录中运行这些命令：  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> make clean</span><br><span class="line"><span class="meta">shell&gt;</span> rm CMakeCache.txt</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>对于上边的脚本而言，我们的构建目录为：<strong><em>bld</em></strong><br>如上边我们在执行<strong>cmake .. -L</strong>时，cmake提示我们boost版本不一致，Boost minor version found is 53 we need 66（mysql需要66，而安装的为53），因此在我们的安装脚本中要指定boost路径，而不能使用默认的路径。<br>你也可以使用特定的环境变量来影响cmake，见<a href="https://dev.mysql.com/doc/refman/8.0/en/environment-variables.html" target="_blank" rel="noopener">4.9 MySQL Program Environment Variables</a>。<br>通过在构建目录（解压后创建的bld目录）下执行<strong>cmake .. -LAH</strong>可以查看所有这些编译选项及其默认值。<br>下边将对CMake选项进行详细的描述。<br>CMake选项主要包括儒如下几类：  </p>
+<ul>
+<li>常规选项  </li>
+<li>安装布局选项  </li>
+<li>存储引擎选项  </li>
+<li>功能特性选项</li>
+<li>编译器标志<br>对于布尔类型的选项，可以将该值指定为1或ON以启用该选项，或将其指定为0或OFF以禁用该选项。<br><strong><em>许多编译时选项可以在安装后服务器启动时通过选项文件或者命令行进行覆盖</em></strong>。例如：默认安装基础目录位置选项：CMAKE_INSTALL_PREFIX，TCP/IP端口号选项MYSQL_TCP_PORT, 和Unix套接字文件选项MYSQL_UNIX_ADDR可以在服务器启动时通过 –basedir, –port, 和–socket来指定。下边我们对一些重要的CMake编译选项进行描述，完整的列表可以参考mysql的官方手册或者使用cmake .. -LAH列出来，篇幅原因不再完整列出。</li>
+</ul>
+<h4 id="2-2-1-常规选项"><a href="#2-2-1-常规选项" class="headerlink" title="2.2.1 常规选项"></a>2.2.1 常规选项</h4><ul>
+<li>-DBUILD_CONFIG=mysql_release<br>该选项配置一个源代码发行版，其中包含与Oracle使用相同的构建选项来生成官方MySQL版本的二进制发行版。  </li>
+<li>-DCMAKE_BUILD_TYPE=type<br>type如下取值：  <blockquote>
+<ul>
+<li>RelWithDebInfo: 启用优化并生成调试信息。这是默认的MySQL构建类型  </li>
+<li>Debug: 禁用优化并生成调试信息。如果启用了WITH_DEBUG选项，也会使用此构建类型。即，-DWITH_DEBUG=1与-DCMAKE_BUILD_TYPE=Debug具有相同的效果。</li>
+</ul>
+</blockquote>
+</li>
+<li>-DCPACK_MONOLITHIC_INSTALL=bool<br>影响make是生成一个安装文件还是多个文件。默认值为OFF，表示生成多个安装文件。</li>
+</ul>
+<h4 id="2-2-2-安装布局选项"><a href="#2-2-2-安装布局选项" class="headerlink" title="2.2.2 安装布局选项"></a>2.2.2 安装布局选项</h4><ul>
+<li>-DCMAKE_INSTALL_PREFIX=dir_name<br>安装基础目录。该值可以在服务器启动时使用–basedir选项进行设置。默认为/usr/local/mysql  </li>
+<li>-DINSTALL_BINDIR=dir_name<br>安装用户程序的目录，一般使用默认值。DCMAKE_INSTALL_PREFIX/bin  </li>
+<li>-DINSTALL_DOCDIR=dir_name<br>文档安装目录。  </li>
+<li>-DINSTALL_DOCREADMEDIR=dir_name<br>README文件安装目录。  </li>
+<li>-DINSTALL_INCLUDEDIR=dir_name<br>头文件安装目录。  </li>
+<li>-DINSTALL_INFODIR=dir_name<br>Info文件安装目录  </li>
+<li><p>-DINSTALL_LAYOUT=name<br>选择预定义的安装布局。name取值如下：  </p>
+<blockquote>
+<ul>
+<li>STANDALONE: 与.tar.gz和.zip软件包使用的布局相同。默认值。  </li>
+<li>RPM: 布局类似于RPM软件包。  </li>
+<li>SVR4: Solaris软件包布局。  </li>
+<li>DEB: DEB软件包布局。<br>你可以选择预定义的安装布局，同时可以通过指定其他选项来修改各个组件的安装位置。例如：  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> cmake . -DINSTALL_LAYOUT=SVR4 -DMYSQL_DATADIR=/var/mysql/data</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<p>INSTALL_LAYOUT的值决定了secure_file_priv，keyring_encrypted_file_data和keyring_file_data系统变量的默认值。  </p>
+</li>
+<li>-DINSTALL_LIBDIR=dir_name<br>库文件安装目录。  </li>
+<li>-DINSTALL_MANDIR=dir_name<br>手册页安装目录。  </li>
+<li>-DINSTALL_MYSQLKEYRINGDIR=dir_path<br>用作keyring_file插件数据文件位置的默认目录。默认值是平台相关的并且取决于INSTALL_LAYOUT CMake选项的值。  </li>
+<li>-DINSTALL_MYSQLSHAREDIR=dir_name<br>share数据文件安装目录。  </li>
+<li>-DINSTALL_MYSQLTESTDIR=dir_name<br>在哪里安装mysql-test目录。要禁止安装此目录，请将该选项显式设置为空值（-DINSTALL_MYSQLTESTDIR =）。  </li>
+<li>-DINSTALL_PKGCONFIGDIR=dir_name<br>用于安装pkg-config使用的mysqlclient.pc文件的目录。默认值是INSTALL_LIBDIR/pkgconfig（除非INSTALL_LIBDIR以/mysql结尾，在这种情况下，首先删除它）。  </li>
+<li>-DINSTALL_PLUGINDIR=dir_name<br>插件的位置。该值可以在服务器启动时使用–plugin_dir选项进行设置。  </li>
+<li>-DINSTALL_SBINDIR=dir_name<br>安装mysqld的目录。  </li>
+<li>-DINSTALL_SECURE_FILE_PRIVDIR=dir_name<br>secure_file_priv系统变量的默认值。默认值是平台特定的，取决于INSTALL_LAYOUT CMake选项的值。  </li>
+<li>-DINSTALL_STATIC_LIBRARIES=bool<br>是否安装静态库。默认为ON。如果设置为OFF，则不安装这些库：libmysqlclient.a，libmysqlservices.a。  </li>
+<li>-DMYSQL_DATADIR=dir_name<br>MySQL数据目录的位置。该值可以在服务器启动时使用–datadir选项进行设置。  </li>
+<li>-DSYSCONFDIR=dir_name<br>默认的my.cnf选项文件位置。可以使用–defaults-file = file_name给定的选项文件启动服务器来进行修改。<br>其他的选项参考mysql的手册。  </li>
+</ul>
+<h4 id="2-2-3-存储引擎选项"><a href="#2-2-3-存储引擎选项" class="headerlink" title="2.2.3 存储引擎选项"></a>2.2.3 存储引擎选项</h4><p>存储引擎作为插件来构建。可以将插件构建为静态模块（编译到服务器中）或者动态模块（构建为动态库时，为了使用它，必须使用INSTALL PLUGIN语句或–plugin-load选项将其安装到服务器中），一些插件不能支持静态或动态构建。<br>InnoDB， MyISAM， MERGE， MEMORY，和 CSV存储引擎是强制性静态的（总是编译到服务器中）无需显式安装。<br>要将存储引擎静态编译到服务器中，请使用-DWITH_engine_STORAGE_ENGINE=1，engine的值可以是：ARCHIVE, BLACKHOLE, EXAMPLE, 和 FEDERATED，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-DWITH_ARCHIVE_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_BLACKHOLE_STORAGE_ENGINE=1</span><br></pre></td></tr></table></figure></p>
+<p>要从构建中排除某个引擎，请使用-DWITH_engine_STORAGE_ENGINE=0或者-DWITHOUT_engine_STORAGE_ENGINE=1<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-DWITH_ARCHIVE_STORAGE_ENGINE=0</span><br><span class="line">-DWITH_EXAMPLE_STORAGE_ENGINE=0</span><br><span class="line">-DWITH_FEDERATED_STORAGE_ENGINE=0</span><br><span class="line"></span><br><span class="line">-DWITHOUT_ARCHIVE_STORAGE_ENGINE=1</span><br><span class="line">-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1</span><br><span class="line">-DWITHOUT_FEDERATED_STORAGE_ENGINE=1</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-2-4-特性选项"><a href="#2-2-4-特性选项" class="headerlink" title="2.2.4 特性选项"></a>2.2.4 特性选项</h4><p>下边列出重要的选项。  </p>
+<ul>
+<li>-DDEFAULT_CHARSET=charset_name<br>默认情况下，MySQL使用utf8mb4字符集。该值可以在服务器启动时使用–character_set_server选项进行设置。  </li>
+<li>-DDEFAULT_COLLATION=collation_name<br>服务器排序规则。默认情况下，MySQL使用utf8mb4_0900_ai_ci。可以在服务器启动时使用–collat​​ion_server选项设置此值。  </li>
+<li>-DMAX_INDEXES=num<br>每个表的最大索引数。默认值为64.最大值为255.小于64的值将被忽略，并使用默认值64。  </li>
+<li>-DMYSQLX_TCP_PORT=port_num<br>X插件监听TCP/IP连接的端口号。默认值是33060。该值可在服务器启动时使用–mysqlx-port选项进行设置。  </li>
+<li>-DMYSQLX_UNIX_ADDR=file_name<br>服务器侦听X插件套接字连接的Unix套接字文件路径。这必须是绝对路径名称。默认值是/tmp/mysqlx.sock。该值可以在服务器启动时使用–mysqlx-socket选项进行设置。  </li>
+<li>-DMYSQL_TCP_PORT=port_num<br>服务器侦听TCP/IP连接的端口号。默认值是3306。该值可以在服务器启动时使用–port选项进行设置。  </li>
+<li><p>-DMYSQL_UNIX_ADDR=file_name<br>服务器侦听套接字连接的Unix套接字文件路径。这必须是绝对路径名称。默认是/tmp/mysql.sock。 这个值可以在服务器启动时用–socket选项来设置。<br>我们在默认情况下安装的话，使用netstat -an可以看到：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost tmp]# netstat -an | grep -E &apos;3306|mysql&apos;</span><br><span class="line">tcp6       0      0 :::33060                :::*                    LISTEN     </span><br><span class="line">tcp6       0      0 :::3306                 :::*                    LISTEN     </span><br><span class="line">unix  2      [ ACC ]     STREAM     LISTENING     2139620  /tmp/mysql.sock</span><br><span class="line">unix  2      [ ACC ]     STREAM     LISTENING     2139623  /tmp/mysqlx.sock</span><br><span class="line">unix  3      [ ]         STREAM     CONNECTED     3731765  /tmp/mysql.sock</span><br></pre></td></tr></table></figure>
+<p>如上有个CONNECTED状态的unix套接字文件，因为我们本地有个连接。  </p>
+</li>
+<li><p>-DWITH_BOOST=path_name<br>Boost库是构建MySQL所必需的。这些CMake选项可以控制库的位置，以及是否自动下载它：  </p>
+<blockquote>
+<ul>
+<li>-DWITH_BOOST=path_name，指定boost库的位置。也可以通过BOOST_ROOT 或者 WITH_BOOST环境变量指定。  </li>
+<li>-DWITH_BOOST=system，只是mysql使用系统安装的boost来构建，而不是使用mysql源代码发行版中包含的任何版本。  </li>
+<li>-DDOWNLOAD_BOOST=bool，是否下载Boost库。默认值为OFF。  </li>
+<li>-DDOWNLOAD_BOOST_TIMEOUT=seconds，下载Boost库的超时时间（秒）。默认为600秒。<br>例如自动构建mysql：   <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir bld</span><br><span class="line">cd bld</span><br><span class="line">cmake .. -DDOWNLOAD_BOOST=ON -DWITH_BOOST=$HOME/my_boost</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<p>这会使Boost下载到你的主目录下的my_boost目录中。如果所需的Boost版本已经存在，则不进行下载。如果所需的Boost版本更改，则会下载较新的版本。如果Boost已经在本地安装，并且编译器自己找到Boost头文件，则可能不需要指定前面的CMake选项。但是，如果MySQL所需的Boost版本已经升级但是本地安装的版本尚未升级，则可能会出现构建问题。通过上述方法将Boost下载到指定的位置，当所需的Boost版本发生更改时，你需要删除bld文件夹并重新创建它，然后再次执行cmake步骤。否则，新的Boost版本可能无法下载，编译可能会失败。  </p>
+</li>
+<li>-DWITH_DEBUG=bool<br>是否支持debug。</li>
+<li>-DWITH_INNODB_MEMCACHED=bool<br>是否生成memcached共享库（libmemcached.so和 innodb_engine.so）。  </li>
+<li>-DWITH_LZ4=lz4_type<br>使用哪个lz4库。  <blockquote>
+<ul>
+<li>bundled：使用mysql发行版自带的lz4库。  </li>
+<li>system：使用系统lz4库。  </li>
+</ul>
+</blockquote>
+</li>
+<li>-DWITH_PROTOBUF=protobuf_type<br>protobuf_type可以是以下值之一：  <blockquote>
+<ul>
+<li>bundled：使用与分发版捆绑在一起的软件包。这是默认设置。</li>
+<li>system：使用系统上安装的软件包。<br>其他值被忽略，回退到 bundled。<br>-DWITH_SSL={ssl_type|path_name}<br>编译要使用的SSL库相关的位置信息。  </li>
+</ul>
+</blockquote>
+</li>
+<li>-DWITH_ZLIB=zlib_type<br>与-DWITH_LZ4类似。<br>如上我们学习了常用的选项，完整的选项，见<a href="https://dev.mysql.com/doc/refman/8.0/en/source-configuration-options.html" target="_blank" rel="noopener">mysql手册</a>。  </li>
+</ul>
+<h4 id="2-2-5-编译器标志"><a href="#2-2-5-编译器标志" class="headerlink" title="2.2.5 编译器标志"></a>2.2.5 编译器标志</h4><ul>
+<li>-DCMAKE_C_FLAGS=”flags”<br>C编译器的标志。  </li>
+<li>-DCMAKE_CXX_FLAGS=”flags”<br>C ++编译器的标志。  </li>
+<li>-DWITH_DEFAULT_COMPILER_OPTIONS=bool<br>是否使用 cmake/build_configurations/compiler_options.cmake中的标志。<br><strong><em>注意：所有优化标志都经过了MySQL编译团队的仔细挑选和测试。因此不要随意的修改，除非你自己经过了严格的测试</em></strong>。<br>例如，要在64位Linux机器上创建32位版本，请执行以下操作：  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">shell&gt; mkdir bld</span><br><span class="line">shell&gt; cd bld</span><br><span class="line">shell&gt; cmake .. -DCMAKE_C_FLAGS=-m32 \</span><br><span class="line">        -DCMAKE_CXX_FLAGS=-m32 \</span><br><span class="line">        -DCMAKE_BUILD_TYPE=RelWithDebInfo</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>如上我们学习了常用的选项，完整的选项，见<a href="https://dev.mysql.com/doc/refman/8.0/en/source-configuration-options.html" target="_blank" rel="noopener">mysql手册</a>。  </p>
+<hr>
+<h2 id="3-升级或降级mysql"><a href="#3-升级或降级mysql" class="headerlink" title="3 升级或降级mysql"></a>3 升级或降级mysql</h2><p>软件升级是一种常见的过程。在生产环境升级之前，一定要先在测试环境执行升级过程，一切正常后才能在生产环境上进行。降级不常见。<br><strong><em>注意：不支持从MySQL 8.0降级到MySQL 5.7（或从一个MySQL 8.0发行版降级到以前的MySQL 8.0发行版）。唯一支持的方法是恢复升级前的备份，因此，在开始升级过程之前备份数据至关重要</em></strong><br>具体的见<a href="https://dev.mysql.com/doc/refman/8.0/en/upgrading-downgrading.html" target="_blank" rel="noopener">mysql的手册</a>。  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/18/database/leveldb/README/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/1-introduction_to_InnoDB/" rel="prev" title="InnoDB存储引擎简介">
+                InnoDB存储引擎简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装和更新MySQL"><span class="nav-number">1.</span> <span class="nav-text">安装和更新MySQL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、通用安装指南"><span class="nav-number">1.1.</span> <span class="nav-text">1、通用安装指南</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-选定版本和发行版"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 选定版本和发行版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-获得mysql"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 获得mysql</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-校验包的完整性"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 校验包的完整性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-安装布局"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.4 安装布局</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、源码安装mysql"><span class="nav-number">1.2.</span> <span class="nav-text">2、源码安装mysql</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-源码安装"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 源码安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-mysql源码配置选项"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 mysql源码配置选项</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-常规选项"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.2.1 常规选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-安装布局选项"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2.2 安装布局选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-存储引擎选项"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.2.3 存储引擎选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-4-特性选项"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">2.2.4 特性选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-5-编译器标志"><span class="nav-number">1.2.2.5.</span> <span class="nav-text">2.2.5 编译器标志</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-升级或降级mysql"><span class="nav-number">1.3.</span> <span class="nav-text">3 升级或降级mysql</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="安全性安全性是一个非常大的话题，包括了方方面面，本章主要学习与mysql安全相关的知识。在考虑MySQL安装中的安全性时，你应该考虑各种可能的主题以及它们如何影响MySQL服务器和相关应用程序的安全性：    1、影响安全性的一般因素。其中包括选择好的密码，不向用户授予不必要的权限，通过防止SQL注入和数据损坏来确保应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xufubo">
+<meta property="og:url" content="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/6-security/6-Security/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="安全性安全性是一个非常大的话题，包括了方方面面，本章主要学习与mysql安全相关的知识。在考虑MySQL安装中的安全性时，你应该考虑各种可能的主题以及它们如何影响MySQL服务器和相关应用程序的安全性：    1、影响安全性的一般因素。其中包括选择好的密码，不向用户授予不必要的权限，通过防止SQL注入和数据损坏来确保应用程序的安全性等。具体见 Section 6.1, General Securi">
+<meta property="og:updated_time" content="2018-11-14T15:06:03.512Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="xufubo">
+<meta name="twitter:description" content="安全性安全性是一个非常大的话题，包括了方方面面，本章主要学习与mysql安全相关的知识。在考虑MySQL安装中的安全性时，你应该考虑各种可能的主题以及它们如何影响MySQL服务器和相关应用程序的安全性：    1、影响安全性的一般因素。其中包括选择好的密码，不向用户授予不必要的权限，通过防止SQL注入和数据损坏来确保应用程序的安全性等。具体见 Section 6.1, General Securi">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/6-security/6-Security/"/>
+
+
+
+
+
+  <title> | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/6-security/6-Security/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-19T23:24:14+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h1><p>安全性是一个非常大的话题，包括了方方面面，本章主要学习与mysql安全相关的知识。<br>在考虑MySQL安装中的安全性时，你应该考虑各种可能的主题以及它们如何影响MySQL服务器和相关应用程序的安全性：  </p>
+<ul>
+<li>1、影响安全性的一般因素。其中包括选择好的密码，不向用户授予不必要的权限，通过防止SQL注入和数据损坏来确保应用程序的安全性等。具体见<a href="https://dev.mysql.com/doc/refman/8.0/en/general-security-issues.html" target="_blank" rel="noopener"> Section 6.1, General Security Issues</a>。</li>
+<li>2、安装本身的安全性。见<a href="https://dev.mysql.com/doc/refman/8.0/en/postinstallation.html" target="_blank" rel="noopener">Section 2.9, Postinstallation Setup and Testing”.</a>。  </li>
+<li>3、数据库系统本身的访问控制和安全性。本章的主要内容。  </li>
+<li>4、安全插件相关的特性。  </li>
+<li>5、MySQL和系统的网络安全性。安全性与个人用户的授权有关，你可能还希望限制MySQL的访问，使其仅在安装MySQL服务器的主机上可用，或者在一组有限的其他主机上可用。  </li>
+<li>6、做好数据的备份。设计好备份方案，做充分的测试。  </li>
+</ul>
+<h1 id="1、一般安全问题"><a href="#1、一般安全问题" class="headerlink" title="1、一般安全问题"></a>1、一般安全问题</h1><h2 id="1-1-安全指南"><a href="#1-1-安全指南" class="headerlink" title="1.1 安全指南"></a>1.1 安全指南</h2><p>在连接到Internet的计算机上使用MySQL的任何人都应阅读本节以避免最常见的安全错误。在讨论安全性时，有必要考虑完全保护整个服务器主机（不仅仅是MySQL服务器）免受所有类型的攻击，例如：窃听，更改，回放和拒绝服务等。  </p>
+<p>MySQL使用基于访问控制列表（ACL）的方式来处理用户可以尝试执行的所有连接，查询和其他操作。为了安全的传输数据，MySQL客户端和服务器之间也支持SSL加密连接。这里讨论的许多概念不是针对MySQL的，很多概念在其他应用程序上也是相同的。  </p>
+<p>运行MySQL时，请遵循以下准则：  </p>
+<ul>
+<li><strong>不要让任何人（MySQL root帐户除外 ）访问系统数据库mysql中的 user表！这很关键</strong>。</li>
+<li>了解和学习MySQL访问权限系统的工作原理（本章会学习），使用 GRANT和 REVOKE语句来控制对MySQL的访问。不要授予多余的权限。永远不会授予所有主机权限。<blockquote>
+<p>尝试mysql -u root，如果能够登录，这将是非常危险的，这时要查看MySQL安装说明，特别注意有关设置root密码的信息。具体见<a href="https://dev.mysql.com/doc/refman/8.0/en/default-privileges.html" target="_blank" rel="noopener">2.9.4 Securing the Initial MySQL Account</a>.<br>使用show grants语句检查用户拥有的权限，通过revoke删除不必要的权限。  </p>
+</blockquote>
+</li>
+<li>不要在数据库中存储明文密码。否则，如果你的计算机受到攻击，入侵者可以获取完整的密码列表并使用它们。相反，应该使用 SHA2()或一些其他单向散列函数并存储散列值。同时为了避免使用rainbow tables破解密码，要对密码加盐后使用这些散列函数，即：hash(passwd + salt)。   </li>
+<li>不要使用容易猜测的密码，比如生日、英文单词等。  </li>
+<li>将MySQL运行在防火墙之后。不应从不受信任的主机访问MySQL的监听端口。  </li>
+<li>访问MySQL的应用程序不应该信任用户输入的任何数据，应该使用适当的防御性编程技术编写。  </li>
+<li>不要通过Internet传输普通（未加密）数据。推荐使用MySQL内置的SSL连接，加密传输数据。  </li>
+<li>学习使用tcpdump和 字符串实用程序。在大多数情况下，您可以通过发出如下命令来检查MySQL数据流是否未加密：<blockquote>
+<p>shell&gt; tcpdump -l -i eth0 -w - src or dst port 3306 | strings</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="1-2-保持密码安全"><a href="#1-2-保持密码安全" class="headerlink" title="1.2 保持密码安全"></a>1.2 保持密码安全</h2><p>密码出现在MySQL中的几个上下文中。以下各节提供了一些准则，使最终用户和管理员能够保护这些密码的安全，并避免暴露这些密码。此外，validate_password插件可用于对可接受的密码实施策略。  </p>
+<h3 id="1-2-1-终端用户密码安全指南"><a href="#1-2-1-终端用户密码安全指南" class="headerlink" title="1.2.1 终端用户密码安全指南"></a>1.2.1 终端用户密码安全指南</h3><p>普通终端用户应该遵循如下指南：<br>当你通过mysql客户端程序连接到mysql服务器时，最好不要以一种公开来的方式给其他用户获取密码。此处列出了运行客户端程序时可用于指定密码的方法，以及每种方法的风险评估。简而言之，最安全的方法是让客户端程序提示输入密码或在受适当保护的配置文件中指定密码。  </p>
+<ul>
+<li><p>1、使用mysql_config_editor实用程序，该程序可以将登录身份信息存储在用户home目录的 .mylogin.cnf文件中，该文件经过了加密，因此，密码是不可见的。MySQL客户端程序稍后可以读取该文件以获取用于连接到MySQL服务器的身份验证凭据。这种比较安全  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> mysql_config_editor set --login-path=client</span><br><span class="line">         --host=localhost --user=localuser --password</span><br><span class="line">Enter password: enter password "localpass" here</span><br><span class="line"><span class="meta">shell&gt;</span> mysql_config_editor set --login-path=remote</span><br><span class="line">         --host=remote.example.com --user=remoteuser --password</span><br><span class="line">Enter password: enter password "remotepass" here</span><br><span class="line"></span><br><span class="line"><span class="meta">shell&gt;</span> mysql_config_editor print --all</span><br><span class="line">[client]</span><br><span class="line">user = localuser</span><br><span class="line">password = *****</span><br><span class="line">host = localhost</span><br><span class="line">[remote]</span><br><span class="line">user = remoteuser</span><br><span class="line">password = *****</span><br><span class="line">host = remote.example.com</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2、在命令行上：mysql -u francis -pfrank db_name  这个非常不安全，不推荐</p>
+</li>
+<li><p>3、这种是安全的</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">shell&gt; mysql -u francis -p db_name</span><br><span class="line">Enter password: ********</span><br></pre></td></tr></table></figure>
+<p>但是，这种输入密码的方法仅适用于以交互方式运行的程序。如果要从非交互式运行的脚本调用客户端，则无法从键盘输入密码。这时就要用到.mylogin.cnf这种加密文件的方式了。  </p>
+</li>
+<li><p>4、将密码存储在选项文件中。例如，在Unix上，您可以在主目录[client]中的.my.cnf文件部分 列出您的密码 ：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[client]</span><br><span class="line">password=your_pass</span><br></pre></td></tr></table></figure>
+<p>这个不安全，不推荐。如果非要使用，除了你自己之外，任何人都无法访问该文件：shell&gt; chmod 600 .my.cnf  </p>
+</li>
+<li>5、将密码存储在MYSQL_PWD 环境变量中。这种是最不安全的，坚决不能使用。</li>
+</ul>
+<p>总的来说就是不要在系统上留下明文密码，如果万不得已留下了，就要限制这些文件的访问权限为自己只读。例如mysql客户端用于记录sql操作的历史文件：<br>.mysql_history（位于用户home目录），linux的命令历史文件~/.bash_history等，都要设置成只有自己可读。  </p>
+<h3 id="1-2-2-管理员密码安全指南"><a href="#1-2-2-管理员密码安全指南" class="headerlink" title="1.2.2 管理员密码安全指南"></a>1.2.2 管理员密码安全指南</h3><p>数据库管理员应该遵循如下指南：  </p>
+<ul>
+<li>1、MySQL在mysql.user表中存储用户帐户的密码。永远不应该向任何非管理帐户授予对此表的访问权限。  </li>
+<li>2、帐户密码可以过期，以便用户必须重置它们。  </li>
+<li>3、validate_password插件可用于对可接受的密码强制实施策略（哪一类密码是合理的，比如密码长度、必须包含字母，数字等策略）。  </li>
+<li>4、应该保护可能写入密码的诸如日志文件等文件。  </li>
+<li>5、有权修改插件目录（plugin_dir系统变量的值）或my.cnf文件（其中可以指定插件目录的位置）的用户可以替换插件并修改插件提供的功能，包括身份验证插件。<strong>这一点要特别注意</strong>。  </li>
+</ul>
+<h3 id="1-2-3-密码和日志"><a href="#1-2-3-密码和日志" class="headerlink" title="1.2.3 密码和日志"></a>1.2.3 密码和日志</h3><h1 id="3、MySQL用户帐户管理"><a href="#3、MySQL用户帐户管理" class="headerlink" title="3、MySQL用户帐户管理"></a>3、MySQL用户帐户管理</h1><h2 id="3-1-用户名和密码"><a href="#3-1-用户名和密码" class="headerlink" title="3.1 用户名和密码"></a>3.1 用户名和密码</h2><p>mysql将账户信息存储在系统数据库mysql的user表中。MySQL支持身份验证插件，因此帐户可能使用某种外部身份验证方法进行身份验证。<br>mysql的用户名和密码有如下几点需要注意：  </p>
+<ul>
+<li>MySQL用户名最长可达32个字符。  </li>
+<li>要对使用MySQL本机身份验证（由mysql_native_password身份验证插件实现）的帐户进行客户端连接身份验证，服务器将使用存储在user表中的密码。如果服务器使用其他插件对客户端进行身份验证，则插件实现的身份验证方法可能会也可能不会使用存储在user表中的密码。在这种情况下，外部密码也可能用于向MySQL服务器进行身份验证。  </li>
+<li>存储在user表中的密码使用特定于插件的算法进行加密。  </li>
+<li><p>如果用户名和密码仅包含ASCII字符，则无论字符集设置如何，都可以连接到服务器。要在用户名或密码包含非ASCII字符时进行连接，则要使用MYSQL_SET_CHARSET_NAME 选项和相应的字符集名称作为参数来调用C API函数mysql_options()。这会使用指定的字符集进行身份认证。标准MySQL客户端程序支持一个–default-character-set选项，该选项就会导致调用mysql_options()。  </p>
+<h2 id="3-2-添加用户帐户"><a href="#3-2-添加用户帐户" class="headerlink" title="3.2 添加用户帐户"></a>3.2 添加用户帐户</h2><p>添加用户要使用对应的用户操作语句，例如：CREATE USER和 GRANT。这些语句使服务器对基础授权表进行适当的修改。这些语句的详细描述见：<a href="https://dev.mysql.com/doc/refman/8.0/en/account-management-sql.html" target="_blank" rel="noopener">Section 13.7.1, “Account Management Statements”</a>。<br><strong>注意：</strong> 不要直接使用insert、update、delete等语句直接修改授权表。避免不必要的问题。  </p>
+</li>
+</ul>
+<p>添加账户举例如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; CREATE USER 'finley'@'localhost' IDENTIFIED BY 'password';</span><br><span class="line">mysql&gt; GRANT ALL PRIVILEGES ON *.* TO 'finley'@'localhost'</span><br><span class="line">    -&gt;     WITH GRANT OPTION;</span><br><span class="line">mysql&gt; CREATE USER 'finley'@'%' IDENTIFIED BY 'password';</span><br><span class="line">mysql&gt; GRANT ALL PRIVILEGES ON *.* TO 'finley'@'%'</span><br><span class="line">    -&gt;     WITH GRANT OPTION;</span><br><span class="line">mysql&gt; CREATE USER 'admin'@'localhost' IDENTIFIED BY 'password';</span><br><span class="line">mysql&gt; GRANT RELOAD,PROCESS ON *.* TO 'admin'@'localhost';</span><br><span class="line">mysql&gt; CREATE USER 'dummy'@'localhost';</span><br></pre></td></tr></table></figure></p>
+<p>这些语句创建了如下账号：  </p>
+<ul>
+<li>两个名为finley的账户。二者都是具有所有权限的超级账户。’finley’@’localhost’仅能从本机连接mysql服务器，’finley’@’%’可以从任意机器连接mysql服务器。  </li>
+<li>‘admin’@’localhost’，表示admin只能从本机连接mysql服务器，admin具有RELOAD 和PROCESS管理权限。这些特权使 admin用户能够执行 mysqladmin reload。  </li>
+<li>‘dummy’@’localhost’帐户没有密码（这是不安全的，不推荐）。此帐户只能用于从本地主机进行连接。没有授予任何权限。  </li>
+</ul>
+<p>查看账户权限：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW GRANTS FOR 'admin'@'localhost';</span><br><span class="line">+<span class="comment">-----------------------------------------------------+</span></span><br><span class="line">| Grants for admin@localhost                          |</span><br><span class="line">+<span class="comment">-----------------------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> RELOAD, PROCESS <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">'admin'</span>@<span class="string">'localhost'</span> |</span><br><span class="line">+<span class="comment">-----------------------------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>查看账户的非权限属性：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW CREATE USER 'admin'@'localhost'\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="keyword">for</span> <span class="keyword">admin</span>@localhost: <span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'admin'</span>@<span class="string">'localhost'</span></span><br><span class="line"><span class="keyword">IDENTIFIED</span> <span class="keyword">WITH</span> <span class="string">'mysql_native_password'</span></span><br><span class="line"><span class="keyword">AS</span> <span class="string">'*67ACDEBDAB923990001F0FFB017EB8ED41861105'</span></span><br><span class="line">REQUIRE <span class="keyword">NONE</span> <span class="keyword">PASSWORD</span> <span class="keyword">EXPIRE</span> <span class="keyword">DEFAULT</span> <span class="keyword">ACCOUNT</span> <span class="keyword">UNLOCK</span></span><br></pre></td></tr></table></figure></p>
+<p>下一个示例创建三个帐户并授予他们访问特定数据库的权限:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; CREATE USER 'custom'@'localhost' IDENTIFIED BY 'password';</span><br><span class="line">mysql&gt; GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP</span><br><span class="line">    -&gt;     ON bankaccount.*</span><br><span class="line">    -&gt;     TO 'custom'@'localhost';</span><br><span class="line">mysql&gt; CREATE USER 'custom'@'host47.example.com' IDENTIFIED BY 'password';</span><br><span class="line">mysql&gt; GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP</span><br><span class="line">    -&gt;     ON expenses.*</span><br><span class="line">    -&gt;     TO 'custom'@'host47.example.com';</span><br><span class="line">mysql&gt; CREATE USER 'custom'@'%.example.com' IDENTIFIED BY 'password';</span><br><span class="line">mysql&gt; GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP</span><br><span class="line">    -&gt;     ON customer.*</span><br><span class="line">    -&gt;     TO 'custom'@'%.example.com';</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>第一个帐户可以访问bankaccount数据库，但只能从本地主机访问数据库服务器。  </li>
+<li>第二个帐户可以访问expenses 数据库，但只能从主机 host47.example.com访问数据库服务器。  </li>
+<li>第三个账户可以访问customer数据库，但只能从example.com 域中的任何主机访问数据库服务器。  </li>
+</ul>
+<h2 id="3-3-删除用户账户"><a href="#3-3-删除用户账户" class="headerlink" title="3.3 删除用户账户"></a>3.3 删除用户账户</h2><p>mysql&gt; DROP USER ‘jeffrey’@’localhost’;<br>主机名部分可以省略。  </p>
+<h2 id="3-4-使用角色"><a href="#3-4-使用角色" class="headerlink" title="3.4 使用角色"></a>3.4 使用角色</h2><p>mysql角色是一组权限的集合。理解角色的时候，可以与用户账户类比，即：这个账户有一个权限集，你可以将这个特殊账户赋予其他账户，其他账户就有了这个特殊账户（角色）的所有权限。创建的角色信息也位于mysql.user表中。<br>有了角色的概念，就可以通过业务概念将权限分组了，例如：read权限分配一个角色（包含select权限），write分配一个角色（包含insert，delete，update权限）。<br>以下总结了mysql提供的角色管理功能：  </p>
+<ul>
+<li>CREATE ROLE和DROP ROLE可以创建和删除角色。  </li>
+<li>GRANT和REVOKE为用户帐户和角色进行权限分配和撤销。  </li>
+<li>SHOW GRANTS 显示用户帐户和角色的权限和角色分配情况。  </li>
+<li>SET DEFAULT ROLE指定默认情况下哪些帐户角色处于活动状态。  </li>
+<li>SET ROLE更改当前会话中的活动角色。  </li>
+<li>CURRENT_ROLE（）函数显示当前会话中的活动角色。   </li>
+<li>mandatory_roles和activate_all_roles_on_login系统变量用于控制在用户登录服务器时，允许定义强制角色并自动激活授予的角色。  </li>
+</ul>
+<p>接下来从几个方面学习角色的使用：  </p>
+<ul>
+<li>创建角色并授予他们权限  </li>
+<li>定义强制性角色  </li>
+<li>检查角色权限  </li>
+<li>激活角色  </li>
+<li>撤消角色或角色权限  </li>
+<li>删除角色  </li>
+<li>用户和角色互换性  </li>
+</ul>
+<h3 id="创建角色并授予他们权限"><a href="#创建角色并授予他们权限" class="headerlink" title="创建角色并授予他们权限"></a>创建角色并授予他们权限</h3><p>这里我们假设有三类用户需要对app_db进行造作：</p>
+<ul>
+<li>1、做统计分析的只读用户  </li>
+<li>2、普通的修改用户  </li>
+<li>3、所有权限的用户  </li>
+</ul>
+<p>为了避免每次授权时列出很多权限，我们决定使用角色管理，同时，好的角色名字，使得权限集的意义更加明确。为此，首先需要创建角色。<br><strong>创建角色：</strong><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> <span class="string">'app_developer'</span>, <span class="string">'app_read'</span>, <span class="string">'app_write'</span>;</span><br><span class="line"><span class="comment">-- 这时在mysql.user中看到如下记录：</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">user</span>,host <span class="keyword">from</span> <span class="keyword">user</span>;</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| user             | host      |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">| app_developer    | %         |</span><br><span class="line">| app_read         | %         |</span><br><span class="line">| app_write        | %         |</span><br><span class="line">| test             | %         |</span><br><span class="line">| mysql.infoschema | localhost |</span><br><span class="line">| mysql.session    | localhost |</span><br><span class="line">| mysql.sys        | localhost |</span><br><span class="line">| root             | localhost |</span><br><span class="line">+<span class="comment">------------------+-----------+</span></span><br><span class="line">8 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>角色名称与用户帐户名称非常相似，由用户部分和主机部分组成：’user_name’@’host_name’。主机部分，如果省略，默认为’％’。<br>要为角色​​分配权限，请使用与为用户帐户分配权限相同的语法执行GRANT：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> ALL <span class="keyword">ON</span> app_db.* <span class="keyword">TO</span> <span class="string">'app_developer'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> app_db.* <span class="keyword">TO</span> <span class="string">'app_read'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">INSERT</span>, <span class="keyword">UPDATE</span>, <span class="keyword">DELETE</span> <span class="keyword">ON</span> app_db.* <span class="keyword">TO</span> <span class="string">'app_write'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>现在假设我们需要一个开发人员帐户，两个只读帐户，以及一个读/写帐户。使用CREATE USER创建帐户：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'dev1'</span>@<span class="string">'localhost'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'dev1pass'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'read_user1'</span>@<span class="string">'localhost'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'read_user1pass'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'read_user2'</span>@<span class="string">'localhost'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'read_user2pass'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'rw_user1'</span>@<span class="string">'localhost'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'rw_user1pass'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>使用GRANT为用户分配角色：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="string">'app_developer'</span> <span class="keyword">TO</span> <span class="string">'dev1'</span>@<span class="string">'localhost'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="string">'app_read'</span> <span class="keyword">TO</span> <span class="string">'read_user1'</span>@<span class="string">'localhost'</span>, <span class="string">'read_user2'</span>@<span class="string">'localhost'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="string">'app_read'</span>, <span class="string">'app_write'</span> <span class="keyword">TO</span> <span class="string">'rw_user1'</span>@<span class="string">'localhost'</span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="定义强制性角色"><a href="#定义强制性角色" class="headerlink" title="定义强制性角色"></a>定义强制性角色</h3><p>通过设置mandatory_roles系统变量的值可以将角色指定为强制角色。<em>服务器将强制角色视为授予所有用户</em>，因此不需要将其明确授予任何帐户。要在服务器启动时指定强制角色，请在my.cnf文件中配置mandatory_roles配置项的值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">mandatory_roles=&apos;role1,role2@localhost,r3@%.example.com&apos;</span><br></pre></td></tr></table></figure></p>
+<p>要在运行时设置和持久化mandatory_roles，请使用如下语句：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> PERSIST mandatory_roles = <span class="string">'role1,role2@localhost,r3@%.example.com'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>SET PERSIST设置正在运行的MySQL实例的值。它还保存了用于后续服务器重启的值; 请参见<a href="https://dev.mysql.com/doc/refman/8.0/en/set-variable.html" target="_blank" rel="noopener">第13.7.5.1节“变量赋值的SET语法”</a>。要更改正在运行的MySQL实例的值而不保存它以便后续重新启动，请使用GLOBAL关键字而不是 PERSIST。<br>除了通常需要设置全局系统变量的SYSTEM_VARIABLES_ADMIN或SUPER权限外，设置mandatory_roles还需要ROLE_ADMIN权限。<br>强制角色，确授予的角色，在激活之前不会生效。如果启用了activate_all_roles_on_login系统变量，则会在登录时对所有授予的角色进行角色激活，否则仅对设置为默认角色的角色进行角色激活。在运行时，通过SET ROLE激活角色。<br>在mandatory_roles的值中命名的角色不能使用REVOKE撤消，也不能使用DROP ROLE或DROP USER删除。<br>如果mysql.user系统表中不存在mandatory_roles中指定的角色，该角色未授予用户。当服务器尝试为用户激活角色时，它不会将不存在的角色视为必需角色，并向错误日志写入警告。如果角色稍后创建并因此变为有效，则需要执行FLUSH PRIVILEGES以使服务器将其视为必需角色。  </p>
+<p>SHOW GRANTS显示强制角色的信息。  </p>
+<h3 id="检查角色权限"><a href="#检查角色权限" class="headerlink" title="检查角色权限"></a>检查角色权限</h3><p>要验证分配给帐户的权限，请使用SHOW GRANTS。例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW GRANTS FOR 'dev1'@'localhost';</span><br><span class="line">+<span class="comment">-------------------------------------------------+</span></span><br><span class="line">| Grants for dev1@localhost                       |</span><br><span class="line">+<span class="comment">-------------------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`dev1`</span>@<span class="string">`localhost`</span>        |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="string">`app_developer`</span>@<span class="string">`%`</span> <span class="keyword">TO</span> <span class="string">`dev1`</span>@<span class="string">`localhost`</span> |</span><br><span class="line">+<span class="comment">-------------------------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>这只会显示该账户被授予的角色，并不会显示角色拥有的权限，要显示角色权限，请添加一个 USING子句：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW GRANTS FOR 'dev1'@'localhost' USING 'app_developer';</span><br><span class="line">+<span class="comment">----------------------------------------------------------+</span></span><br><span class="line">| Grants for dev1@localhost                                |</span><br><span class="line">+<span class="comment">----------------------------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`dev1`</span>@<span class="string">`localhost`</span>                 |</span><br><span class="line">| <span class="keyword">GRANT</span> ALL <span class="keyword">PRIVILEGES</span> <span class="keyword">ON</span> <span class="string">`app_db`</span>.* <span class="keyword">TO</span> <span class="string">`dev1`</span>@<span class="string">`localhost`</span> |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="string">`app_developer`</span>@<span class="string">`%`</span> <span class="keyword">TO</span> <span class="string">`dev1`</span>@<span class="string">`localhost`</span>          |</span><br><span class="line">+<span class="comment">----------------------------------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>再看看别的账户：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW GRANTS FOR 'read_user1'@'localhost' USING 'app_read';</span><br><span class="line">+<span class="comment">--------------------------------------------------------+</span></span><br><span class="line">| Grants for read_user1@localhost                        |</span><br><span class="line">+<span class="comment">--------------------------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`read_user1`</span>@<span class="string">`localhost`</span>         |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> <span class="string">`app_db`</span>.* <span class="keyword">TO</span> <span class="string">`read_user1`</span>@<span class="string">`localhost`</span> |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="string">`app_read`</span>@<span class="string">`%`</span> <span class="keyword">TO</span> <span class="string">`read_user1`</span>@<span class="string">`localhost`</span>       |</span><br><span class="line">+<span class="comment">--------------------------------------------------------+</span></span><br><span class="line">mysql&gt; <span class="keyword">SHOW</span> <span class="keyword">GRANTS</span> <span class="keyword">FOR</span> <span class="string">'rw_user1'</span>@<span class="string">'localhost'</span> <span class="keyword">USING</span> <span class="string">'app_read'</span>, <span class="string">'app_write'</span>;</span><br><span class="line">+<span class="comment">------------------------------------------------------------------------------+</span></span><br><span class="line">| Grants for rw_user1@localhost                                                |</span><br><span class="line">+<span class="comment">------------------------------------------------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`rw_user1`</span>@<span class="string">`localhost`</span>                                 |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">SELECT</span>, <span class="keyword">INSERT</span>, <span class="keyword">UPDATE</span>, <span class="keyword">DELETE</span> <span class="keyword">ON</span> <span class="string">`app_db`</span>.* <span class="keyword">TO</span> <span class="string">`rw_user1`</span>@<span class="string">`localhost`</span> |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="string">`app_read`</span>@<span class="string">`%`</span>,<span class="string">`app_write`</span>@<span class="string">`%`</span> <span class="keyword">TO</span> <span class="string">`rw_user1`</span>@<span class="string">`localhost`</span>               |</span><br><span class="line">+<span class="comment">------------------------------------------------------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>SHOW GRANTS也可以显示强制角色，详见<a href="https://dev.mysql.com/doc/refman/8.0/en/show-grants.html" target="_blank" rel="noopener">第13.7.6.21节“SHOW GRANTS语法”</a>.  </p>
+<h3 id="激活角色"><a href="#激活角色" class="headerlink" title="激活角色"></a>激活角色</h3><p>授予用户帐户的角色可以在帐户会话中处于活动状态或非活动状态。如果授予的角色在会话中处于活动状态，则其权限适用。要确定当前会话中哪些角色处于活动状态，请使用CURRENT_ROLE()函数。如下表示当前账户会话中没有活动角色：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT CURRENT_ROLE();</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| CURRENT_ROLE() |</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| NONE           |</span><br><span class="line">+<span class="comment">----------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>默认情况下，向帐户授予的角色或在mandatory_roles系统变量值中命名的角色不会自动在帐户会话中变为活动状态。例如之前的rw_user1到目前为止还没有激活任何角色。  </p>
+<p>要指定每次用户<em>连接到服务器并进行身份验证时</em>应激活哪些角色，请使用 SET DEFAULT ROLE。要将默认设置为先前创建的每个帐户的所有已分配角色，请使用以下语句：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> <span class="keyword">DEFAULT</span> <span class="keyword">ROLE</span> ALL <span class="keyword">TO</span></span><br><span class="line">  <span class="string">'dev1'</span>@<span class="string">'localhost'</span>,</span><br><span class="line">  <span class="string">'read_user1'</span>@<span class="string">'localhost'</span>,</span><br><span class="line">  <span class="string">'read_user2'</span>@<span class="string">'localhost'</span>,</span><br><span class="line">  <span class="string">'rw_user1'</span>@<span class="string">'localhost'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>现在对于rw_user1，连接后初始激活的角色为：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT CURRENT_ROLE();</span><br><span class="line">+<span class="comment">--------------------------------+</span></span><br><span class="line">| CURRENT_ROLE()                 |</span><br><span class="line">+<span class="comment">--------------------------------+</span></span><br><span class="line">| `app_read`@`%`,`app_write`@`%` |</span><br><span class="line">+<span class="comment">--------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>要在用户连接到服务器时自动激活所有显式授权和强制角色，请启用activate_all_roles_on_login 系统变量。默认情况下禁用。<br>在会话中，用户可以执行SET ROLE以更改活动角色集。例如，对于rw_user1：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 停用所有角色</span></span><br><span class="line">mysql&gt; SET ROLE NONE; SELECT CURRENT_ROLE();</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| CURRENT_ROLE() |</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| NONE           |</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line"><span class="comment">-- 激活除app_write外的所以角色</span></span><br><span class="line">mysql&gt; SET ROLE ALL EXCEPT 'app_write'; SELECT CURRENT_ROLE();</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| CURRENT_ROLE() |</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| `app_read`@`%` |</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line"><span class="comment">-- 回复默认角色</span></span><br><span class="line">mysql&gt; SET ROLE DEFAULT; SELECT CURRENT_ROLE();</span><br><span class="line">+<span class="comment">--------------------------------+</span></span><br><span class="line">| CURRENT_ROLE()                 |</span><br><span class="line">+<span class="comment">--------------------------------+</span></span><br><span class="line">| `app_read`@`%`,`app_write`@`%` |</span><br><span class="line">+<span class="comment">--------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>存储程序和视图对象的有效用户受DEFINER和SQL SECURITY属性的约束，这些属性决定执行是在调用者还是定义者上下文中执行,参见 <a href="https://dev.mysql.com/doc/refman/8.0/en/stored-programs-security.html" target="_blank" rel="noopener">第23.6节“存储的程序和视图的访问控制”</a>:  </p>
+<ul>
+<li>在调用者上下文中执行的存储程序和视图对象使用当前会话中的活动角色。  </li>
+<li>在定义上下文中执行的存储程序和视图对象使用DEFINER属性中指定的用户的默认角色执行。如果 activate_all_roles_on_login 启用，则此类对象将执行授予DEFINER用户的所有角色，包括强制角色。对于存储程序，如果执行的角色与默认值不同，则应执行程序体SET ROLE以激活所需的角色。  </li>
+</ul>
+<h3 id="撤消角色或角色权限"><a href="#撤消角色或角色权限" class="headerlink" title="撤消角色或角色权限"></a>撤消角色或角色权限</h3><p>正如可以将角色授予帐户一样，可以从帐户中撤消这些角色：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">REVOKE</span> <span class="keyword">role</span> <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure></p>
+<p>在系统变量mandatory_roles的值中命名的角色无法撤消。<br>REVOKE也可以应用于角色以修改授予它的权限。这不仅会影响角色本身，还会影响授予了该角色的任何帐户。例如：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">REVOKE</span> <span class="keyword">INSERT</span>, <span class="keyword">UPDATE</span>, <span class="keyword">DELETE</span> <span class="keyword">ON</span> app_db.* <span class="keyword">FROM</span> <span class="string">'app_write'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>这使得app_write角色没有任何权限，正如SHOW GRANTS展示的那样(这表明该语句不仅可以用于账户，也可以与角色一起使用)：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW GRANTS FOR 'app_write';</span><br><span class="line">+<span class="comment">---------------------------------------+</span></span><br><span class="line">| Grants for app_write@%                |</span><br><span class="line">+<span class="comment">---------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`app_write`</span>@<span class="string">`%`</span> |</span><br><span class="line">+<span class="comment">---------------------------------------+</span></span><br><span class="line"><span class="comment">-- 没有任何权限</span></span><br></pre></td></tr></table></figure></p>
+<p>这时rw_user1已经没有表修改权限了：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SHOW GRANTS FOR 'rw_user1'@'localhost'</span><br><span class="line">       USING 'app_read', 'app_write';</span><br><span class="line">+<span class="comment">----------------------------------------------------------------+</span></span><br><span class="line">| Grants for rw_user1@localhost                                  |</span><br><span class="line">+<span class="comment">----------------------------------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`rw_user1`</span>@<span class="string">`localhost`</span>                   |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> <span class="string">`app_db`</span>.* <span class="keyword">TO</span> <span class="string">`rw_user1`</span>@<span class="string">`localhost`</span>           |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="string">`app_read`</span>@<span class="string">`%`</span>,<span class="string">`app_write`</span>@<span class="string">`%`</span> <span class="keyword">TO</span> <span class="string">`rw_user1`</span>@<span class="string">`localhost`</span> |</span><br><span class="line">+<span class="comment">----------------------------------------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到，rw_user1已经成了只读用户。<br>要恢复角色的权限，只需重新授予它们：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">INSERT</span>, <span class="keyword">UPDATE</span>, <span class="keyword">DELETE</span> <span class="keyword">ON</span> app_db.* <span class="keyword">TO</span> <span class="string">'app_write'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>现在rw_user1再次拥有修改权限，授予了app_write角色的任何其他帐户也是如此。  </p>
+<h3 id="删除角色"><a href="#删除角色" class="headerlink" title="删除角色"></a>删除角色</h3><p>要删除角色，请使用DROP ROLE：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">ROLE</span> <span class="string">'app_read'</span>, <span class="string">'app_write'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>删除角色会从授予它的每个帐户撤消该角色。<br>在系统变量mandatory_roles的值中命名的角色无法删除。   </p>
+<h3 id="用户和角色互换性"><a href="#用户和角色互换性" class="headerlink" title="用户和角色互换性"></a>用户和角色互换性</h3><p>账户和角色可以互换使用。可以将用户帐户视为角色，并将该帐户授予其他用户或角色。其结果是将帐户的<em>权限和角色</em>授予其他<em>用户或角色</em>。<br>举个例子：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建用户/角色并将权限授予用户/角色，将用户/角色授予用户/角色</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'u1'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> <span class="string">'r1'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> db1.* <span class="keyword">TO</span> <span class="string">'u1'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> db2.* <span class="keyword">TO</span> <span class="string">'r1'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'u2'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> <span class="string">'r2'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="string">'u1'</span>, <span class="string">'r1'</span> <span class="keyword">TO</span> <span class="string">'u2'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="string">'u1'</span>, <span class="string">'r1'</span> <span class="keyword">TO</span> <span class="string">'r2'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 看看用户u2和角色r2的权限</span></span><br><span class="line">mysql&gt; SHOW GRANTS FOR 'u2' USING 'u1', 'r1';</span><br><span class="line">+<span class="comment">-------------------------------------+</span></span><br><span class="line">| Grants for u2@%                     |</span><br><span class="line">+<span class="comment">-------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`u2`</span>@<span class="string">`%`</span>      |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> <span class="string">`db1`</span>.* <span class="keyword">TO</span> <span class="string">`u2`</span>@<span class="string">`%`</span> |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> <span class="string">`db2`</span>.* <span class="keyword">TO</span> <span class="string">`u2`</span>@<span class="string">`%`</span> |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="string">`u1`</span>@<span class="string">`%`</span>,<span class="string">`r1`</span>@<span class="string">`%`</span> <span class="keyword">TO</span> <span class="string">`u2`</span>@<span class="string">`%`</span> |</span><br><span class="line">+<span class="comment">-------------------------------------+</span></span><br><span class="line">mysql&gt; <span class="keyword">SHOW</span> <span class="keyword">GRANTS</span> <span class="keyword">FOR</span> <span class="string">'r2'</span> <span class="keyword">USING</span> <span class="string">'u1'</span>, <span class="string">'r1'</span>;</span><br><span class="line">+<span class="comment">-------------------------------------+</span></span><br><span class="line">| Grants for r2@%                     |</span><br><span class="line">+<span class="comment">-------------------------------------+</span></span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">USAGE</span> <span class="keyword">ON</span> *.* <span class="keyword">TO</span> <span class="string">`r2`</span>@<span class="string">`%`</span>      |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> <span class="string">`db1`</span>.* <span class="keyword">TO</span> <span class="string">`r2`</span>@<span class="string">`%`</span> |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> <span class="string">`db2`</span>.* <span class="keyword">TO</span> <span class="string">`r2`</span>@<span class="string">`%`</span> |</span><br><span class="line">| <span class="keyword">GRANT</span> <span class="string">`u1`</span>@<span class="string">`%`</span>,<span class="string">`r1`</span>@<span class="string">`%`</span> <span class="keyword">TO</span> <span class="string">`r2`</span>@<span class="string">`%`</span> |</span><br><span class="line">+<span class="comment">-------------------------------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>当然了，以上讨论是简单的使用，真实情况下也是有意义的，例如：之前有个用户账户，具有一堆权限：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'old_app_dev'</span>@<span class="string">'localhost'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'old_app_devpass'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> ALL <span class="keyword">ON</span> old_app.* <span class="keyword">TO</span> <span class="string">'old_app_dev'</span>@<span class="string">'localhost'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>现在这个用户离职了，那么有两种方法解决这个问题：  </p>
+<ul>
+<li><p>1-不使用角色：更改帐户密码，以便原始开发人员无法使用它，并让新开发人员使用该帐户：  </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span> <span class="string">'old_app_dev'</span>@<span class="string">'localhost'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'new_password'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2-锁定帐户以防止任何人使用它来连接到服务器,然后将账户作为角色使用：  </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 锁定老帐户</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span> <span class="string">'old_app_dev'</span>@<span class="string">'localhost'</span> <span class="keyword">ACCOUNT</span> <span class="keyword">LOCK</span>;</span><br><span class="line"><span class="comment">-- 创建新账户并分配权限</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">'new_app_dev1'</span>@<span class="string">'localhost'</span> <span class="keyword">IDENTIFIED</span> <span class="keyword">BY</span> <span class="string">'new_password'</span>;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="string">'old_app_dev'</span>@<span class="string">'localhost'</span> <span class="keyword">TO</span> <span class="string">'new_app_dev1'</span>@<span class="string">'localhost'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="3-5-预留的用户账户"><a href="#3-5-预留的用户账户" class="headerlink" title="3.5 预留的用户账户"></a>3.5 预留的用户账户</h2><p>mysql安装的一部分是数据目录初始化，在这期间，mysql会创建保留账户：  </p>
+<ul>
+<li>‘root’@’localhost：用于管理目的。此帐户具有所有权限，可以执行任何操作。  </li>
+<li>‘mysql.sys’@’localhost’：用作sys模式对象的DEFINER。使用mysql.sys帐户可以避免DBA重命名或删除root帐户时出现的问题。此帐户已锁定，因此无法用于客户端连接。  </li>
+<li>‘mysql.session’@’localhost’：由插件在内部使用以访问服务器。此帐户已锁定，因此无法用于客户端连接。  </li>
+<li>‘mysql.infoschema’@’localhost’：用作INFORMATION_SCHEMA视图的DEFINER。使用mysql.infoschema帐户可以避免DBA重命名或删除root帐户时出现的问题。此帐户已锁定，因此无法用于客户端连接。  </li>
+</ul>
+<h2 id="3-6-设置帐户资源限制"><a href="#3-6-设置帐户资源限制" class="headerlink" title="3.6 设置帐户资源限制"></a>3.6 设置帐户资源限制</h2>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/5-mysql_server_administration/4-mysql_server_logs/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/7-backup_and_recovery/7-Backup_and_Recovery/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安全性"><span class="nav-number">1.</span> <span class="nav-text">安全性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1、一般安全问题"><span class="nav-number">2.</span> <span class="nav-text">1、一般安全问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-安全指南"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 安全指南</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-保持密码安全"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 保持密码安全</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-终端用户密码安全指南"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.2.1 终端用户密码安全指南</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-管理员密码安全指南"><span class="nav-number">2.2.2.</span> <span class="nav-text">1.2.2 管理员密码安全指南</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-3-密码和日志"><span class="nav-number">2.2.3.</span> <span class="nav-text">1.2.3 密码和日志</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3、MySQL用户帐户管理"><span class="nav-number">3.</span> <span class="nav-text">3、MySQL用户帐户管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-用户名和密码"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 用户名和密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-添加用户帐户"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 添加用户帐户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-删除用户账户"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 删除用户账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-使用角色"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 使用角色</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建角色并授予他们权限"><span class="nav-number">3.4.1.</span> <span class="nav-text">创建角色并授予他们权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义强制性角色"><span class="nav-number">3.4.2.</span> <span class="nav-text">定义强制性角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查角色权限"><span class="nav-number">3.4.3.</span> <span class="nav-text">检查角色权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#激活角色"><span class="nav-number">3.4.4.</span> <span class="nav-text">激活角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#撤消角色或角色权限"><span class="nav-number">3.4.5.</span> <span class="nav-text">撤消角色或角色权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除角色"><span class="nav-number">3.4.6.</span> <span class="nav-text">删除角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用户和角色互换性"><span class="nav-number">3.4.7.</span> <span class="nav-text">用户和角色互换性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-预留的用户账户"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 预留的用户账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-设置帐户资源限制"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 设置帐户资源限制</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

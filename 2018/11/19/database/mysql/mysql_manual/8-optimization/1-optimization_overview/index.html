@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="引言对系统性能的优化是每一个工程师孜孜不倦追求的目标，现在随着数据量爆炸式的增长，一个系统的架构越来越复杂，几乎每一个系统都是分布式系统，每一个系统都分为多个层次，为了提高系统性能，系统中存在大量的缓存。目前来看，一个系统大概分为如下几层：  接入层 逻辑层 cache层（redis、memcahed等） 持久层（my">
+<meta property="og:type" content="article">
+<meta property="og:title" content="优化">
+<meta property="og:url" content="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/1-optimization_overview/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="引言对系统性能的优化是每一个工程师孜孜不倦追求的目标，现在随着数据量爆炸式的增长，一个系统的架构越来越复杂，几乎每一个系统都是分布式系统，每一个系统都分为多个层次，为了提高系统性能，系统中存在大量的缓存。目前来看，一个系统大概分为如下几层：  接入层 逻辑层 cache层（redis、memcahed等） 持久层（mysql集群、分布式文件系统等）。每一层都需要做优化，系统的性能瓶颈取决于性能最低">
+<meta property="og:updated_time" content="2018-11-19T15:21:10.206Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="优化">
+<meta name="twitter:description" content="引言对系统性能的优化是每一个工程师孜孜不倦追求的目标，现在随着数据量爆炸式的增长，一个系统的架构越来越复杂，几乎每一个系统都是分布式系统，每一个系统都分为多个层次，为了提高系统性能，系统中存在大量的缓存。目前来看，一个系统大概分为如下几层：  接入层 逻辑层 cache层（redis、memcahed等） 持久层（mysql集群、分布式文件系统等）。每一层都需要做优化，系统的性能瓶颈取决于性能最低">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/1-optimization_overview/"/>
+
+
+
+
+
+  <title>优化 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/1-optimization_overview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">优化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-19T23:25:11+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>对系统性能的优化是每一个工程师孜孜不倦追求的目标，现在随着数据量爆炸式的增长，一个系统的架构越来越复杂，几乎每一个系统都是分布式系统，每一个系统都分为多个层次，为了提高系统性能，系统中存在大量的缓存。目前来看，一个系统大概分为如下几层：</p>
+<ul>
+<li>接入层</li>
+<li>逻辑层</li>
+<li>cache层（redis、memcahed等）</li>
+<li>持久层（mysql集群、分布式文件系统等）。<br>每一层都需要做优化，系统的性能瓶颈取决于性能最低的地方。接入层通常来说主要是负载均衡和命令字转发的功能。就是网络包的透传，而且可以很容易的实现线性扩展。逻辑层通常基于RPC，也可以很容易的线性扩展，cache层，通常是对内存的直接操作，速度很快，而且通过k-v可以很容易的做到分布式，最为复杂麻烦的就在于持久层。这一层通常难以扩展，而且对于数据库而言，也有很多点可以优化。现在互联网企业多用mysql集群作为持久层。掌握好mysql的优化，将变得很有意义。接下来探讨和学习mysql的优化，接下来的内容主要来自mysql8.0的官方手册，也会有自己的一些理解。   </li>
+</ul>
+<p>本章主要谈论如下几个方面：  </p>
+<ol>
+<li>优化概述  </li>
+<li>优化SQL语句</li>
+<li>优化和索引</li>
+<li>优化数据库结构</li>
+<li>优化InnoDB表</li>
+<li>优化MyISAM表</li>
+<li>优化MEMORY表</li>
+<li>了解查询执行计划</li>
+<li>控制查询优化器</li>
+<li>buffer和cache</li>
+<li>优化锁定操作</li>
+<li>优化MySQL服务器层</li>
+<li>衡量性能（基准测试）</li>
+<li><p>检查线程信息</p>
+<h2 id="1-优化概述"><a href="#1-优化概述" class="headerlink" title="1 优化概述"></a>1 优化概述</h2><p>优化是一门很大的学问，而且涉及到方方面面不同层次的优化。而且不同的角色，优化关注的点不尽相同。你可以例如，对于DBA而言，优化服务器的配置（缓存区、线程数等）、与开发人员一起优化表的设计，根据业务，配置合适的复制等就非常重要，对于开发人员，不仅要和DBA讨论业务，设计出合理的表结构，数据类型，同时，也需要理解mysql的查询执行，优化器的优化程度，依据业务特点设计合理的索引等。接下来就学习mysql优化的方方面面。<br>数据库的性能取决于数据库各个级别的因素，如：配置、表设计、查询语句等。在处理数据库性能时，应该首先掌握<strong>基本的规则和准则</strong>，随着学习的深入，再去了解内部发生的事情，这时候，就需要深入到源码级别进行优化。<br>一般的用户旨在从现有的软件和硬件配置中获得最佳的数据库性能。高级用户通常需要结合自己的业务，改进MySQL软件本身（例如国内的bat都需要定制和改造mysql，因为现有的软件无法满足业务需求），或者开发自己的存储引擎和硬件设备来扩展MySQL生态系统。<br>对于优化通常有如下几点：</p>
+<ul>
+<li>数据库级别的优化</li>
+<li>硬件级别的优化</li>
+<li>在可移植性和性能之间平衡<h3 id="数据库级别的优化"><a href="#数据库级别的优化" class="headerlink" title="数据库级别的优化"></a>数据库级别的优化</h3>使数据库应用程序加快的最重要因素是其基本设计：</li>
+<li>表结构设计是否合理？数据类型是否正确？</li>
+<li>正确的索引舍否建立？</li>
+<li>选择的存储引擎是否合理？</li>
+<li>表格是否使用合适的行格式？</li>
+<li>应用程序是否使用合适的锁策略？例如，在可能的情况下允许共享访问，以便数据库操作可以并发运行，在适当时请求独占访问，从而使关键操作成为最高优先级。同样，存储引擎的选择也很重要。 InnoDB存储引擎可处理大多数锁问题，而无需您的参与，从而实现数据库更好的并发性并减少代码的实验和调整量。</li>
+<li>内存缓冲区配置是否合理？主要涉及到InnoDB的缓冲池和MyISAM的key缓存。</li>
+<li>线程数的设置是否合理？</li>
+<li>依据业务的特点，事务的隔离级别选择是否合理？</li>
+<li>复制设置是否合适？</li>
+</ul>
+</li>
+</ol>
+<h3 id="硬件级别的优化"><a href="#硬件级别的优化" class="headerlink" title="硬件级别的优化"></a>硬件级别的优化</h3><p>随着数据库变得越来越繁忙，任何数据库应用程序最终都会遇到硬件限制。DBA必须评估是否可以调整应用程序或重新配置服务器以避免这些瓶颈，或者是否需要更多硬件资源。系统瓶颈通常来自这些：</p>
+<ul>
+<li>磁盘寻到，对于磁盘而言，主要是寻道时间，新的次磁盘也不会有数量级上的提升，因此，对于磁盘的优化，优化查找时间的方法是将数据分配到多个磁盘上，通过并行处理来提高。</li>
+<li>磁盘的读取和写入，也可以通过多个磁盘并行读取来优化。</li>
+<li>CPU时钟周期，当数据在内存中时，我们必须对其进行处理以得到我们的结果。与内存数量相比，大表是最常见的限制因素。但对于小表，速度通常不是问题。</li>
+<li><p>内存带宽，当CPU需要的数据量超过CPU缓存容量时，内存带宽就成为瓶颈。对大多数系统来说，这是一个罕见的瓶颈，但需要注意的一个瓶颈。</p>
+<h3 id="在可移植性和性能之间平衡"><a href="#在可移植性和性能之间平衡" class="headerlink" title="在可移植性和性能之间平衡"></a>在可移植性和性能之间平衡</h3><p>为了使用mysql特有的性能，又为了使应用程序具有可移植性，你可以将mysql特定的关键字包含在/<em>! </em>/中，其他的SQL服务器会忽略这些注释。<br>通常情况下，对于一个软件工程师而言，硬件级别的优化通常不可控，但是数据库级别的优化却是完全可以的，通常也是优化的重点，接下来着重学习数据库级别的优化。</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/8-optimization/10-buffering_and_caching/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/8-optimization/3-optimization_and_indexes/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-优化概述"><span class="nav-number">2.</span> <span class="nav-text">1 优化概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库级别的优化"><span class="nav-number">2.1.</span> <span class="nav-text">数据库级别的优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#硬件级别的优化"><span class="nav-number">2.2.</span> <span class="nav-text">硬件级别的优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在可移植性和性能之间平衡"><span class="nav-number">2.3.</span> <span class="nav-text">在可移植性和性能之间平衡</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

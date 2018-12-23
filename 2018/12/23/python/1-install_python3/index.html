@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="python语言,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="python3升级引言默认情况下，centos7安装的是python2.7，不过python3毕竟是主流，因此我们学习python3.首先先升级centos7下的python2.7至python3。但是，由于很多基本的命令、软件包都依赖旧版本，比如：yum。所以，在更新 Python 时，建议不要删除旧版本（新旧版本可以共存）。   查看 Python 版本号当 Linux 上安装 Python">
+<meta name="keywords" content="python语言">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python3 安装">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/python/1-install_python3/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="python3升级引言默认情况下，centos7安装的是python2.7，不过python3毕竟是主流，因此我们学习python3.首先先升级centos7下的python2.7至python3。但是，由于很多基本的命令、软件包都依赖旧版本，比如：yum。所以，在更新 Python 时，建议不要删除旧版本（新旧版本可以共存）。   查看 Python 版本号当 Linux 上安装 Python">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-23T11:55:25.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python3 安装">
+<meta name="twitter:description" content="python3升级引言默认情况下，centos7安装的是python2.7，不过python3毕竟是主流，因此我们学习python3.首先先升级centos7下的python2.7至python3。但是，由于很多基本的命令、软件包都依赖旧版本，比如：yum。所以，在更新 Python 时，建议不要删除旧版本（新旧版本可以共存）。   查看 Python 版本号当 Linux 上安装 Python">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/python/1-install_python3/">
+
+
+
+
+
+  <title>python3 安装 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/python/1-install_python3/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python3 安装</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T19:00:09+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="python3升级"><a href="#python3升级" class="headerlink" title="python3升级"></a>python3升级</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>默认情况下，centos7安装的是python2.7，不过python3毕竟是主流，因此我们学习python3.首先先升级centos7下的python2.7至python3。<br>但是，由于很多基本的命令、软件包都依赖旧版本，比如：yum。所以，在更新 Python 时，建议不要删除旧版本（新旧版本可以共存）。  </p>
+<h2 id="查看-Python-版本号"><a href="#查看-Python-版本号" class="headerlink" title="查看 Python 版本号"></a>查看 Python 版本号</h2><p>当 Linux 上安装 Python 后（默认安装），只需要输入简单的命令，就可以查看 Python 的版本号：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python -V</span><br><span class="line"><span class="meta">#</span> 或者</span><br><span class="line">python --version</span><br></pre></td></tr></table></figure></p>
+<h2 id="下载新版本"><a href="#下载新版本" class="headerlink" title="下载新版本"></a>下载新版本</h2><p>进入 Python下载页面，选择需要的版本。这里，我选择的版本是 3.7.0 。进入 /usr/local/src 目录:<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/src/</span><br><span class="line">wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz</span><br></pre></td></tr></table></figure></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf Python-3.7.0.tgz</span><br><span class="line"><span class="meta">#</span>安装openssl-devel（pip需要）</span><br><span class="line">yum install openssl-devel</span><br><span class="line">cd Python-3.7.0/</span><br><span class="line">./configure</span><br><span class="line"><span class="meta">#</span> 编译</span><br><span class="line">make</span><br><span class="line"><span class="meta">#</span> 安装</span><br><span class="line">make install</span><br><span class="line"><span class="meta">#</span> 安装成功以后，就可以查看 Python 的版本了：</span><br><span class="line">python -V</span><br><span class="line">Python 2.7.5</span><br><span class="line">python3 -V</span><br><span class="line">Python 3.7.0</span><br><span class="line"><span class="meta">#</span> 注意：在 /usr/local/bin/ 下有一个 python3 的链接，指向 bin 目录下的 python 3.7.</span><br></pre></td></tr></table></figure>
+<h2 id="设置3-x-为默认版本"><a href="#设置3-x-为默认版本" class="headerlink" title="设置3.x 为默认版本"></a>设置3.x 为默认版本</h2><p>查看 Python 的路径，在 /usr/bin 下面。可以看到 python 链接的是 python 2.7，所以，执行 python 就相当于执行 python 2.7。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ll /usr/bin | grep python</span><br><span class="line">-rwxr-xr-x.   1 root root       11232 Aug 10  2017 abrt-action-analyze-python</span><br><span class="line">-rwxr-xr-x.   1 root root        7208 Aug  5  2017 pmpython</span><br><span class="line">lrwxrwxrwx.   1 root root           7 Jan 25  2018 python -&gt; python2</span><br><span class="line">lrwxrwxrwx.   1 root root           9 Jan 25  2018 python2 -&gt; python2.7</span><br><span class="line">-rwxr-xr-x.   1 root root        7136 Aug  4  2017 python2.7</span><br><span class="line">-rwxr-xr-x.   1 root root        1835 Aug  4  2017 python2.7-config</span><br><span class="line">lrwxrwxrwx.   1 root root          16 Jan 25  2018 python2-config -&gt; python2.7-config</span><br><span class="line">lrwxrwxrwx.   1 root root          14 Jan 25  2018 python-config -&gt; python2-config</span><br></pre></td></tr></table></figure></p>
+<p>将原来 python 的软链接重命名：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv /usr/bin/python /usr/bin/python.bak</span><br></pre></td></tr></table></figure></p>
+<p>将 python 链接至 python3：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s /usr/local/bin/python3 /usr/bin/python</span><br></pre></td></tr></table></figure></p>
+<p>再查看 Python 的版本：  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python -V</span><br><span class="line">Python 3.7.0</span><br></pre></td></tr></table></figure>
+<h2 id="配置-yum"><a href="#配置-yum" class="headerlink" title="配置 yum"></a>配置 yum</h2><p>升级 Python 之后，由于将默认的 python 指向了 python3，yum 不能正常使用，需要编辑 yum 的配置文件：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /usr/bin/yum</span><br></pre></td></tr></table></figure></p>
+<p>将 #!/usr/bin/python 改为 #!/usr/bin/python2，保存退出即可。  </p>
+<h2 id="centos7的问题"><a href="#centos7的问题" class="headerlink" title="centos7的问题"></a>centos7的问题</h2><p>如上修改yum配置文件后，执行yum任然有问题：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost Python-3.7.0]# yum install openssl-devel</span><br><span class="line">......</span><br><span class="line">......</span><br><span class="line">Total download size: 3.2 M</span><br><span class="line">Is this ok [y/d/N]: y</span><br><span class="line">Downloading packages:</span><br><span class="line">No Presto metadata available for base</span><br><span class="line">  File "/usr/libexec/urlgrabber-ext-down", line 28</span><br><span class="line">    except OSError, e:</span><br><span class="line">                  ^</span><br><span class="line">SyntaxError: invalid syntax</span><br><span class="line">  File "/usr/libexec/urlgrabber-ext-down", line 28</span><br><span class="line">    except OSError, e:</span><br><span class="line">                  ^</span><br><span class="line">SyntaxError: invalid syntax</span><br><span class="line">  File "/usr/libexec/urlgrabber-ext-down", line 28</span><br><span class="line">    except OSError, e:</span><br><span class="line">                  ^</span><br><span class="line">SyntaxError: invalid syntax</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Exiting on user cancel</span><br><span class="line">[root@localhost Python-3.7.0]#</span><br></pre></td></tr></table></figure></p>
+<p>以前CentOS6没这个问题的。</p>
+<p>打开/usr/libexec/urlgrabber-ext-down看了下，发下它也使用了/usr/bin/python，于是跟前面一样，改为2，完成。<br>升级后 还有一个问题，gnome-tweak-tool 也就是优化工具打不开<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost applications]# find / -name gnome-tweak-tool</span><br><span class="line">/usr/bin/gnome-tweak-tool</span><br><span class="line">/usr/share/gnome-tweak-tool</span><br><span class="line">[root@localhost applications]# vim /usr/bin/gnome-tweak-tool</span><br></pre></td></tr></table></figure></p>
+<p>解决办法： gnome-tweak-tool 文件 #!/usr/bin/python换成 #!/usr/bin/python2 就可以了.  </p>
+<p>yum-config-manager 文件同样出错<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost kwplayer-master]# whereis yum-config-manager</span><br><span class="line">yum-config-manager: /usr/bin/yum-config-manager /usr/share/man/man1/yum-config-manager.1.gz</span><br><span class="line">[root@localhost kwplayer-master]# vim /usr/bin/yum-config-manager</span><br></pre></td></tr></table></figure></p>
+<p>解决办法同上： #!/usr/bin/python换成 #!/usr/bin/python2 就可以了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python语言/" rel="tag"># python语言</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/go/go_program/1-install/" rel="next" title="Linux下安装Go">
+                <i class="fa fa-chevron-left"></i> Linux下安装Go
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#python3升级"><span class="nav-number">1.</span> <span class="nav-text">python3升级</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言"><span class="nav-number">1.1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看-Python-版本号"><span class="nav-number">1.2.</span> <span class="nav-text">查看 Python 版本号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载新版本"><span class="nav-number">1.3.</span> <span class="nav-text">下载新版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.4.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置3-x-为默认版本"><span class="nav-number">1.5.</span> <span class="nav-text">设置3.x 为默认版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-yum"><span class="nav-number">1.6.</span> <span class="nav-text">配置 yum</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#centos7的问题"><span class="nav-number">1.7.</span> <span class="nav-text">centos7的问题</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

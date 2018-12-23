@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="8 了解查询执行计划上边我们学习了mysql的优化技术相关的理论，不过毕竟是理论，而且有可能文档跟不上代码的变化是常有的事，因此，具体了解mysql为某个查询生成的执行计划（也称为EXPLAIN计划）将是非常有必要的，通过观察mysql生成的查询计划，来进行更进一步的优化。   8.1 用EXPLAIN优化查询EXPL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xufubo">
+<meta property="og:url" content="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/8-understand_the_query_plan/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="8 了解查询执行计划上边我们学习了mysql的优化技术相关的理论，不过毕竟是理论，而且有可能文档跟不上代码的变化是常有的事，因此，具体了解mysql为某个查询生成的执行计划（也称为EXPLAIN计划）将是非常有必要的，通过观察mysql生成的查询计划，来进行更进一步的优化。   8.1 用EXPLAIN优化查询EXPLAIN语句提供了有关MySQL如何执行语句的信息：    EXPLAIN与SEL">
+<meta property="og:updated_time" content="2018-11-14T15:06:03.512Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="xufubo">
+<meta name="twitter:description" content="8 了解查询执行计划上边我们学习了mysql的优化技术相关的理论，不过毕竟是理论，而且有可能文档跟不上代码的变化是常有的事，因此，具体了解mysql为某个查询生成的执行计划（也称为EXPLAIN计划）将是非常有必要的，通过观察mysql生成的查询计划，来进行更进一步的优化。   8.1 用EXPLAIN优化查询EXPLAIN语句提供了有关MySQL如何执行语句的信息：    EXPLAIN与SEL">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/8-understand_the_query_plan/"/>
+
+
+
+
+
+  <title> | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/8-understand_the_query_plan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-19T23:25:11+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="8-了解查询执行计划"><a href="#8-了解查询执行计划" class="headerlink" title="8 了解查询执行计划"></a>8 了解查询执行计划</h1><p>上边我们学习了mysql的优化技术相关的理论，不过毕竟是理论，而且有可能文档跟不上代码的变化是常有的事，因此，具体了解mysql为某个查询生成的执行计划（也称为EXPLAIN计划）将是非常有必要的，通过观察mysql生成的查询计划，来进行更进一步的优化。  </p>
+<h2 id="8-1-用EXPLAIN优化查询"><a href="#8-1-用EXPLAIN优化查询" class="headerlink" title="8.1 用EXPLAIN优化查询"></a>8.1 用EXPLAIN优化查询</h2><p>EXPLAIN语句提供了有关MySQL如何执行语句的信息：  </p>
+<ul>
+<li>EXPLAIN与SELECT，DELETE，INSERT，REPLACE和UPDATE语句一起使用。</li>
+<li>当EXPLAIN与可解释的语句一起使用时，MySQL会显示来自优化器的关于语句执行计划的信息。也就是说，MySQL解释了它将如何处理该语句，包括有关表如何连接以及按何种顺序处理等信息。接下来会详细说明。  </li>
+<li>当EXPLAIN与FOR CONNECTION connection_id而不是可解释的语句一起使用时，它会显示在命名连接中执行的语句的执行计划，见<a href="https://dev.mysql.com/doc/refman/8.0/en/explain-for-connection.html" target="_blank" rel="noopener">8.8.4 Obtaining Execution Plan Information for a Named Connection</a>。  </li>
+<li>对于SELECT语句，EXPLAIN会生成可以使用SHOW WARNINGS显示的其他执行计划信息  </li>
+<li>EXPLAIN对于检查涉及分区表的查询很有用。  </li>
+<li>FORMAT选项可用于选择输出格式。TRADITIONAL表示以表格形式呈现输出结果，这是默认值。JSON格式以JSON格式显示信息。<br>在EXPLAIN的帮助下，你可以看到应该在哪里添加索引，以便通过使用索引来更快地执行语句。也可以使用EXPLAIN来检查优化器是否以最佳顺序join表。为了提示优化器使用与SELECT语句中的表命名顺序相对应的连接顺序，用SELECT STRAIGHT_JOIN而不是SELECT来开始查询语句，但是，STRAIGHT_JOIN可能会阻止使用索引，因为它会禁用半连接转换（semi-join transformations），见<a href="https://dev.mysql.com/doc/refman/8.0/en/semi-joins.html" target="_blank" rel="noopener"> Section 8.2.2.1, “Optimizing Subqueries, Derived Tables, View References, and Common Table Expressions with Semi-Join Transformations</a>。<br>优化器跟踪有时可以提供与EXPLAIN的信息互补的信息。但是，优化器跟踪的格式和内容在版本之间可能会发生变化，具体见<a href="https://dev.mysql.com/doc/internals/en/optimizer-tracing.html" target="_blank" rel="noopener">MySQL Internals: Tracing the Optimizer</a>。<br>如果你通过EXPLAIN确认了mysql优化器没有使用应该使用的索引，那么，运行ANALYZE TABLE来更新表的统计信息。见<a href="https://dev.mysql.com/doc/refman/8.0/en/analyze-table.html" target="_blank" rel="noopener">Section 13.7.3.1 ANALYZE TABLE Syntax</a>。  <blockquote>
+<ul>
+<li><strong>注意：</strong><br>EXPLAIN也可以用于获取有关表中列的信息，EXPLAIN tbl_name与DESCRIBE tbl_name和SHOW COLUMNS FROM tbl_name同义。</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<h2 id="8-2-EXPLAIN输出格式"><a href="#8-2-EXPLAIN输出格式" class="headerlink" title="8.2 EXPLAIN输出格式"></a>8.2 EXPLAIN输出格式</h2><p>EXPLAIN为SELECT语句中使用的每个表返回一行信息。mysql按照在处理语句时读取它们的顺序列出输出中的表。MySQL使用嵌套循环(nested-loop)连接方法解析所有连接。这意味着MySQL从第一个表中读取一行，然后在第二个表，第三个表中找到匹配的行，等等。<br><strong>EXPLAIN的输出列</strong><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; explain select * from t1;</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+</span></span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+</span></span><br><span class="line">|  1 | SIMPLE      | t1    | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    1 |   100.00 | NULL  |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>如上，输出的列解释如下：  </p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th>JSON名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>select_id</td>
+<td>该SELECT标识符</td>
+</tr>
+<tr>
+<td>select_type</td>
+<td>没有</td>
+<td>该SELECT类型</td>
+</tr>
+<tr>
+<td>table</td>
+<td>table_name</td>
+<td>表名</td>
+</tr>
+<tr>
+<td>partitions</td>
+<td>partitions</td>
+<td>匹配的分区</td>
+</tr>
+<tr>
+<td>type</td>
+<td>access_type</td>
+<td>连接类型</td>
+</tr>
+<tr>
+<td>possible_keys</td>
+<td>possible_keys</td>
+<td>可能的索引选择</td>
+</tr>
+<tr>
+<td>key</td>
+<td>key</td>
+<td>实际选择的索引</td>
+</tr>
+<tr>
+<td>key_len</td>
+<td>key_length</td>
+<td>所选键的长度</td>
+</tr>
+<tr>
+<td>ref</td>
+<td>ref</td>
+<td>与键列中指定的索引进行比较的列</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>rows</td>
+<td>要检查的行数（越小越好）</td>
+</tr>
+<tr>
+<td>filtered</td>
+<td>filtered</td>
+<td>符合条件的结果行所占检查行的百分比(越大越好)</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td>没有</td>
+<td>附加信息（很重要）</td>
+</tr>
+</tbody>
+</table>
+<p>举例：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show create table t2;</span><br><span class="line">+<span class="comment">-------+---------------------------------------------------------------------------+</span></span><br><span class="line">| Table | <span class="keyword">Create</span> <span class="keyword">Table</span>                                                              |</span><br><span class="line">+<span class="comment">-------+---------------------------------------------------------------------------+</span></span><br><span class="line">| t2    | <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`t2`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`col`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span></span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</span><br><span class="line">+<span class="comment">-------+---------------------------------------------------------------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.04</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> * <span class="keyword">from</span> t2;</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| id   | col  |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">|    1 |    1 |</span><br><span class="line">|    2 |    2 |</span><br><span class="line">|    3 |    7 |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">explain</span> <span class="keyword">select</span> * <span class="keyword">from</span> t2 <span class="keyword">where</span> <span class="keyword">id</span> = <span class="number">1</span>;</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+</span></span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+</span></span><br><span class="line">|  1 | SIMPLE      | t2    | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    3 |    33.33 | Using where |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">alter</span> <span class="keyword">table</span> t2 <span class="keyword">add</span> <span class="keyword">unique</span> <span class="keyword">key</span> uk_id(<span class="string">`id`</span>);</span><br><span class="line"></span><br><span class="line">mysql&gt; explain select * from t2 where id = 1;</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+-------+---------------+-------+---------+-------+------+----------+-------+</span></span><br><span class="line">| id | select_type | table | partitions | type  | possible_keys | key   | key_len | ref   | rows | filtered | Extra |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+-------+---------------+-------+---------+-------+------+----------+-------+</span></span><br><span class="line">|  1 | SIMPLE      | t2    | NULL       | const | uk_id         | uk_id | 5       | const |    1 |   100.00 | NULL  |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+-------+---------------+-------+---------+-------+------+----------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show create table t;</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line">| Table | <span class="keyword">Create</span> <span class="keyword">Table</span>                                                                 |</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line">| t     | <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`t`</span> (</span><br><span class="line">  <span class="string">`a`</span> <span class="built_in">int</span>(<span class="number">10</span>) <span class="keyword">unsigned</span> zerofill <span class="keyword">DEFAULT</span> <span class="literal">NULL</span></span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">show</span> <span class="keyword">create</span> <span class="keyword">table</span> t2;</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line">| Table | <span class="keyword">Create</span> <span class="keyword">Table</span>                                                                 |</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line">| t2    | <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`t2`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`col`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="keyword">UNIQUE</span> <span class="keyword">KEY</span> <span class="string">`uk_id`</span> (<span class="string">`id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">show</span> <span class="keyword">create</span> <span class="keyword">table</span> t4;</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line">| Table | <span class="keyword">Create</span> <span class="keyword">Table</span>                                                                 |</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line">| t4    | <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`t4`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`col`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span></span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 |</span><br><span class="line">+<span class="comment">-------+------------------------------------------------------------------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> * <span class="keyword">from</span> t;</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| a          |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| 0000001000 |</span><br><span class="line">| 0000000657 |</span><br><span class="line">| 0000000657 |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> * <span class="keyword">from</span> t2;</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| id   | col  |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">|    1 |    1 |</span><br><span class="line">|    2 |    2 |</span><br><span class="line">|    3 |    7 |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">select</span> * <span class="keyword">from</span> t4;</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| id   | col  |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">|    1 |    1 |</span><br><span class="line">|    2 |    2 |</span><br><span class="line">|    3 |    7 |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line">mysql&gt; <span class="keyword">explain</span> <span class="keyword">select</span> * <span class="keyword">from</span> t4, t <span class="keyword">where</span> t4.id = t.a;</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+</span></span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                                              |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+</span></span><br><span class="line">|  1 | SIMPLE      | t     | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    2 |   100.00 | NULL                                               |</span><br><span class="line">|  1 | SIMPLE      | t4    | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    3 |    33.33 | Using where; Using join buffer (Block Nested Loop) |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+----------------------------------------------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; <span class="keyword">explain</span> <span class="keyword">select</span> * <span class="keyword">from</span> t2, t <span class="keyword">where</span> t2.id = t.a;</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+-------+---------+----------+------+----------+-----------------------+</span></span><br><span class="line">| id | select_type | table | partitions | type | possible_keys | key   | key_len | ref      | rows | filtered | Extra                 |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+-------+---------+----------+------+----------+-----------------------+</span></span><br><span class="line">|  1 | SIMPLE      | t     | NULL       | ALL  | NULL          | NULL  | NULL    | NULL     |    2 |   100.00 | Using where           |</span><br><span class="line">|  1 | SIMPLE      | t2    | NULL       | ref  | uk_id         | uk_id | 5       | test.t.a |    1 |   100.00 | Using index condition |</span><br><span class="line">+<span class="comment">----+-------------+-------+------------+------+---------------+-------+---------+----------+------+----------+-----------------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure>
+<p>如上是一些例子，接下来，详细的对各个列的含义进行说明：  </p>
+<ul>
+<li>id（JSON名： select_id）：SELECT标识符。这是SELECT查询的内部连续编号。</li>
+<li><p>select_type （JSON名称：无）：可以是下表的任何类型。  </p>
+<p>|select_type值|JSON名称|含义|<br>|-|-|-|<br>|SIMPLE|无|简单SELECT（不使用 UNION或子查询）|<br>|PRIMARY|无|Outermost SELECT|<br>|UNION|无||<br>|DEPENDENT UNION|dependent (true)||<br>|UNION RESULT|union_result||<br>|SUBQUERY|无||<br>|DEPENDENT SUBQUERY|dependent (true)||<br>|DERIVED|无||<br>|MATERIALIZED|materialized_from_subquery||<br>|UNCACHEABLE SUBQUERY|cacheable (false)||<br>|UNCACHEABLE UNION|cacheable (false)||  </p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/8-optimization/2-optimizing_SQL_statements/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#8-了解查询执行计划"><span class="nav-number">1.</span> <span class="nav-text">8 了解查询执行计划</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-用EXPLAIN优化查询"><span class="nav-number">1.1.</span> <span class="nav-text">8.1 用EXPLAIN优化查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-2-EXPLAIN输出格式"><span class="nav-number">1.2.</span> <span class="nav-text">8.2 EXPLAIN输出格式</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

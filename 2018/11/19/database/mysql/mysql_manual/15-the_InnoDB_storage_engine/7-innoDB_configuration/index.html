@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="InnoDB配置本节介绍InnoDB初始化，启动以及各种组件和功能的配置，关于InnoDB表的优化见Section 8.5, “Optimizing for InnoDB Tables”。   7.1 InnoDB启动配置有关InnoDB配置，首先考虑和涉及的是：数据文件、日志文件、页（InnoDB中可用于存储多行数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xufubo">
+<meta property="og:url" content="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/7-innoDB_configuration/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="InnoDB配置本节介绍InnoDB初始化，启动以及各种组件和功能的配置，关于InnoDB表的优化见Section 8.5, “Optimizing for InnoDB Tables”。   7.1 InnoDB启动配置有关InnoDB配置，首先考虑和涉及的是：数据文件、日志文件、页（InnoDB中可用于存储多行数据的块）大小、内存缓冲区。建议你在创建InnoDB实例之前配置好数据文件，日志文件">
+<meta property="og:updated_time" content="2018-11-19T15:21:10.206Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="xufubo">
+<meta name="twitter:description" content="InnoDB配置本节介绍InnoDB初始化，启动以及各种组件和功能的配置，关于InnoDB表的优化见Section 8.5, “Optimizing for InnoDB Tables”。   7.1 InnoDB启动配置有关InnoDB配置，首先考虑和涉及的是：数据文件、日志文件、页（InnoDB中可用于存储多行数据的块）大小、内存缓冲区。建议你在创建InnoDB实例之前配置好数据文件，日志文件">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/7-innoDB_configuration/"/>
+
+
+
+
+
+  <title> | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/7-innoDB_configuration/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-19T23:25:11+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="InnoDB配置"><a href="#InnoDB配置" class="headerlink" title="InnoDB配置"></a>InnoDB配置</h1><p>本节介绍InnoDB初始化，启动以及各种组件和功能的配置，关于InnoDB表的优化见<a href="https://dev.mysql.com/doc/refman/8.0/en/optimizing-innodb.html" target="_blank" rel="noopener">Section 8.5, “Optimizing for InnoDB Tables”</a>。  </p>
+<h2 id="7-1-InnoDB启动配置"><a href="#7-1-InnoDB启动配置" class="headerlink" title="7.1 InnoDB启动配置"></a>7.1 InnoDB启动配置</h2><p>有关InnoDB配置，首先考虑和涉及的是：数据文件、日志文件、页（InnoDB中可用于存储多行数据的块）大小、内存缓冲区。建议你在创建InnoDB实例之前配置好数据文件，日志文件和页面大小。在创建InnoDB实例之后修改数据文件或日志文件配置会比较复杂，同时：<strong>页面大小只能在首次初始化InnoDB实例时定义。</strong> 除了这些配置，本小节还包括如下配置：  </p>
+<ul>
+<li>在MySQL配置文件中指定选项  </li>
+<li>查看InnoDB初始化信息  </li>
+<li>主要的考量因素  </li>
+<li>系统表空间数据文件配置   </li>
+<li>重做日志文件配置  </li>
+<li>撤消表空间配置  </li>
+<li>全局临时表空间配置  </li>
+<li>会话临时表空间配置  </li>
+<li>页大小配置  </li>
+<li>内存配置  </li>
+</ul>
+<h3 id="7-1-1-在MySQL配置文件中指定选项"><a href="#7-1-1-在MySQL配置文件中指定选项" class="headerlink" title="7.1.1 在MySQL配置文件中指定选项"></a>7.1.1 在MySQL配置文件中指定选项</h3><p>有关InnoDB的配置，在配置文件中，放在[mysqld] 之下。要确保mysqld仅从特定文件（和mysqld-auto.cnf）读取选项，请在启动服务器时使用–defaults-file选项作为命令行上的第一个选项：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqld --defaults-file=path_to_configuration_file</span><br></pre></td></tr></table></figure></p>
+<h3 id="7-1-2-查看InnoDB初始化信息"><a href="#7-1-2-查看InnoDB初始化信息" class="headerlink" title="7.1.2 查看InnoDB初始化信息"></a>7.1.2 查看InnoDB初始化信息</h3><p>要在启动期间查看InnoDB初始化信息，请从命令提示符启动mysqld。从命令提示符启动mysqld时，初始化信息将打印到控制台。例如：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">shell&gt;</span> bin/mysqld --user=mysql &amp;</span><br></pre></td></tr></table></figure></p>
+<p>如果未将服务器输出发送到控制台，可以查阅日志文件。  </p>
+<h4 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h4><blockquote>
+<p>InnoDB在启动时不会打开所有用户表和关联的数据文件,但是，InnoDB会检查数据字典中引用的表空间文件（*.ibd文件）是否存在。如果找不到表空间文件，InnoDB会打印错误信息并继续按序启动。在崩溃恢复期间，很可能会打开重做日志中引用的表空间文件。  </p>
+</blockquote>
+<h3 id="7-1-3-主要的考量因素"><a href="#7-1-3-主要的考量因素" class="headerlink" title="7.1.3 主要的考量因素"></a>7.1.3 主要的考量因素</h3><p>在开始配置InnoDB之前，请了解与存储相关的注意事项。  </p>
+<ul>
+<li><p>某些情况下，数据不全部存储在同一物理磁盘上，会提高数据库性能。将日志文件放在与数据不同的磁盘上通常有利于提高性能。可以将系统表空间数据文件和日志文件放在不同的磁盘。还可以将原始磁盘分区（原始设备）用于InnoDB数据文件,这可能会加快I/O速度。详见<a href="https://dev.mysql.com/doc/refman/8.0/en/innodb-system-tablespace.html#innodb-raw-devices" target="_blank" rel="noopener">Using Raw Disk Partitions for the System Tablespace</a>  </p>
+</li>
+<li><p>InnoDB是一种适用于MySQL的事务安全（ACID兼容）存储引擎，具有提交，回滚和崩溃恢复功能，可保护用户数据。<strong>但是</strong>，如果底层操作系统或硬件无法正常工作，则无法保证这些操作。许多操作系统或磁盘子系统可能会延迟或重新排序写入操作以提高性能。在某些操作系统上，等到文件的所有数据都已刷新的fsync（）系统调用实际上可能在数据刷新到持久存储之前返回。因此，操作系统崩溃或断电可能会破坏最近提交的数据，或者在最坏的情况下，甚至因为写入操作已重新排序而损坏数据库。如果数据对您非常重要，在用于生产环境之前，请一定要进行插拔测试。在OS X 10.3及更高版本上，InnoDB使用特殊的fcntl（）文件刷新方法。在Linux下，<strong>建议禁用回写缓存(disable the write-back cache)</strong>。在ATA / SATA磁盘驱动器上，hdparm -W0 /dev/hda等命令可能会禁用回写缓存。请注意，某些驱动器或磁盘控制器可能无法禁用回写缓存。  </p>
+</li>
+<li><p>为了保证数据在崩溃恢复下不受损坏，InnoDB使用文件刷新技术，被称为doublewrite缓冲区的结构（称为缓冲区，但是该缓冲区位于磁盘上），默认情况下启用（innodb_doublewrite = ON）。双写缓冲区可在崩溃或停电后为恢复增加安全性。为了保证数据安全性，最好启用该选项。</p>
+</li>
+<li><p>在InnoDB与NFS一起使用之前，请看<a href="https://dev.mysql.com/doc/refman/8.0/en/disk-issues.html#disk-issues-nfs" target="_blank" rel="noopener">NFS与MySQL一起使用的潜在问题</a>。  </p>
+</li>
+</ul>
+<h3 id="7-1-4-系统表空间数据文件配置"><a href="#7-1-4-系统表空间数据文件配置" class="headerlink" title="7.1.4 系统表空间数据文件配置"></a>7.1.4 系统表空间数据文件配置</h3><p>innodb_data_file_path配置项定义InnoDB系统表空间数据文件的名称，大小和属性。如果没有为innodb_data_file_path指定值，默认行为是创建一个略大于12MB的单个自动扩展数据文件，名为ibdata1。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like 'innodb_data_file_path';</span><br><span class="line">+<span class="comment">-----------------------+------------------------+</span></span><br><span class="line">| Variable_name         | Value                  |</span><br><span class="line">+<span class="comment">-----------------------+------------------------+</span></span><br><span class="line">| innodb_data_file_path | ibdata1:12M:autoextend |</span><br><span class="line">+<span class="comment">-----------------------+------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.63</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>要指定多个数据文件，请用”;” 分隔：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">innodb_data_file_path=datafile_spec1[;datafile_spec2]...</span><br></pre></td></tr></table></figure></p>
+<p>以下配置一个名为ibdata1的12MB数据文件，该文件是自动扩展的。没有给出文件的位置，因此默认情况下，InnoDB在MySQL数据目录中创建它：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">innodb_data_file_path=ibdata1:12M:autoextend</span><br></pre></td></tr></table></figure></p>
+<p>文件大小指定时使用K,KB, M,MB, G,GB 这些后缀。<br>当系统表空间有多个文件时，为<strong>第一个</strong>系统表空间数据文件强制实施最小文件大小，以确保有足够的空间用于双写缓冲区页面：  </p>
+<ul>
+<li>innodb_page_size值为16KB或更小时，文件最小为3MB。  </li>
+<li>innodb_page_size值为32KB时，文件最小为6MB。  </li>
+<li>innodb_page_size值为64KB时，文件最小为12MB。<br>具有固定大小50MB文件名为ibdata1的系统表空间和一个名为ibdata2的50MB自动扩展文件可以像这样配置：  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">innodb_data_file_path=ibdata1:50M;ibdata2:50M:autoextend</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>完整的语法如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file_name:file_size[:autoextend[:max:max_file_size]]</span><br></pre></td></tr></table></figure></p>
+<p>autoextend和max属性只能用于innodb_data_file_path设置中最后指定的数据文件。 如果为最后一个数据文件指定autoextend选项, 如果表空间中的可用空间不足，InnoDB会扩展数据文件。默认情况下，自动扩展增量一次为64MB。要修改增量，请更改innodb_autoextend_increment系统变量。如果磁盘已满，您可能希望在另一个磁盘上添加另一个数据文件。有关说明，请参阅<a href="https://dev.mysql.com/doc/refman/8.0/en/innodb-system-tablespace.html#innodb-resize-system-tablespace" target="_blank" rel="noopener">Resizing the System Tablespace</a>。  </p>
+<p>单个文件的大小限制由您的操作系统决定。你可以在支持大文件的操作系统上将文件大小设置为大于4GB。还可以将<a href="https://dev.mysql.com/doc/refman/8.0/en/innodb-system-tablespace.html#innodb-raw-devices" target="_blank" rel="noopener">原始磁盘分区作为数据文件</a>。  </p>
+<p>InnoDB不知道文件系统的最大文件大小，因此在最大文件大小较小的文件系统（如2GB）时要小心。要指定自动扩展数据文件的最大大小，请使用autoextend属性后面的max属性。因为超过最大大小会导致致命错误，可能导致服务器退出，所以仅在限制磁盘使用率至关重要的情况下才使用max属性。以下配置允许ibdata1增长到500MB：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">innodb_data_file_path=ibdata1:12M:autoextend:max:500M</span><br></pre></td></tr></table></figure></p>
+<p>默认情况下，InnoDB在MySQL数据目录（datadir指定）中创建系统表空间文件。要明确指定位置，请使用innodb_data_home_dir选项。例如，要在名为myibdata的目录中创建名为ibdata1和ibdata2的两个文件，请按以下方式配置InnoDB：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">innodb_data_home_dir = /path/to/myibdata/</span><br><span class="line">innodb_data_file_path=ibdata1:50M;ibdata2:50M:autoextend</span><br></pre></td></tr></table></figure></p>
+<h4 id="注意：-1"><a href="#注意：-1" class="headerlink" title="注意："></a>注意：</h4><blockquote>
+<p>在为innodb_data_home_dir指定值时，需要使用尾部斜杠。<br>InnoDB不会创建目录，因此请确保在启动服务器之前myibdata目录已经存在。<br>确保MySQL服务器具有在数据目录中创建文件的适当访问权限。更一般地说，服务器必须在需要创建数据文件的任何目录中具有访问权限。  </p>
+</blockquote>
+<p>如果将innodb_data_home_dir指定为空字符串，则可以为innodb_data_file_path值中列出的数据文件指定绝对路径。以下示例等同于前一个示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">innodb_data_home_dir =</span><br><span class="line">innodb_data_file_path=/path/to/myibdata/ibdata1:50M;/path/to/myibdata/ibdata2:50M:autoextend</span><br></pre></td></tr></table></figure></p>
+<h3 id="7-1-5-重做日志文件配置"><a href="#7-1-5-重做日志文件配置" class="headerlink" title="7.1.5 重做日志文件配置"></a>7.1.5 重做日志文件配置</h3><p>默认情况下，InnoDB会在数据目录中创建两个5MB的重做日志文件：ib_logfile0和ib_logfile1。以下选项可用于修改默认配置：  </p>
+<ul>
+<li><p>innodb_log_group_home_dir定义了InnoDB重做日志文件的路径。如果未配置此选项，则会在MySQL数据目录（datadir）中创建InnoDB重做日志文件。可以使用此选项将InnoDB日志文件放在与InnoDB数据文件不同的物理存储位置，以避免潜在的I / O资源冲突。例如：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">innodb_log_group_home_dir = /dr3/iblogs</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>注意：</strong><br>InnoDB不创建目录，因此在启动之前确保目录已经存在。<br>确保MySQL服务器具有在数据目录中创建文件的适当访问权限。更一般地说，服务器必须在需要创建数据文件的任何目录中具有访问权限。  </p>
+</blockquote>
+</li>
+<li><p>innodb_log_files_in_group定义了重做日志组中的日志文件数。默认值和建议值为2。  </p>
+</li>
+<li>innodb_log_file_size定义重做日志组中每个日志文件的大小（以字节为单位）。日志文件的总大小（innodb_log_file_size * innodb_log_files_in_group）不能超过一个略小于512GB的最大值。例如，一对255 GB的日志文件接近限制但不超过它。默认重做日志文件大小为48MB。通常，日志文件的总大小应该足够大，以至于服务器可以消除工作负载活动中的高峰和低谷，这通常意味着有足够的重做日志空间来处理超过一小时的写入活动。值越大，缓冲池中需要的检查点刷新活动越少，从而节省了磁盘I/O。更多信息见<a href="https://dev.mysql.com/doc/refman/8.0/en/optimizing-innodb-logging.html" target="_blank" rel="noopener">Section 8.5.4, “Optimizing InnoDB Redo Logging”</a>。    </li>
+</ul>
+<h3 id="7-1-6-撤消表空间配置"><a href="#7-1-6-撤消表空间配置" class="headerlink" title="7.1.6 撤消表空间配置"></a>7.1.6 撤消表空间配置</h3><h3 id="7-1-7-全局临时表空间配置"><a href="#7-1-7-全局临时表空间配置" class="headerlink" title="7.1.7 全局临时表空间配置"></a>7.1.7 全局临时表空间配置</h3><h3 id="7-1-8-会话临时表空间配置"><a href="#7-1-8-会话临时表空间配置" class="headerlink" title="7.1.8 会话临时表空间配置"></a>7.1.8 会话临时表空间配置</h3><h3 id="7-1-9-页面大小配置"><a href="#7-1-9-页面大小配置" class="headerlink" title="7.1.9 页面大小配置"></a>7.1.9 页面大小配置</h3><p>innodb_page_size选项用于配置MySQL实例中InnoDB所有表空间的页面大小。创建实例时设置此值之后要保持其不变。有效值包括：64KB，32KB，16KB（默认值），8KB和4KB。也可以直接指定对应的字节数（65536,32768,16384,8192,4096）。   </p>
+<p>默认情况下，页面大小为16KB，适用于各种工作负载，特别是涉及表扫描和涉及批量更新的DML查询。对于涉及许多小写入的OLTP工作负载，较小的页面大小可能更有效，其中当单个页面包含许多行时锁争用可能是一个性能问题。较小的页面也可能对SSD存储设备更加有效，后者通常使用较小的块大小。保持InnoDB页面大小接近存储设备块大小可以最大限度地减少将未更改数据重复写到磁盘的数量。    </p>
+<h3 id="7-1-10-内存配置"><a href="#7-1-10-内存配置" class="headerlink" title="7.1.10 内存配置"></a>7.1.10 内存配置</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/15-the_InnoDB_storage_engine/4-innoDB_in-memory_structs/" rel="next" title="InnoDB体系结构">
+                <i class="fa fa-chevron-left"></i> InnoDB体系结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/17-replication/1-configuring_replication/1_and_2-binary_log_file_pos_based_replication/" rel="prev" title="基于binlog文件位置的复制配置">
+                基于binlog文件位置的复制配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB配置"><span class="nav-number">1.</span> <span class="nav-text">InnoDB配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-InnoDB启动配置"><span class="nav-number">1.1.</span> <span class="nav-text">7.1 InnoDB启动配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-1-在MySQL配置文件中指定选项"><span class="nav-number">1.1.1.</span> <span class="nav-text">7.1.1 在MySQL配置文件中指定选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-2-查看InnoDB初始化信息"><span class="nav-number">1.1.2.</span> <span class="nav-text">7.1.2 查看InnoDB初始化信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#注意："><span class="nav-number">1.1.2.1.</span> <span class="nav-text">注意：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-3-主要的考量因素"><span class="nav-number">1.1.3.</span> <span class="nav-text">7.1.3 主要的考量因素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-4-系统表空间数据文件配置"><span class="nav-number">1.1.4.</span> <span class="nav-text">7.1.4 系统表空间数据文件配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#注意：-1"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">注意：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-5-重做日志文件配置"><span class="nav-number">1.1.5.</span> <span class="nav-text">7.1.5 重做日志文件配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-6-撤消表空间配置"><span class="nav-number">1.1.6.</span> <span class="nav-text">7.1.6 撤消表空间配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-7-全局临时表空间配置"><span class="nav-number">1.1.7.</span> <span class="nav-text">7.1.7 全局临时表空间配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-8-会话临时表空间配置"><span class="nav-number">1.1.8.</span> <span class="nav-text">7.1.8 会话临时表空间配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-9-页面大小配置"><span class="nav-number">1.1.9.</span> <span class="nav-text">7.1.9 页面大小配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-10-内存配置"><span class="nav-number">1.1.10.</span> <span class="nav-text">7.1.10 内存配置</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

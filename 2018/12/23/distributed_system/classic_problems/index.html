@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="一致性协议,分布式系统,raft,数据一致性,基础理论,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1 简介随着互联网的发展，后台服务的承载量越来越大，性能多高的单台机器也无法满足无限制增长的承载量，因此产生了分布式系统。但是分布式系统极其复杂，涉及到的技术非常多，本文主要总结一下分布式系统的常见问题。 2 分布式系统定义分布式系统有很多不同的定义，一般认为：“一个分布式系统是一些独立的计算机集合，但是对这个系统的用户来说，系统就像一台计算机一样。”这个定义有两方面的含义：第一，从硬件角度来讲，">
+<meta name="keywords" content="一致性协议,分布式系统,raft,数据一致性,基础理论">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式系统基础知识">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/distributed_system/classic_problems/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="1 简介随着互联网的发展，后台服务的承载量越来越大，性能多高的单台机器也无法满足无限制增长的承载量，因此产生了分布式系统。但是分布式系统极其复杂，涉及到的技术非常多，本文主要总结一下分布式系统的常见问题。 2 分布式系统定义分布式系统有很多不同的定义，一般认为：“一个分布式系统是一些独立的计算机集合，但是对这个系统的用户来说，系统就像一台计算机一样。”这个定义有两方面的含义：第一，从硬件角度来讲，">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-23T11:52:26.264Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式系统基础知识">
+<meta name="twitter:description" content="1 简介随着互联网的发展，后台服务的承载量越来越大，性能多高的单台机器也无法满足无限制增长的承载量，因此产生了分布式系统。但是分布式系统极其复杂，涉及到的技术非常多，本文主要总结一下分布式系统的常见问题。 2 分布式系统定义分布式系统有很多不同的定义，一般认为：“一个分布式系统是一些独立的计算机集合，但是对这个系统的用户来说，系统就像一台计算机一样。”这个定义有两方面的含义：第一，从硬件角度来讲，">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/distributed_system/classic_problems/">
+
+
+
+
+
+  <title>分布式系统基础知识 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/distributed_system/classic_problems/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式系统基础知识</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T18:54:13+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/一致性协议/" itemprop="url" rel="index">
+                    <span itemprop="name">一致性协议</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-简介"><a href="#1-简介" class="headerlink" title="1 简介"></a>1 简介</h1><p>随着互联网的发展，后台服务的承载量越来越大，性能多高的单台机器也无法满足无限制增长的承载量，因此产生了分布式系统。但是分布式系统极其复杂，涉及到的技术非常多，本文主要总结一下分布式系统的常见问题。</p>
+<h1 id="2-分布式系统定义"><a href="#2-分布式系统定义" class="headerlink" title="2 分布式系统定义"></a>2 分布式系统定义</h1><p>分布式系统有很多不同的定义，一般认为：“一个分布式系统是一些独立的计算机集合，但是对这个系统的用户来说，系统就像一台计算机一样。”这个定义有两方面的含义：第一，从硬件角度来讲，每台计算机都是自主的；第二，从软件角度来讲，用户将整个系统看做是一台计算机。这两者都是必需的，缺一不可。  </p>
+<h1 id="3-系统分布式的原因以及问题"><a href="#3-系统分布式的原因以及问题" class="headerlink" title="3 系统分布式的原因以及问题"></a>3 系统分布式的原因以及问题</h1><p>随着移动互联网的发展，网络用户呈爆炸式增长，当一个互联网业务获得大众喜欢时，最为显著的问题就是响应时间变长，这时，不管性能多高的单机，终有一天都会遇到性能问题。为此，整个系统从单机模式逐步演化为分布式系统。分布式系统与单机系统不同，分布式系统关注的核心点不是单节点的异常，而是系统整体的稳定性和健壮性。但是分布式系统与单机系统又有很大的不同，特别是：  </p>
+<ul>
+<li>分布式系统不仅仅是是和非，分布式系统有三态： 一个RPC（节点A向节点B发起的远程过程调用）的执行结果有三种：成功、失败、超时(未知)。<br>分布式系统拥有分布式的计算单元和资源，它的设计目标是：  </li>
+<li>容错：在组件失效的时候不会产生错误的行为。  </li>
+<li>高可用：在某些组件失效的时候，依然可以提供服务。  </li>
+<li>可还原：在失效的组件被修复后，它们可以重新加入系统。  </li>
+<li>一致性：系统的各个组件可以在并发和失败的情形下协调工作，这让整个系统看起来像一个节点。  </li>
+<li>可扩展性：系统可以在必要的时候增加或者删除节点或者组件，而这样的扩展不会对系统的运行造成大的影响。</li>
+<li>可预测的性能：能够及时提供需要的响应。  </li>
+<li>安全：对于数据和服务访问的安全认证。<br>因为如上的一系列目标，造成了分布式系统要解决的一个重要的问题是：不同节点间如何达成共识。因为分布式系统的三态性，要达到分布式系统的目标就非常不易。因为网络是不可靠的，节点也可能随时宕机，宕机后如何恢复，如何加入一个运行中的分布式系统中，如何处理超时这种未知状态等等问题使得分布式系统变得异常复杂，由此才衍生出很多的协议和理论：  </li>
+<li>为探究共识问题最大能解决的程度，衍生出FLP、CAP边界理论，BASE理论；</li>
+<li>为了解决核心问题（数据一致性），衍生出raft、paxos、zab等协议；</li>
+<li>为了实现这些协议，产生了多数派、Leader选举、租约、逻辑时钟等概念和方法；</li>
+<li>为了解决数据的分布均匀以及节点宕机的恢复速度，产生了一致性hash；</li>
+<li>为了实现分布式系统的高可用，引入了复制机制（由此产生了数据一致性问题）；</li>
+<li><p>由于网络原因数据分布存储，由此产生了2PC，3PC等分布式事务的实现机制。</p>
+<p>本文主要探究分布式系统的协作问题，至于分布式系统的架构设计，服务器的性能、全局稳定性、高可用等这些方面的技术和思想的研究和学习后边再进行专门的研究。  </p>
+</li>
+</ul>
+<h1 id="4-分布式系统的边界理论和设计原则"><a href="#4-分布式系统的边界理论和设计原则" class="headerlink" title="4 分布式系统的边界理论和设计原则"></a>4 分布式系统的边界理论和设计原则</h1><h2 id="4-1-CAP理论"><a href="#4-1-CAP理论" class="headerlink" title="4.1 CAP理论"></a>4.1 CAP理论</h2><p>CAP理论CAP由Eric Brewer在2000年PODC会议上提出，在提出两年后被证明成立[4]，成为我们熟知的CAP定理：  </p>
+<ul>
+<li>数据一致性(consistency)：如果系统对一个写操作返回成功，那么之后的读请求都必须读到这个新数据；如果返回失败，那么所有读操作都不能读到这个数据，对调用者而言数据具有强一致性(strong consistency) (又叫原子性 atomic、线性一致性 linearizable consistency，强一致性)  </li>
+<li>服务可用性(availability)：所有读写请求在一定时间内得到响应，可终止、不会一直等待。  </li>
+<li>分区容错性(partition-tolerance)：在网络分区的情况下，被分隔的节点仍能正常对外服务。<br>这里要解释一下何为分区：<br>一个分布式系统里面，节点组成的网络本来应该是连通的。然而可能因为一些故障，使得有些节点之间不连通了，整个网络就分成了几块区域。数据就散布在了这些不连通的区域中。这就叫分区。当你一个数据项只在一个节点中保存，那么分区出现后，和这个节点不连通的部分就访问不到这个数据了。这时分区就是无法容忍的。提高分区容忍性的办法就是一个数据项复制到多个节点上，那么出现分区之后，这一数据项就可能分布到各个区里。容忍性就提高了。然而，要把数据复制到多个节点，就会带来一致性的问题，就是多个节点上面的数据可能是不一致的。要保证一致，每次写操作就都要等待全部节点写成功，而这等待又会带来可用性的问题。总的来说就是，数据存在的节点越多，分区容忍性越高，但要复制更新的数据就越多，一致性就越难保证。为了保证一致性，更新所有节点数据所需要的时间就越长，可用性就会降低。 <a href="https://www.zhihu.com/question/54105974/answer/139037688" target="_blank" rel="noopener">来源</a>  </li>
+</ul>
+<p>CAP从理论层面指出，不要去妄图设计一种完全拥有CAP特性的分布式系统。因为这种系统理论上就不存在。如果作为一个架构师，最主要的就是依据业务特点在这三点之中做权衡，最多只能达到两点，尽最大努力的实现第三点（但是不会完全实现）。<br>在某时刻如果满足AP，分隔的节点同时对外服务但不能相互通信，将导致状态不一致，即不能满足C；如果满足CP，网络分区的情况下为达成C，请求只能一直等待，即不满足A；如果要满足CA，在一定时间内要达到节点状态一致，要求不能出现网络分区，则不能满足P。  </p>
+<ul>
+<li><p><strong>关于P的理解</strong>：P的意思是网络分区，即分布式系统因为某些原因被分割成几个部分，这几个部分无法相互通信。这时有些人认为：网络分区发生的概率非常小，是不是满足CA就好？其实不然，因为在现实工程中，我们面对的是一个不可靠的网络，很多节点组成的分布式系统（这里特别强调很多节点，为了说明发生网络分区不一定是网络问题导致，例如节点宕机，这时分布式系统中的其他节点也无法与它通信，也会发生网络分区，一个节点发生宕机的概率很小，但是多个节点发生宕机的概率就很高了），这两个原因导致发生网络分区的概率还是比较高的。因此，在分布式系统中，P是一个必须选项，而不是可选项。总不能一个分布式系统为了CA而经常因为P的发生不能对外服务吧？互联网业务更加不能容忍这一点。因此，对于分布式系统工程而言，CAP理论就是：在满足分区容错的前提下，没有算法能同时满足数据一致性和服务可用性。我们需要对CA做选择。  </p>
+</li>
+<li><p><strong>CA并非非此即彼：</strong>前面我们说到，分布式系统P是必选的，那么理论上就是在CA中选择一种，然而，在工程实践中，并不是如此，因为可用性有不同的等级和要求，一致性也有不同的强度，放宽限制后，我们可以兼顾二者，依据业务特性找到一个合适的平衡点。为此，不得不谈谈<strong>一致性</strong>这个话题。<br>CAP定理证明中的一致性指强一致性，强一致性要求多节点组成的被调要能像单节点一样运作、操作具备原子性，数据在时间、时序上都有要求。如果放宽这些要求，除了强一致性，还有如下两种一致性：  </p>
+</li>
+<li>序列一致性(sequential consistency)[13]：不要求时序一致，A操作先于B操作，在B操作后如果所有调用端读操作得到A操作的结果，满足序列一致性，也叫弱一致性，不同副本上的值有新有旧，需要应用方做更多的工作获取最新值。  </li>
+<li>最终一致性(eventual consistency)[14]：放宽对时间的要求，在被调完成操作响应后的某个时间点，被调多个节点的数据最终达成一致。  </li>
+</ul>
+<p>可用性在CAP理论中指所有读写操作必须要能在一定时间内得到响应，可终止、不会一直等待。在工程领域，特别是数据存储型服务，通常作为被调方，这时，当出现网络分区时，我们可以让被调方支持读操作，禁止写，通过牺牲了一部分可用性而实现数据一致性。  </p>
+<p>CAP理论对实现分布式系统具有指导意义，但CAP理论仅仅涵盖了分布式工程实践中的很小一部分，主要就是分布式系统的边界问题。在服务可用性中，说到要在一定的时间内得到响应，什么叫一定的时间呢？其实就是时延问题，它是衡量系统可用性、与用户体验直接相关的一项重要指标。当然是越快越好，不过我们在设计系统时应该结合具体问题进行设计和分析。这个涉及到很多技术，特别是服务性能。当然了。分布式系统诞生，在本质上也是为了提高吞吐量，降低时延。  </p>
+<p>时延与一致性也是一对相互矛盾的问题，如果要达到多个数据副本之见强一致，必然增加时延，由此，我们在设计分布式系统的时候，依据CAP理论，主要做如下设计：如果出现P(网络分区)，如何在A(服务可用性)、C(数据一致性)之间选择；否则，如何在L(延时)、C(数据一致性)之间选择。我们主要是要结合自己的业务特点设计自己的分布式系统。  </p>
+<h2 id="4-2-BASE理论"><a href="#4-2-BASE理论" class="headerlink" title="4.2 BASE理论"></a>4.2 BASE理论</h2><p>通过上边对CAP理论的学习和了解，我们认识到同时满足CAP的系统是不存在的。我们主要是在满足P的情况下，依据业务特点在CA之见做平衡，有的业务对一致性要求没那么高，有的则必须一致。为此，产生了BASE理论，该理论也是分布式系统设计的基石。它的内容是：<br>BASE是Basically Available（基本可用）、Soft state（软状态）和Eventually consistent（最终一致性）三个短语的缩写。BASE理论是对CAP中一致性和可用性权衡的结果，其来源于对大规模互联网系统分布式实践的总结，是基于CAP定理逐步演化而来的。BASE理论的核心思想是：即使无法做到强一致性，但每个应用都可以根据自身业务特点，采用适当的方式来使系统达到最终一致性。接下来看一下BASE中的三要素：  </p>
+<ul>
+<li>1、基本可用<br>基本可用是指分布式系统在出现不可预知故障的时候，允许损失部分可用性，例如之前我们说的只支持读，不支持写（<strong>注意，这绝不等价于系统不可用</strong>）。  </li>
+<li>2、软状态<br>软状态指允许系统中的数据存在中间状态，并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。  </li>
+<li>3、最终一致性<br>最终一致性强调的是所有的数据副本，在经过一段时间的同步之后，最终都能够达到一个一致的状态。因此，最终一致性的本质是需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。  </li>
+</ul>
+<p>总的来说，BASE理论面向的是大型高可用可扩展的分布式系统，和传统的事物ACID特性是相反的，它完全不同于ACID的强一致性模型，而是通过牺牲强一致性来获得可用性，并允许数据在一段时间内是不一致的，但最终达到一致状态。但同时，在实际的分布式场景中，不同业务单元和组件对数据一致性的要求是不同的，因此在具体的分布式系统架构设计过程中，ACID特性和BASE理论往往又会结合在一起。而且，对于分布式系统来说，至少要达到最终一致性。不然系统中的数据都是没有意义的。  </p>
+<h1 id="5-分布式系统的一致性"><a href="#5-分布式系统的一致性" class="headerlink" title="5 分布式系统的一致性"></a>5 分布式系统的一致性</h1><p>前边学习和了解了分布式系统的理论基石，接下来了解和学习分布式系统的一致性问题。<br>为了实现系统的高可用性，在分布式系统中数据常常有多个副本，这时，数据一致性问题就非常关键突出。近半个世纪以来，科学家们围绕着一致性问题提出了很多理论模型，依据这些理论模型，业界也出现了很多工程实践投影。下边我们将学习和了解这些理论。  </p>
+<p>这些理论主要包括：2PC、3PC、paxos、raft。这里主要学习2PC、3PC，至于paxos和raft是非常复杂的算法，篇幅原因，不在这里学习。  </p>
+<h2 id="5-1-分布式事务"><a href="#5-1-分布式事务" class="headerlink" title="5.1 分布式事务"></a>5.1 分布式事务</h2><p>分布式事务是指会涉及到操作多个数据库的事务。其实就是将对同一库事务的概念扩大到了对多个库的事务。目的是为了保证分布式系统中的数据一致性。分布式事务处理的关键是必须有一种方法可以知道事务在任何地方所做的所有动作，提交或回滚事务的决定必须产生统一的结果（全部提交或全部回滚）。  </p>
+<p>在分布式系统中，各个节点之间在物理上相互独立，通过网络进行沟通和协调。由于存在事务机制，可以保证每个独立节点上的数据操作可以满足ACID。但是，相互独立的节点之间无法准确的知道其他节点中的事务执行情况。所以从理论上讲，两台机器理论上无法达到一致的状态。如果想让分布式部署的多台机器中的数据保持一致性，那么就要保证在所有节点的数据写操作，要么全部都执行，要么全部都不执行。但是，一台机器在执行本地事务的时候无法知道其他机器中的本地事务的执行结果。所以他也就不知道本次事务到底应该commit还是 roolback。所以，常规的解决办法就是引入一个“协调者”的组件来统一调度所有分布式节点的执行。这个思想不就是计算机领域非常经典的分层理论吗？任何问题都可以通过增加一层来解决。2PC、3PC这些理论就是由此演化而来的。  </p>
+<h2 id="5-2-FLP不可能定理-本部分内容来自区块链技术指南一书"><a href="#5-2-FLP不可能定理-本部分内容来自区块链技术指南一书" class="headerlink" title="5.2 FLP不可能定理(本部分内容来自区块链技术指南一书)"></a>5.2 FLP不可能定理(本部分内容来自区块链技术指南一书)</h2><p>前面的CAP从理论层面说明了分布式系统的边界，FLP定理是研究分布式一致性问题边界的原理。我们先了解了问题的边界，再去研究解决方法无疑是很好的。下边进行FLP定理的学习。  </p>
+<p>FLP不可能定理：FLP 不可能原理：在网络可靠，但允许节点失效（即便只有一个）的最小化异步模型系统中，不存在一个可以解决一致性问题的确定性共识算法（No completely asynchronous consensus protocol can tolerate even a single unannounced process death）。  </p>
+<p>提出并证明该定理的论文《Impossibility of Distributed Consensus with One Faulty Process》是由 Fischer，Lynch 和 Patterson 三位科学家于 1985 年发表，该论文后来获得了 Dijkstra（就是发明最短路径算法的那位计算机科学家）奖。  </p>
+<p>FLP 不可能原理告诉我们，不要浪费时间，去试图为异步分布式系统设计面向任意场景的共识算法。  </p>
+<p>如何理解呢？<br>要正确理解 FLP 不可能原理，首先要弄清楚“异步”的含义。在分布式系统中，同步和异步这两个术语存在特殊的含义。  </p>
+<ul>
+<li>同步，是指系统中的各个节点的时钟误差存在上限；并且消息传递必须在一定时间内完成，否则认为失败；同时各个节点完成处理消息的时间是一定的。因此同步系统中可以很容易地判断消息是否丢失。  </li>
+<li>异步，则意味着系统中各个节点可能存在较大的时钟差异；同时消息传输时间是任意长的；各节点对消息进行处理的时间也可能是任意长的。这就造成无法判断某个消息迟迟没有被响应是哪里出了问题（节点故障还是传输故障？）。不幸地是，现实生活中的系统往往都是异步系统。<br>FLP 不可能性在论文中以图论的形式进行了严格证明。要理解其基本原理并不复杂，一个不严谨的例子如下。  </li>
+</ul>
+<p>三个人在不同房间，进行投票（投票结果是 0 或者 1）。彼此可以通过电话进行沟通，但经常有人会时不时睡着。比如某个时候，A 投票 0，B 投票 1，C 收到了两人的投票，然后 C 睡着了。此时，A 和 B 将永远无法在有限时间内获知最终的结果，究竟是 C 没有应答还是应答的时间过长。如果可以重新投票，则类似情形可以在每次取得结果前发生，这将导致共识过程永远无法完成。  </p>
+<p>FLP 原理实际上说明对于<strong>允许节点失效情况下，纯粹异步系统</strong>无法确保共识在有限时间内完成（也就无法同时满足强一致和可用性）。即便对于非拜占庭错误的前提下，包括 Paxos、Raft 等算法也都存在无法达成共识的极端情况，只是在工程实践中这种情况出现的概率很小。<br>那么，这是否意味着研究共识算法压根没有意义？<br>不必如此悲观。学术研究，往往考虑地是数学和物理意义上理想化的情形，很多时候现实世界要稳定得多（感谢这个世界如此鲁棒！）。例如，上面例子中描述的最坏情形，每次都发生的概率其实并没有那么大。工程实现上某次共识失败，再尝试几次，很大可能就成功了。<br>科学告诉你什么是不可能的；工程则告诉你，付出一些代价，可以把它变成可行。<br>这就是科学和工程不同的魅力。<strong>FLP 不可能原理告诉大家不必浪费时间去追求完美的共识方案</strong>，而要根据实际情况设计可行的工程方案。<br>那么，退一步讲，在付出一些代价的情况下，共识能做到多好？<br>回答这一问题的是另一个很出名的原理：CAP 原理。<br>注：科学告诉你去赌场是愚蠢的，因为最终总会输钱；工程则告诉你，如果你愿意接受最终输钱的风险，中间说不定能偶尔小赢几笔呢！  </p>
+<h2 id="5-3-2PC"><a href="#5-3-2PC" class="headerlink" title="5.3 2PC"></a>5.3 2PC</h2><p>在分布式系统中，为了保证数据的高可用，通常，我们会将数据保留多个副本(replica)，这些副本会放置在不同的物理的机器上。为了对用户提供正确的增\删\改\差等语义，我们需要保证这些放置在不同物理机器上的副本是一致的。因此，一致性问题是分布式系统中最基本，最根本性的问题，近半个世纪以来，科学家们围绕着一致性问题提出了很多理论模型，依据这些理论模型，出现了很多工程实践。下面我们从一致性问题、特定条件下解决一致性问题的两种方法(2PC、3PC)入门，了解最基础、简单的分布式系统理论。后边我们会将更加高级的分布式理论，raft、paxos。  </p>
+<p>要理解2PC，必须先理解为什么在分布式系统中一致性很难做到。为此我们先看看一致性。   </p>
+<h3 id="5-3-1-一致性"><a href="#5-3-1-一致性" class="headerlink" title="5.3.1 一致性"></a>5.3.1 一致性</h3><p>分布式系统和单机系统都涉及到一致性，在单价系统中，传统的数据库事务已经很好的解决了这一点，我们在此讨论的是分布式系统中的一致性。简单来说，狭义上的一致性往往指的是相互独立的节点之间的数据一致性，狭义上说，一致性问题就是相互独立的节点之间如何达成一项决议的问题（数据一致性也属于这个范畴，更具体点，比如一个事务在多台机器上要不要提交，这个决议如何达成？）。为此发展出了分布式事务、leader选举、租约等一系列概念。  </p>
+<p>假设有一个N个节点的分布式系统，当其满足以下条件时，我们说这个系统满足一致性：  </p>
+<ul>
+<li>全认同(agreement): 所有N个节点都认同一个结果。  </li>
+<li>值合法(validity)：该结果必须由N个节点中的节点提出。</li>
+<li>可结束(termination): 决议过程在一定时间内结束，不会无休止地进行下去，这点非常重要。  </li>
+</ul>
+<p>看起来不是很简单吗？对于几个人来说，商量一下不就行了，如此简单的事情，在分布式系统领域实现起来并不容易，甚至可以说很复杂，因为在分布式系统中会面临如下基本的问题：  </p>
+<ol>
+<li>消息传递异步无序(asynchronous): 现实网络不是一个可靠的信道，存在消息延时、丢失，节点间消息传递做不到同步有序(synchronous)  </li>
+<li>节点宕机(fail-stop): 节点持续宕机，不会恢复   </li>
+<li>节点宕机恢复(fail-recover): 节点宕机一段时间后恢复，在分布式系统中最常见    </li>
+<li>网络分区(network partition): 网络链路出现问题，将N个节点隔离成多个部分  </li>
+<li>拜占庭将军问题(byzantine failure): 节点或宕机或逻辑失败，甚至不按套路出牌抛出干扰决议的信息  </li>
+</ol>
+<p>我们把以上问题称为系统模型(system model)，讨论分布式系统理论和工程实践的时候，必先划定系统模型。这其实就是要先明确问题，再讨论解决之道，在问题没明确的时候谈解决之道就是扯淡，在需求不明确的时候讨论技术架构也是徒劳的，要求评估所需时间的行为就是耍流氓，作为一名技术开发，这也是要坚持的原则，扯远了，回归正题。例如有以下两种系统模型：  </p>
+<ul>
+<li>异步环境(asynchronous)下，节点宕机(fail-stop)</li>
+<li>异步环境(asynchronous)下，节点宕机恢复(fail-recover)、网络分化(network partition)<br>2比1多了节点恢复、网络分区的考量，因而对这两种模型的理论研究和工程解决方案必定是不同的。<br>一致性还具备两个属性，一个是强一致(safety)，它要求所有节点状态一致、共进退；一个是可用(liveness)，它要求分布式系统24*7无间断对外服务。FLP定理已经证明在一个收窄的模型中(异步环境并只存在节点宕机)，不能同时满足强一致和可用性。因此工程实践中往往在这二者之间做取舍。2PC是较为简单的解决分布式一致性问题的协议。接下来进行讨论。  </li>
+</ul>
+<h3 id="5-3-2-2PC-协议"><a href="#5-3-2-2PC-协议" class="headerlink" title="5.3.2 2PC 协议"></a>5.3.2 2PC 协议</h3><h4 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h4><p>2PC也是实现分布式事务的协议，我们先回顾一下分布式事务的定义：</p>
+<ul>
+<li>分布式事务是指会涉及到操作多个数据库的事务。其实就是将对同一数据库事务的概念扩大到了对多个数据库的事务。<em>目的是为了保证分布式系统中的数据一致性</em>。分布式事务处理的关键是必须有一种方法可以知道事务在任何地方所做的所有动作，提交或回滚事务的决定必须产生统一的结果（全部提交或全部回滚）。以mysql为例，多个数据库可能位于一个实例，也可能位于一个实例。  </li>
+</ul>
+<p>在分布式系统中，各个节点的事务作为一个单机事务已经得到了很好的解决，但是，如果将分布式系统作为一个整体对外服务的话，在应用程序来看，分布式系统的事务性应该是：所有节点的事务要么全commit，要么全rollback，但是各个节点不知道其他节点的事务状态，当然可以广播，自己的状态到分布式系统中的事务参与者，但是这样实现起来太过复杂，因此引入了一个<strong>协调者</strong> 来统一调度所有分布式节点的执行。  </p>
+<h4 id="XA规范"><a href="#XA规范" class="headerlink" title="XA规范"></a>XA规范</h4><p>X/Open 组织（即现在的 Open Group）定义了分布式事务处理模型。包括应用程序（AP）、事务管理器（TM）、资源管理器（RM）、通信资源管理器（CRM）四部分。一般，常见的事务管理器（TM）是事务中间件，常见的资源管理器（RM）是传统的单机数据库，常见的通信资源管理器（CRM）是消息中间件。通常把一个数据库内部的事务处理，如对多个表的操作，作为本地事务看待。数据库的事务处理对象是本地事务，而分布式事务处理的对象是全局事务。所谓全局事务，是指分布式事务处理环境中，多个数据库可能需要共同完成一个工作，这个工作即是一个全局事务，例如，一个事务中可能更新几个不同的数据库。对数据库的操作发生在系统的各处但必须全部被提交或回滚。此时一个数据库对自己内部所做操作的提交不仅依赖本身操作是否成功，还要依赖与全局事务相关的其它数据库的操作是否成功，如果任一数据库的任一操作失败，则参与此事务的所有数据库所做的所有操作都必须回滚。一般情况下，某一数据库无法知道其它数据库在做什么，因此，事务中间件是必需的，由它通知和协调相关数据库的提交或回滚。而一个数据库只将其自己所做的操作（可恢复）影射到全局事务中。   </p>
+<ul>
+<li>XA 就是 X/Open DTP 定义的事务中间件与数据库之间的接口规范（即接口函数），事务中间件用它来通知数据库事务的开始、结束以及提交、回滚等。 XA 接口函数由数据库厂商提供。   </li>
+</ul>
+<p>二阶提交协议和三阶提交协议就是根据这一思想衍生出来的。可以说二阶段提交其实就是实现XA分布式事务的关键。  </p>
+<h4 id="2PC"><a href="#2PC" class="headerlink" title="2PC"></a>2PC</h4><p>2PC(tow phase commit)两阶段提交[5]顾名思义它分成两个阶段，先由一方进行提议(propose)并收集其他节点的反馈(vote)，再根据反馈决定提交(commit)或中止(abort)事务。我们将提议的节点称为协调者(coordinator)，其他参与决议节点称为参与者(participants, 或cohorts)：  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/一致性协议/" rel="tag"># 一致性协议</a>
+          
+            <a href="/tags/分布式系统/" rel="tag"># 分布式系统</a>
+          
+            <a href="/tags/raft/" rel="tag"># raft</a>
+          
+            <a href="/tags/数据一致性/" rel="tag"># 数据一致性</a>
+          
+            <a href="/tags/基础理论/" rel="tag"># 基础理论</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/raft-zh_cn-master/raft-zh_cn/" rel="next" title="raft协议中文版">
+                <i class="fa fa-chevron-left"></i> raft协议中文版
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/rpc/tars/1-tars_install/" rel="prev" title="tars install">
+                tars install <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-简介"><span class="nav-number">1.</span> <span class="nav-text">1 简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-分布式系统定义"><span class="nav-number">2.</span> <span class="nav-text">2 分布式系统定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-系统分布式的原因以及问题"><span class="nav-number">3.</span> <span class="nav-text">3 系统分布式的原因以及问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-分布式系统的边界理论和设计原则"><span class="nav-number">4.</span> <span class="nav-text">4 分布式系统的边界理论和设计原则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-CAP理论"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 CAP理论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-BASE理论"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 BASE理论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-分布式系统的一致性"><span class="nav-number">5.</span> <span class="nav-text">5 分布式系统的一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-分布式事务"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 分布式事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-FLP不可能定理-本部分内容来自区块链技术指南一书"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 FLP不可能定理(本部分内容来自区块链技术指南一书)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-2PC"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 2PC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-1-一致性"><span class="nav-number">5.3.1.</span> <span class="nav-text">5.3.1 一致性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-2-2PC-协议"><span class="nav-number">5.3.2.</span> <span class="nav-text">5.3.2 2PC 协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式事务"><span class="nav-number">5.3.2.1.</span> <span class="nav-text">分布式事务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#XA规范"><span class="nav-number">5.3.2.2.</span> <span class="nav-text">XA规范</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2PC"><span class="nav-number">5.3.2.3.</span> <span class="nav-text">2PC</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式系统,RPC框架,tars,高性能,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1、 协议设计理论随着移动互联网的发展，微服务架构成了后台服务架构的标配。通常支撑微服务架构的底层技术是RPC，RPC在通信的时候，数据的序列化、反序列化，跨平台等等是需要解决的问题。通常情况下，跨平台是通过IDL来解决的，通信过程中的协议设计也非常重要，通常有如下目标：    解析效率：互联网服务具有海量服务的特点，高校的解析效率可以节约大量的CPU。 编码长度：编码的效率决定了使用的网络带宽。">
+<meta name="keywords" content="分布式系统,RPC框架,tars,高性能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tars协议">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/5-tars_protocol/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="1、 协议设计理论随着移动互联网的发展，微服务架构成了后台服务架构的标配。通常支撑微服务架构的底层技术是RPC，RPC在通信的时候，数据的序列化、反序列化，跨平台等等是需要解决的问题。通常情况下，跨平台是通过IDL来解决的，通信过程中的协议设计也非常重要，通常有如下目标：    解析效率：互联网服务具有海量服务的特点，高校的解析效率可以节约大量的CPU。 编码长度：编码的效率决定了使用的网络带宽。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-23T11:53:31.402Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tars协议">
+<meta name="twitter:description" content="1、 协议设计理论随着移动互联网的发展，微服务架构成了后台服务架构的标配。通常支撑微服务架构的底层技术是RPC，RPC在通信的时候，数据的序列化、反序列化，跨平台等等是需要解决的问题。通常情况下，跨平台是通过IDL来解决的，通信过程中的协议设计也非常重要，通常有如下目标：    解析效率：互联网服务具有海量服务的特点，高校的解析效率可以节约大量的CPU。 编码长度：编码的效率决定了使用的网络带宽。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/5-tars_protocol/">
+
+
+
+
+
+  <title>tars协议 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/5-tars_protocol/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tars协议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T18:57:38+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/rpc-tars/" itemprop="url" rel="index">
+                    <span itemprop="name">rpc-tars</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1、-协议设计理论"><a href="#1、-协议设计理论" class="headerlink" title="1、 协议设计理论"></a>1、 协议设计理论</h1><p>随着移动互联网的发展，微服务架构成了后台服务架构的标配。通常支撑微服务架构的底层技术是RPC，RPC在通信的时候，数据的序列化、反序列化，跨平台等等是需要解决的问题。通常情况下，跨平台是通过IDL来解决的，通信过程中的协议设计也非常重要，通常有如下目标：  </p>
+<ul>
+<li>解析效率：互联网服务具有海量服务的特点，高校的解析效率可以节约大量的CPU。</li>
+<li>编码长度：编码的效率决定了使用的网络带宽。</li>
+<li>易于实现和学习：协议应该简单好用，不需要大而全的东西。  </li>
+<li>后向兼容性:互联网业务的特点就是灵活多变，易于升级，可以很好的兼容老的协议。我觉得随着机器性能的提升，这个因素更加成为一个核心目标。  </li>
+<li>易于阅读和理解</li>
+</ul>
+<p>协议设计主要就是尽量达到这些目标。  </p>
+<p>协议设计需要解决两个最为基本的核心问题是：  </p>
+<ul>
+<li>序列化、反序列化</li>
+<li>判断数据包的完整性。<br>解决了这两个最基本的问题之后，机器之间就可以完成通信。<br>满足了最基本问题之后，后向兼容性方面也是需要考虑的问题：如何支持升级、可用性如何维护。  </li>
+</ul>
+<p>接下来就先学习互联网后台协议解决前两个基本问题的方法，然后再看看tars是怎么做的，后向兼容性又是如何做的。  </p>
+<h2 id="1-1-序列化-反序列化"><a href="#1-1-序列化-反序列化" class="headerlink" title="1.1 序列化/反序列化"></a>1.1 序列化/反序列化</h2><p>序列化我们常称之为编码，或者打包，反序列化常称之为解码，或者解包。常用的序列化/反序列化方式主要有以下几种：  </p>
+<ol>
+<li><p>TLV（tag-length-value）编码：Protobuf/thrift/tars/ASN BER都属于这种。TLV编码基本原理是每个字段打一个二进制包，每个包包含tag、length、value 3个部分  </p>
+<ul>
+<li><ul>
+<li>：tag: 一般占用1个字节，表示数据类型，有的编码方式（Protobuf/thrift/tars）中tag还包含字段的id，有的编码方式（ASN BER）不包含字段的id。在包含字段id的序列化方式中，id是字段的标志，协议可以灵活的增删字段，只要保证字段id唯一，就能兼容解析，非常适合互联网业务的开发，因此大部分互联网RPC协议都是带有id的编码方式。   </li>
+</ul>
+</li>
+<li><ul>
+<li>length：一个整数，表示后面数据块的长度，Protobuf/thrift/tars的序列化有些不包含length字段，因为大部分数据类型的长度都可以根据tag中的类型信息得到。  </li>
+</ul>
+</li>
+<li><ul>
+<li>value：真正的数据内容。  </li>
+</ul>
+</li>
+<li><p>TLV的编码方式有如下特点：  </p>
+</li>
+<li><ul>
+<li>解析效率高：不需要转义字符。  </li>
+</ul>
+</li>
+<li><ul>
+<li>编码长度低：元数据占用空间少(例如json格式中，元数据占用的空间打，key的名字有时候占用的长度比其值占用的都大)。  </li>
+</ul>
+</li>
+<li><ul>
+<li>不易实现：虽然实现起来比较复杂，但是业界有很多良好的实现，通常是和IDL绑定，自动生成代码，进行序列化、反序列化，开发效率反而往往很高。  </li>
+</ul>
+</li>
+<li><ul>
+<li>兼容性高：通过tag中包含id信息的方式，双方可以独立升级。</li>
+</ul>
+</li>
+<li><ul>
+<li>不易阅读和理解：因为是二进制协议，肉眼难以识别。  </li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>文本流编码：例如xml/json都属于这种。基本原理是把每个字段打一个字符串形式的包，通过键值对（key-value）的方式存储数据，key是字段的名字（对比上面TLV编码采用id的方式标志一个字段），特殊字符特别是非文本字符需要做适当转义（例如通过base64编码），转义为xml/json的合法字符。xml的解析效率低于json，而编码长度高于json，json作为序列化的方式一般是优于xml的。  </p>
+<ul>
+<li>文本流编码的特点是：</li>
+<li><ul>
+<li>解析效率低</li>
+</ul>
+</li>
+<li><ul>
+<li>编码长度高</li>
+</ul>
+</li>
+<li><ul>
+<li>易于实现</li>
+</ul>
+</li>
+<li><ul>
+<li>可扩展性高</li>
+</ul>
+</li>
+<li><ul>
+<li>可读性好<br>可见，对性能要求较高的场景而言，这种序列化/反序列化方式不合适。  </li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>固定结构编码：基本原理是，协议约定了传输字段类型和字段含义，和TLV的方式类似，但是没有了tag和len，只有value  </p>
+<ul>
+<li><p>固定结构编码如果协议升级了又需要保证兼容性，那么可以在协议中增加一个“版本号”字段，然后根据版本号决定如何序列化和反序列化，这样可以保证协议的兼容性。但是这样会导致代码非常混乱。</p>
+</li>
+<li><p>固定结构编码的特点是：</p>
+</li>
+<li><ul>
+<li>解析效率搞  </li>
+</ul>
+</li>
+<li><ul>
+<li>编码长度更低：对于TLV而言  </li>
+</ul>
+</li>
+<li><ul>
+<li>易于实现：都是已经约定好固定的格式。  </li>
+</ul>
+</li>
+<li><ul>
+<li>可读性方面略微优于TLV方式。</li>
+</ul>
+</li>
+<li><ul>
+<li>灵活性和兼容性非常差。  </li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>因此，互联网协议中，通常使用TLV方式实现序列化/反序列化。   </p>
+<h2 id="1-2-判断数据包的完整性"><a href="#1-2-判断数据包的完整性" class="headerlink" title="1.2 判断数据包的完整性"></a>1.2 判断数据包的完整性</h2><p>现在序列化/反序列化完成了，我们可以把结构化数据转化成字节流，并从字节流中恢复结构化数据。但是我们知道，TCP协议是安全的字节流协议，但是并不负责完整的数据包的处理，在TCP的角度，它不管你的数据包，只是当作字节流处理，因此，判断数据包的完整性就得应用层实现了（内核层只负责将字节传输过去），通常来说，这个由框架完成。业务开发只关心业务逻辑。  </p>
+<p>实现判断数据包的完整性通常有两种方式：  </p>
+<ol>
+<li>在序列化后的buffer前面增加一个采用固定结构编码的头部，头部长度和结构固定，其中有个字段存储包总长度。收包时，先接收固定字节数的头部，解出这个包完整长度，按此长度接收包体。  </li>
+<li>在序列化后的buffer前面增加一个字符流的头部，其中有个字段存储包总长度，根据特殊字符（比如根据\n 或者\0）判断头部的完整性。这样通常比1中的方式要麻烦一些，http、memcached和radis采用的是这种方式，不过好处就是头部是可扩展的，头部的长度是可变的，这样的话，我们就能在头部携带一些附加信息。收包的时候，先判断已收到的数据中是否包含结束符，收到结束符后解析包头，解出这个包完整长度，按此长度接收包体。  </li>
+</ol>
+<p>至此，我们就为两台机器的通信做了基础的工作，得到了协议设计最核心部分的基本思想和框架。涉及到具体业务的时候，基于这些思想加以适当调整，就能都得到一个合适的协议。   </p>
+<h1 id="2-tars序列化-反序列化"><a href="#2-tars序列化-反序列化" class="headerlink" title="2 tars序列化/反序列化"></a>2 tars序列化/反序列化</h1>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式系统/" rel="tag"># 分布式系统</a>
+          
+            <a href="/tags/RPC框架/" rel="tag"># RPC框架</a>
+          
+            <a href="/tags/tars/" rel="tag"># tars</a>
+          
+            <a href="/tags/高性能/" rel="tag"># 高性能</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/rpc/tars/4-tars_lang/" rel="next" title="tars IDL 语言">
+                <i class="fa fa-chevron-left"></i> tars IDL 语言
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/rpc/tars/6-tars_terminology/" rel="prev" title="6 tars术语">
+                6 tars术语 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、-协议设计理论"><span class="nav-number">1.</span> <span class="nav-text">1、 协议设计理论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-序列化-反序列化"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 序列化/反序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-判断数据包的完整性"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 判断数据包的完整性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-tars序列化-反序列化"><span class="nav-number">2.</span> <span class="nav-text">2 tars序列化/反序列化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

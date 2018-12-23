@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式系统,RPC框架,tars,高性能,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="引言在tars快速开始 中，我们通过一个简单的例子介绍了tars的使用，接下来归纳总结一下tars使用时的规范。   命名规范服务命名 APP：应用名，标识一组服务的一个小集合，在Tars系统中，应用名必须唯一。例如：TestApp。   Server：服务名，提供服务的进程名称，Server名字根据业务服务功能命名，一般命名为：XXServer，例如LogServer，TimerServer等；">
+<meta name="keywords" content="分布式系统,RPC框架,tars,高性能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tars cpp开发指南">
+<meta property="og:url" content="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/3-cpp_dev_specification/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="引言在tars快速开始 中，我们通过一个简单的例子介绍了tars的使用，接下来归纳总结一下tars使用时的规范。   命名规范服务命名 APP：应用名，标识一组服务的一个小集合，在Tars系统中，应用名必须唯一。例如：TestApp。   Server：服务名，提供服务的进程名称，Server名字根据业务服务功能命名，一般命名为：XXServer，例如LogServer，TimerServer等；">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-23T11:53:22.626Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tars cpp开发指南">
+<meta name="twitter:description" content="引言在tars快速开始 中，我们通过一个简单的例子介绍了tars的使用，接下来归纳总结一下tars使用时的规范。   命名规范服务命名 APP：应用名，标识一组服务的一个小集合，在Tars系统中，应用名必须唯一。例如：TestApp。   Server：服务名，提供服务的进程名称，Server名字根据业务服务功能命名，一般命名为：XXServer，例如LogServer，TimerServer等；">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/3-cpp_dev_specification/">
+
+
+
+
+
+  <title>tars cpp开发指南 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/23/distributed_system/rpc/tars/3-cpp_dev_specification/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tars cpp开发指南</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-23T18:57:38+08:00">
+                2018-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/rpc-tars/" itemprop="url" rel="index">
+                    <span itemprop="name">rpc-tars</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>在<a href="2-tars_quick_start.md">tars快速开始</a> 中，我们通过一个简单的例子介绍了tars的使用，接下来归纳总结一下tars使用时的规范。  </p>
+<h1 id="命名规范"><a href="#命名规范" class="headerlink" title="命名规范"></a>命名规范</h1><h2 id="服务命名"><a href="#服务命名" class="headerlink" title="服务命名"></a>服务命名</h2><ul>
+<li>APP：应用名，标识一组服务的一个小集合，在Tars系统中，应用名必须唯一。例如：TestApp。  </li>
+<li>Server：服务名，提供服务的进程名称，Server名字根据业务服务功能命名，一般命名为：XXServer，例如LogServer，TimerServer等；  </li>
+<li>Servant：服务者，提供具体服务的接口或实例。例如:HelloImp  </li>
+</ul>
+<p><strong>说明：</strong><br>一个Server可以包含多个Servant，系统会使用服务的App + Server + Servant，进行组合，来定义服务在系统中的路由名称，称为路由Obj，其名称在整个系统中必须是唯一的，以便在对外服务时，能唯一标识自身。因此在定义APP时，需要注意APP的唯一性。   </p>
+<p>例如：Comm.TimerServer.TimerObj，Comm.LogServer.LogServerObj等；  </p>
+<h2 id="Namespace命名"><a href="#Namespace命名" class="headerlink" title="Namespace命名"></a>Namespace命名</h2><p>每个业务都有一个不同的名称，即Application名称，该名称也做为该Application下面所有代码的namespace。<br>因此namespace一般为业务的名称，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">namespace Comm</span><br></pre></td></tr></table></figure></p>
+<h2 id="class命名-接口名"><a href="#class命名-接口名" class="headerlink" title="class命名(接口名)"></a>class命名(接口名)</h2><p>class 的名字必须由一个或多个能表达该类的意思的单词或缩写组成，单词首字母大写。  </p>
+<p>例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class Hello</span><br></pre></td></tr></table></figure></p>
+<h2 id="方法命名"><a href="#方法命名" class="headerlink" title="方法命名"></a>方法命名</h2><p>函数的命名是以能表达函数的动作意义为原则的，一般是由动词打头，然后跟上表示动作对象的名词。小写字母开头，后面每个单词首字母大写。<br>另外，还有一些通用的函数命名规则。<br>取数用get打头，然后跟上要取的对象的名字；<br>设置用set打头，然后跟上要设的对象的名字；<br>对象中响应消息进行动作的函数，以on打头，然后是相应的消息的名称；<br>进行主动动作的函数，可以命名为do打头，然后是相应的动作名称；<br>用 has 或者 can 来代替布尔型获取函数的 is 前缀，意义更加明确。<br>例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">getNumber(); </span><br><span class="line">setNumber(); </span><br><span class="line">onProcess(); </span><br><span class="line">doAddFile();</span><br><span class="line">hasFile();</span><br><span class="line">canPrint();</span><br><span class="line">sendMessage();</span><br></pre></td></tr></table></figure></p>
+<h2 id="变量命名规则"><a href="#变量命名规则" class="headerlink" title="变量命名规则"></a>变量命名规则</h2><p>对于各种变量的定义，都有一个共同点，就是应该使用有实际意义的英文单词或英文单词缩写，不要使用简单的没有意义的字串，尽可能不使用阿拉伯数字，更切忌使用中文拼音的首字母。<br>如这样的名称是不提倡的：Value1,Value2,Value3,Value4…。<br>一般规则为：小写字母开头,后面每个单词的首字母大写,一般为名词。（如果只有一个单词，则小写）<br>userNo（手机号）、station（省份）、destNo（目的号码）、srcNo（源号码）等等<br>其他: 对于一些比较重要的数，最好用常量替代，而不要直接写数，常量全部大写，多个单词之间以下划线分隔开。  </p>
+<h1 id="Tars文件目录规范"><a href="#Tars文件目录规范" class="headerlink" title="Tars文件目录规范"></a>Tars文件目录规范</h1><p>Tars文件是TARS服务的协议通信接口，因此非常重要，在管理上必须按照以下规范：<br>tars文件原则上和相应的server放在一起；<br>每个server在开发机上建立/home/tarsproto/[namespace]/[server]子目录；<br>所有tars文件需要更新到/home/tarsproto下相应server的目录；<br>使用其他server的tars文件时，需要到/home/tarsproto中使用，不能copy到本目录下，见Makefile规范；<br>tars的接口原则上只能增加，不能减少或修改；<br>makefile里面运行make release会自动完成相关操作，详见Makefile规范；  </p>
+<p>说明：  </p>
+<p>make release会将tars文件copy到/home/tarsproto/[namespace]/[server]目录下，同时生成调用tars2cpp生成.h, 并生成一个[server].mk文件；其他调用该服务时，在makefile底部包含这个mk文件即可。  </p>
+<h1 id="Makefile规范"><a href="#Makefile规范" class="headerlink" title="Makefile规范"></a>Makefile规范</h1><p>使用Tars实现的服务，强烈建议使用该Makefile规范。<br>TARS框架提供了一个makefile.tars的基础Makefile，采用Tars编写的服务包含该Makefile会有效的帮助你对Makefile的维护；<br>TARS框架也提供了脚本(安装目录/script/create_tars_server.sh)可以自动生成空的服务框架和Makefile；  </p>
+<h2 id="Makefile使用原则"><a href="#Makefile使用原则" class="headerlink" title="Makefile使用原则"></a>Makefile使用原则</h2><p>原则上一个目录只能是一个Server或者程序，即Makefile只能有一个Target；<br>需要包含其他库时，根据依赖关系倒序include在Makefile文件底部；  </p>
+<p><strong>例如：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">include /home/tarsproto/TestApp/HelloServer/HelloServer.mk  </span><br><span class="line">include /usr/local/tars/cpp/makefile/makefile.tars</span><br></pre></td></tr></table></figure></p>
+<p>makefile.tars必须包含。  </p>
+<h2 id="Makefile模板解释"><a href="#Makefile模板解释" class="headerlink" title="Makefile模板解释"></a>Makefile模板解释</h2><p>APP：程序的名字空间（即Application）<br>TARGET：Server名称；<br>CONFIG：配置文件名称，make tar时将该文件包含在tar包中；<br>INCLUDE：其他需要包含的路径；<br>LIB： 需要的库<br>Test.HelloServer的makefile实例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#-----------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">APP           := TestApp</span><br><span class="line">TARGET        := HelloServer</span><br><span class="line">CONFIG        := HelloServer.conf</span><br><span class="line">STRIP_FLAG    := N</span><br><span class="line">TARS2CPP_FLAG  :=</span><br><span class="line">TARS_SSL := 1</span><br><span class="line"></span><br><span class="line">INCLUDE       += </span><br><span class="line">LIB           += </span><br><span class="line"></span><br><span class="line">#-----------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">include /home/tarsproto/TestApp/HelloServer/HelloServer.mk  </span><br><span class="line">include /usr/local/tars/cpp/makefile/makefile.tars</span><br></pre></td></tr></table></figure></p>
+<p>关键的变量，通常不用，但是业务可以在这些变量后面添加自己的值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RELEASE_TARS：需要发布在/home/tarsproto/目录下面的tars文件，如果需要把自己.h也发布到/home/tarsproto则可以如下：  </span><br><span class="line">RELEASE_TARS += xxx.h</span><br><span class="line">CONFIG：配置文件名称，其实后面可以增加自己需要的文件，这样在调用make tar时也会把该文件包含到tar包中；</span><br></pre></td></tr></table></figure></p>
+<p>其他变量请阅读makefile.tars。  </p>
+<h2 id="Makefile使用"><a href="#Makefile使用" class="headerlink" title="Makefile使用"></a>Makefile使用</h2><p>make help：可以看到makefile所有使用功能。<br>make tar：生成发布文件<br>make release：copy tars文件到/home/tarsproto相应目录，并自动生成相关的mk文件<br>make clean：清除<br>make cleanall：清除所有  </p>
+<h4 id="特别说明：本节内容主要来自tars官方文档"><a href="#特别说明：本节内容主要来自tars官方文档" class="headerlink" title="特别说明：本节内容主要来自tars官方文档"></a>特别说明：本节内容主要来自tars官方文档</h4><p><a href="https://github.com/TarsCloud/TarsCpp/blob/ed4727a4843ce79b91e736f30f463d6407a59487/docs/tars_cpp_develop_specification.md" target="_blank" rel="noopener">tars_cpp_develop_specification</a>.   </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式系统/" rel="tag"># 分布式系统</a>
+          
+            <a href="/tags/RPC框架/" rel="tag"># RPC框架</a>
+          
+            <a href="/tags/tars/" rel="tag"># tars</a>
+          
+            <a href="/tags/高性能/" rel="tag"># 高性能</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/rpc/tars/2-tars_quick_start/" rel="next" title="tars 快速入门">
+                <i class="fa fa-chevron-left"></i> tars 快速入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/distributed_system/rpc/tars/4-tars_lang/" rel="prev" title="tars IDL 语言">
+                tars IDL 语言 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">36</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#命名规范"><span class="nav-number">2.</span> <span class="nav-text">命名规范</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务命名"><span class="nav-number">2.1.</span> <span class="nav-text">服务命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Namespace命名"><span class="nav-number">2.2.</span> <span class="nav-text">Namespace命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#class命名-接口名"><span class="nav-number">2.3.</span> <span class="nav-text">class命名(接口名)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法命名"><span class="nav-number">2.4.</span> <span class="nav-text">方法命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量命名规则"><span class="nav-number">2.5.</span> <span class="nav-text">变量命名规则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tars文件目录规范"><span class="nav-number">3.</span> <span class="nav-text">Tars文件目录规范</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Makefile规范"><span class="nav-number">4.</span> <span class="nav-text">Makefile规范</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Makefile使用原则"><span class="nav-number">4.1.</span> <span class="nav-text">Makefile使用原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Makefile模板解释"><span class="nav-number">4.2.</span> <span class="nav-text">Makefile模板解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Makefile使用"><span class="nav-number">4.3.</span> <span class="nav-text">Makefile使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#特别说明：本节内容主要来自tars官方文档"><span class="nav-number">4.3.0.1.</span> <span class="nav-text">特别说明：本节内容主要来自tars官方文档</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

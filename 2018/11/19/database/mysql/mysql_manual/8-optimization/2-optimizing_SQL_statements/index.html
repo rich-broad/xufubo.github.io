@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据库应用程序的核心逻辑是通过SQL语句来完成的。这里主要研究mysql对SQL语句的优化。从而写出mysql更加喜欢的SQL语句。 1 优化查询语句查询以select语句的形式执行数据库中的查找操作。select语句由很多子语句组成，优化和调整这些子语句是重要的。除select外，查询优化的技术也适用于CREATE ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xufubo">
+<meta property="og:url" content="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/2-optimizing_SQL_statements/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="数据库应用程序的核心逻辑是通过SQL语句来完成的。这里主要研究mysql对SQL语句的优化。从而写出mysql更加喜欢的SQL语句。 1 优化查询语句查询以select语句的形式执行数据库中的查找操作。select语句由很多子语句组成，优化和调整这些子语句是重要的。除select外，查询优化的技术也适用于CREATE TABLE…AS SELECT, INSERT INTO…SELECT,和在DE">
+<meta property="og:updated_time" content="2018-11-14T15:06:03.512Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="xufubo">
+<meta name="twitter:description" content="数据库应用程序的核心逻辑是通过SQL语句来完成的。这里主要研究mysql对SQL语句的优化。从而写出mysql更加喜欢的SQL语句。 1 优化查询语句查询以select语句的形式执行数据库中的查找操作。select语句由很多子语句组成，优化和调整这些子语句是重要的。除select外，查询优化的技术也适用于CREATE TABLE…AS SELECT, INSERT INTO…SELECT,和在DE">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/2-optimizing_SQL_statements/"/>
+
+
+
+
+
+  <title> | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/19/database/mysql/mysql_manual/8-optimization/2-optimizing_SQL_statements/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-19T23:25:11+08:00">
+                2018-11-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>数据库应用程序的核心逻辑是通过SQL语句来完成的。这里主要研究mysql对SQL语句的优化。从而写出mysql更加喜欢的SQL语句。</p>
+<h1 id="1-优化查询语句"><a href="#1-优化查询语句" class="headerlink" title="1 优化查询语句"></a>1 优化查询语句</h1><p>查询以select语句的形式执行数据库中的查找操作。select语句由很多子语句组成，优化和调整这些子语句是重要的。除select外，查询优化的技术也适用于CREATE TABLE…AS SELECT, INSERT INTO…SELECT,和在DELETE和UPDATE的WHERE条件。这些语句具有额外的性能考虑，因为它们将写操作与面向读取的查询操作结合在一起。优化查询的主要考虑因素是：</p>
+<ul>
+<li>要让SELECT … WHERE查询更快，首先要检查的是是否可以添加索引。为WHERE子句中使用的列设置索引，以加速过滤和最终检索结果。为了避免浪费磁盘空间，以及维护过多的索引带来的额外开销，通常构建一组索引，以加快应用程序中使用的许多相关查询。</li>
+<li>对于引用不同表的查询，索引尤其重要，可以使用连接和外键等功能。您可以使用EXPLAIN语句来确定哪些索引用于SELECT。</li>
+<li>隔离并调整查询的任何部分，例如，能在结果集上使用函数就不在表的每行上使用。</li>
+<li>尽量减少查询中全表扫描的次数，特别是对于大表格。</li>
+<li>mysql的查询优化器是基于统计的，因此，通过定期使用ANALYZE TABLE语句保持表的统计数据是最新的，所以优化器具有构建高效执行计划所需的信息。</li>
+<li>了解和学习特定于存储引擎的技术。</li>
+<li>避免以难以理解的方式转换查询，特别是如果优化器自动执行一些相同的转换。</li>
+<li>如果性能问题不能通过基本准则轻松解决，请通过阅读EXPLAIN计划并调整索引，WHERE子句，连接子句等来研究特定查询的内部详细信息（这个非常重要）。</li>
+<li>合理的调整mysql的缓冲区，特别是InnoDB缓冲池和NyISAM的key缓冲的大小。以尽可能使查询过程中的I/O次数减少。</li>
+<li>即使对于使用高速缓存区快速运行的查询，您仍可能进一步优化，以便它们需要较少的高速缓存内存，从而使您的应用程序更具可扩展性。可扩展意味着您的应用程序可以同时处理更多的用户，更大的请求等等，而不会出现性能大幅下降的情况。</li>
+<li><p>处理锁定问题，其中查询速度可能会受到其他会话同时访问表的影响。</p>
+<h2 id="1-1-where条件优化"><a href="#1-1-where条件优化" class="headerlink" title="1.1 where条件优化"></a>1.1 where条件优化</h2><p>接下来研究mysql对where条件的优化，当然了，mysql的优化器一直也在发展，这里记录的不一定完整。文档通常都是比源代码滞后的。对于where条件的优化，</p>
+<ul>
+<li>移除不必要的括号:<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">   ((a AND b) AND c OR (((a AND b) AND (c AND d))))</span><br><span class="line">-&gt; (a AND b AND c) OR (a AND b AND c AND d)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>Constant folding:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">   (a&lt;b AND b=c) AND a=5</span><br><span class="line">-&gt; b&gt;5 AND b=c AND a=5</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>确定条件的去除</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">   (B&gt;=5 AND B=5) OR (B=6 AND 5=5) OR (B=7 AND 5=6)</span><br><span class="line">-&gt; B=5 OR B=6</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由索引使用的常量表达式仅计算一次</p>
+</li>
+<li>对于没有WHERE的单个表上的COUNT（*），直接从MyISAM和MEMORY表的表信息中查询，当仅与一个表一起使用时，这也适用于任何NOT NULL表达式。</li>
+<li>及时检测无效的常量表达式。 MySQL会快速检测到某些SELECT语句中的where条件不会发生，并且不返回任何行。</li>
+<li>如果不使用GROUP BY或聚合函数（COUNT（），MIN（）等），HAVING将与WHERE合并。</li>
+<li>对于连接中的每个表，构造一个更简单的WHERE以加快过滤。</li>
+<li><p>在查询任何其他表之前首先读取所有常量表。 常量表是以下任何一项：</p>
+<ul>
+<li>空表或者包含一行的表</li>
+<li>与PRIMARY KEY或UNIQUE索引中的WHERE子句一起使用的表，其中所有索引部分都与常量表达式进行比较并定义为NOT NULL。以下所有表格均用作常量表格：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> t <span class="keyword">WHERE</span> primary_key=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> t1,t2</span><br><span class="line">  <span class="keyword">WHERE</span> t1.primary_key=<span class="number">1</span> <span class="keyword">AND</span> t2.primary_key=t1.id;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>通过尝试所有可能性来找到联表的最佳联合组合。如果ORDER BY和GROUP BY子句中的所有列都来自同一个表，那么在连接时首选该表。</p>
+</li>
+<li>如果存在ORDER BY子句和不同的GROUP BY子句，或者如果ORDER BY或GROUP BY包含来自联接队列中第一个表以外的表的列，则会创建一个临时表。</li>
+<li>如果您使用SQL_SMALL_RESULT修饰符，则MySQL使用内存中的临时表。</li>
+<li>除非优化器认为使用表扫描更高效，否则将查询每个表索引，并使用最佳索引。在之前，根据最佳索引是否超过表格的30％来使用扫描，但固定百分比这种做法，不再用于决定是使用索引还是全表扫描。优化器现在更加复杂，会基于其他因素进行考量，如表大小，行数和I/O块大小。</li>
+<li>在某些情况下，MySQL可以从索引中读取行，而无需查询数据文件。如果索引中使用的所有列都是数字，则仅使用索引树来解析查询。</li>
+<li>在输出每行之前，会跳过与HAVING子句不匹配的那些行。<br>一些很快的查询例子：<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(*) <span class="keyword">FROM</span> tbl_name;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">MIN</span>(key_part1),<span class="keyword">MAX</span>(key_part1) <span class="keyword">FROM</span> tbl_name;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">MAX</span>(key_part2) <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  <span class="keyword">WHERE</span> key_part1=<span class="keyword">constant</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  <span class="keyword">ORDER</span> <span class="keyword">BY</span> key_part1,key_part2,... <span class="keyword">LIMIT</span> <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  <span class="keyword">ORDER</span> <span class="keyword">BY</span> key_part1 <span class="keyword">DESC</span>, key_part2 <span class="keyword">DESC</span>, ... <span class="keyword">LIMIT</span> <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>假设索引列是数值类型，那么mysql将仅使用索引树来解析如下查询：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> key_part1,key_part2 <span class="keyword">FROM</span> tbl_name <span class="keyword">WHERE</span> key_part1=val;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(*) <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  <span class="keyword">WHERE</span> key_part1=val1 <span class="keyword">AND</span> key_part2=val2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> key_part2 <span class="keyword">FROM</span> tbl_name <span class="keyword">GROUP</span> <span class="keyword">BY</span> key_part1;</span><br></pre></td></tr></table></figure></p>
+<p>以下查询使用索引来按照排序顺序检索行，而无需单独的排序：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  <span class="keyword">ORDER</span> <span class="keyword">BY</span> key_part1,key_part2,... ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FROM</span> tbl_name</span><br><span class="line">  <span class="keyword">ORDER</span> <span class="keyword">BY</span> key_part1 <span class="keyword">DESC</span>, key_part2 <span class="keyword">DESC</span>, ... ;</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-2-范围优化"><a href="#1-2-范围优化" class="headerlink" title="1.2 范围优化"></a>1.2 范围优化</h2>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/8-optimization/3-optimization_and_indexes/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/19/database/mysql/mysql_manual/8-optimization/8-understand_the_query_plan/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-优化查询语句"><span class="nav-number">1.</span> <span class="nav-text">1 优化查询语句</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-where条件优化"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 where条件优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-范围优化"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 范围优化</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
