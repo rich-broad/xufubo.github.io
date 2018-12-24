@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="数据库,MySQL内核,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="mysql服务器本质上也是一个C++程序，本节的主要目的是了解其主程序的基本结构，为此，先了解mysql源码的结构。 1 MySQL 源码目录介绍下载解压mysql源码，源码中核心目录如下：   1.1 BUILD 目录MySQL 使用cmake 的方式去构建的，cmake 有两种编译方式：内部编译和外部编译，外部编译通常需要一个BUILD目录，用于存放cmake 在构建过程中生成的一些中间文件。">
+<meta name="keywords" content="数据库,MySQL内核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1 MySQL服务器源码骨架分析">
+<meta property="og:url" content="http://yoursite.com/2018/12/25/database/mysql/mysql_kernel/1-mysql_source_code_skeleton/index.html">
+<meta property="og:site_name" content="xufubo">
+<meta property="og:description" content="mysql服务器本质上也是一个C++程序，本节的主要目的是了解其主程序的基本结构，为此，先了解mysql源码的结构。 1 MySQL 源码目录介绍下载解压mysql源码，源码中核心目录如下：   1.1 BUILD 目录MySQL 使用cmake 的方式去构建的，cmake 有两种编译方式：内部编译和外部编译，外部编译通常需要一个BUILD目录，用于存放cmake 在构建过程中生成的一些中间文件。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-24T17:16:42.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="1 MySQL服务器源码骨架分析">
+<meta name="twitter:description" content="mysql服务器本质上也是一个C++程序，本节的主要目的是了解其主程序的基本结构，为此，先了解mysql源码的结构。 1 MySQL 源码目录介绍下载解压mysql源码，源码中核心目录如下：   1.1 BUILD 目录MySQL 使用cmake 的方式去构建的，cmake 有两种编译方式：内部编译和外部编译，外部编译通常需要一个BUILD目录，用于存放cmake 在构建过程中生成的一些中间文件。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/25/database/mysql/mysql_kernel/1-mysql_source_code_skeleton/">
+
+
+
+
+
+  <title>1 MySQL服务器源码骨架分析 | xufubo</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">xufubo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/25/database/mysql/mysql_kernel/1-mysql_source_code_skeleton/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="xufubo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="xufubo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">1 MySQL服务器源码骨架分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-25T01:18:33+08:00">
+                2018-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/MySQL-Kernel/" itemprop="url" rel="index">
+                    <span itemprop="name">MySQL Kernel</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>mysql服务器本质上也是一个C++程序，本节的主要目的是了解其主程序的基本结构，为此，先了解mysql源码的结构。</p>
+<h1 id="1-MySQL-源码目录介绍"><a href="#1-MySQL-源码目录介绍" class="headerlink" title="1 MySQL 源码目录介绍"></a>1 MySQL 源码目录介绍</h1><p>下载解压mysql源码，源码中核心目录如下：  </p>
+<h2 id="1-1-BUILD-目录"><a href="#1-1-BUILD-目录" class="headerlink" title="1.1 BUILD 目录"></a>1.1 BUILD 目录</h2><p>MySQL 使用cmake 的方式去构建的，cmake 有两种编译方式：内部编译和外部编译，外部编译通常需要一个BUILD目录，用于存放cmake 在构建过程中生成的一些中间文件。  </p>
+<h2 id="1-2-client-目录"><a href="#1-2-client-目录" class="headerlink" title="1.2 client 目录"></a>1.2 client 目录</h2><p>该目录主要是MySQL 的一些客户端程序，包括mysql.cc(mysql 可执行文件的源代码)和其他实用程序。MySQL参考手册中提到了大多数的客户端实用程序。通常这些是独立的C 程序，它们以“客户端模式”运行，即：它们调用MySQL 服务器。<br>该目录中的核心C 程序文件如下：</p>
+<ul>
+<li>get_password.c —从终端控制台获取一个密码(就是那个passwd 提示符)</li>
+<li>mysql.cc —MySQL 命令行工具</li>
+<li>mysqladmin.cc —维护MySQL 数据库的工具</li>
+<li>mysqlcheck.c —检查所有数据库，检查连接等。</li>
+<li>mysqldump.c —备份MySQL 数据库相关的东西</li>
+<li>mysqlimport.c —将不同格式的文本文件导入到MySQL 表中</li>
+<li>mysqlmanager-pwgen.c — pwgen 代表“密码生成”(目前没有维护)</li>
+<li>mysqlmanagerc.c — mysql manager 的入口点(目前没有维护)</li>
+<li>mysqlshow.c —显示数据库，表或列的信息</li>
+<li>mysqltest.c —由mysql 测试套件使用的测试程序，mysql-test-run<h2 id="1-3-cmake-目录"><a href="#1-3-cmake-目录" class="headerlink" title="1.3 cmake 目录"></a>1.3 cmake 目录</h2>还是与MySQL 的构建有关，该目录存放MySQL 构建相关的cmake 自定义模块。  <h2 id="1-4-cmd-line-utils-目录"><a href="#1-4-cmd-line-utils-目录" class="headerlink" title="1.4 cmd-line-utils 目录"></a>1.4 cmd-line-utils 目录</h2>这里的所有文件都是“非MySQL”文件，在这个意义上，MySQL 没有生成它们，它只是使用它们。除非你正在为MySQL 编写或调试类似tty 的客户端，否则不必研究这些文件中的程序，例如mysql.exe。就是一些构建MySQL 客户端时使用的更加基础的一些命令行的通用的库，这些库非MySQL 专有，其他的程序也可以使用。因此在研究MySQL 时，没必要研究他们。<h2 id="1-5-dbug-目录"><a href="#1-5-dbug-目录" class="headerlink" title="1.5 dbug 目录"></a>1.5 dbug 目录</h2>Fred Fish 的dbug 库。这不是MySQL 的真正部分。相反，它是一组公共库，可用于调试MySQL 程序。MySQL服务器，所有的.c 和.cc 程序都支持使用这个包。<br>它的使用方式：在一个常规的MySQL 程序中插入一个以DBUG_ *开头的函数调用。例如，在get_password.c 中，在一个函数的开始你会发现这一行：<br>DBUG_ENTER(“get_tty_password”);<br>在例行结束时你会发现这一行：<br>DBUG_RETURN(my_strdup(to,MYF(MY_FAE)));<br>这些行不影响生产代码。dbug 库的特性包括广泛的报告和分析(后者尚未被MySQL 使用)。  <h2 id="1-6-Docs-目录"><a href="#1-6-Docs-目录" class="headerlink" title="1.6 Docs 目录"></a>1.6 Docs 目录</h2>文档目录，因为MySQL 的文档都是以另外的形式在官网发布，因此，这个目录通常为空。  <h2 id="1-7-extra-目录"><a href="#1-7-extra-目录" class="headerlink" title="1.7 extra 目录"></a>1.7 extra 目录</h2>一些次要的独立的实用程序。这些程序都是独立的实用程序，也就是说，它们有一个main()函数，它们的主要作用是显示MySQL 服务器需要或生成的信息。大多数都不重要。确实需要的话再进行研究。  <h2 id="1-8-include-目录"><a href="#1-8-include-目录" class="headerlink" title="1.8 include 目录"></a>1.8 include 目录</h2>MySQL 的头文件所在的地方。  <h2 id="1-9-libevent-目录"><a href="#1-9-libevent-目录" class="headerlink" title="1.9 libevent 目录"></a>1.9 libevent 目录</h2>就是libevent 目录。  <h2 id="1-10-libmysql-目录"><a href="#1-10-libmysql-目录" class="headerlink" title="1.10 libmysql 目录"></a>1.10 libmysql 目录</h2>该目录中为MySQL 的库(例如windows 下为ddl，Linux 下为so 文件)，其中最为重要的就是：libmysql.c —实现MySQL API 的代码，即：要连接到MySQL 的客户端程序必须链接到该库才能与MySQL 服务器通信。之前的老版本会有对应的libmysql_r 线程安全版本。现在已经不存在了，默认libmysql 就是线程安<br>全的。  <h2 id="1-11-libmysqld-目录"><a href="#1-11-libmysqld-目录" class="headerlink" title="1.11 libmysqld 目录"></a>1.11 libmysqld 目录</h2>嵌入式MySQL 服务器库。 libmysqld 不是一个客户/服务器，而是一个库。也不是关注和研究的重点。  <h2 id="1-12-man-目录"><a href="#1-12-man-目录" class="headerlink" title="1.12 man 目录"></a>1.12 man 目录</h2>man 手册页  <h2 id="1-13-mysql-test-目录"><a href="#1-13-mysql-test-目录" class="headerlink" title="1.13 mysql-test 目录"></a>1.13 mysql-test 目录</h2>一个MySQL测试套件。该目录有一个README 文件，说明如何运行测试，如何进行新的测试，以及如何报告错误等。  <h2 id="1-14-mysys-目录"><a href="#1-14-mysys-目录" class="headerlink" title="1.14 mysys 目录"></a>1.14 mysys 目录</h2>MySQL 系统的基础库，主要是对底层系统调用的封装，例如字符集处理、字符编码(例如base64 算法)文件处理，线程相关的锁、POSIX 线程处理、基础数据结构(例如hash 表，链表，动态数组、树等)、全局错误信息、内存管理、压缩/解压缩。这些是构建MySQL 其他代码的基础。  <h2 id="1-15-mysys-ssl-目录"><a href="#1-15-mysys-ssl-目录" class="headerlink" title="1.15 mysys_ssl 目录"></a>1.15 mysys_ssl 目录</h2>主要是用于SSL 的一些算法，例如MD5、sha1、sha2、aes 等。  <h2 id="1-16-packaging-目录"><a href="#1-16-packaging-目录" class="headerlink" title="1.16 packaging 目录"></a>1.16 packaging 目录</h2>打包等的目录  <h2 id="1-17-plugin-目录"><a href="#1-17-plugin-目录" class="headerlink" title="1.17 plugin 目录"></a>1.17 plugin 目录</h2>我们知道，MySQL 很多功能都是以插件的形式提供的，例如：UDF、一些企业级插件等，MySQL 实现架构中，该目录主要就是用于实现其插件。  <h2 id="1-18-regex-目录"><a href="#1-18-regex-目录" class="headerlink" title="1.18 regex 目录"></a>1.18 regex 目录</h2>BSD Unix 中正则表达式处理的默认实现。Henry Spencer 的正则表达式库。  <h2 id="1-19-scripts-目录"><a href="#1-19-scripts-目录" class="headerlink" title="1.19 scripts 目录"></a>1.19 scripts 目录</h2>sql 批处理相关的脚本，是一个入门学习的好地方。  <h2 id="1-20-sql-目录"><a href="#1-20-sql-目录" class="headerlink" title="1.20 sql 目录"></a>1.20 sql 目录</h2>我们知道，MySQL 的分成架构中包含服务器层、存储引擎层，该目录是MySQL 服务器层的实现，具体包括：服务器的启动，与客户端连接的处理，网络socket 的监听，客户端的鉴权，SQL 的词法分析、语法分析、查询的优化、连表的实现，服务器的管理(包括暂停、重启等等)、以及与存储引擎借口的交互处理，查询缓存的处理，执行计划的生成(将一个SQL 查询转换成一系列的存储引擎API 操作)，MySQL 函数的实现、主从复制、binlog等日志的处理等等。注意，MySQL 的事务是在存储引擎层做的哈，当然了，为了理解MySQL 的事务，也要理解MySQL 服务器层对事务处理到了何种程度，如何与存储引擎层进行交互等。该目录的文件非常多。不再一一列出，后续的学习中慢慢研究。  <h2 id="1-21-sql-bench-目录"><a href="#1-21-sql-bench-目录" class="headerlink" title="1.21 sql-bench 目录"></a>1.21 sql-bench 目录</h2>MySQL 用于基准测试的目录，里边包含一些用于基准测试的工具。  <h2 id="1-22-sql-common-目录"><a href="#1-22-sql-common-目录" class="headerlink" title="1.22 sql-common 目录"></a>1.22 sql-common 目录</h2>存放部分服务器端和客户端都会用到的代码。  <h2 id="1-23storage-目录"><a href="#1-23storage-目录" class="headerlink" title="1.23storage 目录"></a>1.23storage 目录</h2>MySQL 各种存储引擎的实现目录，MySQL 源码中最为重要的就是sql 目录和该目录了。  <h2 id="1-24-strings-目录"><a href="#1-24-strings-目录" class="headerlink" title="1.24 strings 目录"></a>1.24 strings 目录</h2>字符编码的实现(例如：big5、cp932、gbk、gb2312、utf8 等)，字符串函数的实现，一个程序中字符串的处理会非常频繁，因此高效的处理字符串是非常重要的，因此MySQL 实现了通用的字符串库，这些字符串处理函数的含义与C 标准库的很多都一样。只是做了一些特殊的优化。  <h2 id="1-25-support-files"><a href="#1-25-support-files" class="headerlink" title="1.25 support-files"></a>1.25 support-files</h2>用于支持在不同系统上构建MySQL 的一些文件。这里的文件会被用于构建MySQL 的包管理器，编译器，链接器和其他构建工具使用。例如：my.cnf 文件，可以用作MySQL 的默认设置。  <h2 id="1-26-test-目录"><a href="#1-26-test-目录" class="headerlink" title="1.26 test 目录"></a>1.26 test 目录</h2>测试脚本所在目录。  <h2 id="1-27-unittest-目录"><a href="#1-27-unittest-目录" class="headerlink" title="1.27 unittest 目录"></a>1.27 unittest 目录</h2>用于MySQL 的单元测试的测试工具。  <h2 id="1-28-vio-目录"><a href="#1-28-vio-目录" class="headerlink" title="1.28 vio 目录"></a>1.28 vio 目录</h2>虚拟I / O 库。我的理解就是对上层提供一个统一接口，然而底层的IO 可以使TCP/IP 协议的网络IO，也可以是unix 的domain socket 或者共享内存(windows 下)，命名管道等。即：上层代码只需调用这些函数即可。真正的实现会对应不同的IO，我觉得思想和Linux 的VFS 很像。   <h2 id="1-29-win-目录"><a href="#1-29-win-目录" class="headerlink" title="1.29 win 目录"></a>1.29 win 目录</h2>用于windows 平台编译支持的一些文件。    <h2 id="1-30-zlib-目录"><a href="#1-30-zlib-目录" class="headerlink" title="1.30 zlib 目录"></a>1.30 zlib 目录</h2>数据压缩库，用于Windows。在Unix/Linux 上，MySQL 使用libgz.a 库。它不是一个MySQL 包。它是由GNU Zip(gzip.org)人员开发的公共使用的库。  <h2 id="1-31-libservices-目录"><a href="#1-31-libservices-目录" class="headerlink" title="1.31 libservices 目录"></a>1.31 libservices 目录</h2>5.5.x 中新加的目录，实现了打印功能，非核心。<br>小结：以上是5.6.36 版本中MySQL 源码目录的总结，当然了，MySQL 源码的目录会随着版本的升级会做适当的调整，但是最为核心的目录基本会保持不变的。<br>对于5.7.18 又增加了如下几个目录：  </li>
+<li>1、没有了test，取而代之的是testclients。  </li>
+<li>2、增加了rapid：组复制等一些新特性，非核心功能。  </li>
+<li>3、增加了libbinlogevents：名字就是实现的功能，即：与binlog 事件相关的东西。  </li>
+<li>4、增加了libbinlogstandalone：也是与binlog 相关的东西。  </li>
+</ul>
+<h1 id="2-MySQL-服务器源码骨架分析"><a href="#2-MySQL-服务器源码骨架分析" class="headerlink" title="2 MySQL 服务器源码骨架分析"></a>2 MySQL 服务器源码骨架分析</h1><p>为了看到MySQL 的整体程序架构，我们先分析其main 函数，从这个函数，可以看到MySQL 的启动流程，以及启动后的状态。<br>MySQL 的源码目录中，核心为sql 目录下的源代码，该目录为MySQL 的核心部分。main 函数也在该层实现，位于文件main.cc 中。函数非常简单，只是简单的调用mysqld_main 函数。因此分析mysqld_main 函数即可。首先通过分析mysqld_main 函数来了解MySQL 的程序骨架。该函数位于mysqld.cc 文件中。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">mysqld_main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="comment">//一系列的初始化，最为重要的是各种基础资源的初始化，如线程资源的相关初始化，配置文件的装载，sql语句名字的初始化，一些全局变量的初始化，插件的初始化，日志组件的初始化，线程栈保护区大小的设置，ddl日志的恢复(因为MySQL 启动的时候从main 函数开始执行，因此可能是崩溃后的重启，因此会进行相关的恢复)，网络的初始化(主要是对套接字进行监听，简单来说，就是linux 网络编程服务器端的那几步，只不过加了一些错误处理而已)。做好这些初始化工作之后，就可以处理来自客户端的网络连接了。这时进入作为一个服务器最为核心的骨架代码了：handle_connections_sockets(); 该函数就是MySQL 主程序的核心。后边就是MySQL退出时做的一些事情了。下边详细分析函数handle_connections_sockets()。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>handle_connections_sockets 函数也位于mysqld.cc 中<br>handle_connections_sockets()的程序骨架就是一个大的while 循环，在这里你能够看到典型的服务端程序骨架：一个主线程负责处理监听套接字上的新连接，然后接受链接，并创建链接相关的数据结构THD，然后创建一个新的线程来处理客户端的链接，主线程继续监听套接字上的新连接。这就是MySQL 的核心主程序。在这里我们只是列出了其最为核心的部分，略去了一些错误处理。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">handle_connections_sockets</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    。。。。。。。。</span><br><span class="line">    <span class="keyword">while</span> (!abort_loop))</span><br><span class="line">    &#123;</span><br><span class="line">        retval= select((<span class="keyword">int</span>) max_used_connection,&amp;readFDs,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">        sock = ip_sock; <span class="comment">//sock为监听套接字</span></span><br><span class="line">        flags= ip_flags;</span><br><span class="line">        <span class="comment">//循环尝试接受新的连接，只要连接成功返回，则结束循环，MAX_ACCEPT_RETRY被定义为10.最多尝试10次。</span></span><br><span class="line">        <span class="keyword">for</span> (uint retry=<span class="number">0</span>; retry &lt; MAX_ACCEPT_RETRY; retry++)</span><br><span class="line">        &#123;</span><br><span class="line">        size_socket length= <span class="keyword">sizeof</span>(struct sockaddr_storage);</span><br><span class="line">        new_sock= mysql_socket_accept(key_socket_client_connection, sock,</span><br><span class="line">        (struct sockaddr *)(&amp;cAddr), &amp;length);</span><br><span class="line">        <span class="keyword">if</span> (mysql_socket_getfd(new_sock) != INVALID_SOCKET ||</span><br><span class="line">            (socket_errno != SOCKET_EINTR &amp;&amp; socket_errno != SOCKET_EAGAIN))</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//创建一个针对该链接socket的THD，同时使用各种结构初始化THD的网络部分，</span></span><br><span class="line">        <span class="keyword">if</span> (!(thd= <span class="keyword">new</span> THD))</span><br><span class="line">        &#123;<span class="comment">//如果创建THD失败，则做些错误处理(关闭socket等)继续进行循环处理，等待下一个连接到来 &#125;</span></span><br><span class="line">        <span class="keyword">bool</span> is_unix_sock= (mysql_socket_getfd(sock) == mysql_socket_getfd(unix_sock));</span><br><span class="line">        enum_vio_type vio_type= (is_unix_sock ? VIO_TYPE_SOCKET : VIO_TYPE_TCPIP);</span><br><span class="line">        uint vio_flags= (is_unix_sock ? VIO_LOCALHOST : <span class="number">0</span>);</span><br><span class="line">        vio_tmp= mysql_socket_vio_new(new_sock, vio_type, vio_flags);</span><br><span class="line">        <span class="keyword">if</span> (!vio_tmp || my_net_init(&amp;thd-&gt;net, vio_tmp))</span><br><span class="line">        &#123;<span class="comment">//也是一样，如果初始化网络部分失败了，则做些资源清理，然后继续下一次循环，等待链接到来。</span></span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        init_net_server_extension(thd);</span><br><span class="line">        create_new_thread(thd);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接着就是创建一个新的线程来处理这个链接了，create_new_thread(thd);函数位于文件mysqld.cc 中。该函数的主要逻辑为：检查当前连接数是否已经达到最大，如果是，则关闭链接，否则，允许链接，并进行下一步的处理。最核心的代码为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">create_new_thread</span><span class="params">(THD *thd)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    mysql_mutex_lock(&amp;LOCK_connection_count);</span><br><span class="line">    <span class="keyword">if</span> (connection_count &gt;= max_connections + <span class="number">1</span> || abort_loop)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//关闭链接，做些统计。</span></span><br><span class="line">    &#125;</span><br><span class="line">    ++connection_count;</span><br><span class="line">    <span class="keyword">if</span> (connection_count &gt; max_used_connections)</span><br><span class="line">        max_used_connections= connection_count;</span><br><span class="line">    mysql_mutex_unlock(&amp;LOCK_connection_count);</span><br><span class="line">    <span class="comment">/* Start a new thread to handle connection. */</span></span><br><span class="line">    mysql_mutex_lock(&amp;LOCK_thread_count);</span><br><span class="line">    thd-&gt;thread_id= thd-&gt;variables.pseudo_thread_id= thread_id++;</span><br><span class="line">    MYSQL_CALLBACK(thread_scheduler, add_connection, (thd));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可见，最核心的是；MYSQL_CALLBACK(thread_scheduler, add_connection, (thd))。这一句是什么意思呢？<br>MYSQL_CALLBACK 是个宏定义，该宏有三个参数，分别是：obj，func，params，即对象实例，对象实例中的函数指针成员，函数的参数。因此，该语句就是调用thread_scheduler 的add_connection 函数，参数为thd 即：thread_scheduler-&gt;add_connection(thd)。接着要分析函数add_connection。<br>thread_scheduler 的定义如下:(位于sql/scheduler.cc)<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scheduler_functions *thread_scheduler= <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure></p>
+<p>scheduler_functions 的定义如下：(位于sql/scheduler.h)<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Functions used when manipulating threads */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">scheduler_functions</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    uint max_threads;</span><br><span class="line">    <span class="keyword">bool</span> (*init)(<span class="keyword">void</span>);</span><br><span class="line">    <span class="keyword">bool</span> (*init_new_connection_thread)(<span class="keyword">void</span>);</span><br><span class="line">    <span class="keyword">void</span> (*add_connection)(THD *thd);</span><br><span class="line">    <span class="keyword">void</span> (*thd_wait_begin)(THD *thd, <span class="keyword">int</span> wait_type);</span><br><span class="line">    <span class="keyword">void</span> (*thd_wait_end)(THD *thd);</span><br><span class="line">    <span class="keyword">void</span> (*post_kill_notification)(THD *thd);</span><br><span class="line">    <span class="keyword">bool</span> (*end_thread)(THD *thd, <span class="keyword">bool</span> cache_thread);</span><br><span class="line">    <span class="keyword">void</span> (*end)(<span class="keyword">void</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>该结构体的成员主要是各种为了支持线程的函数指针。该结构体的初始化在sql/scheduler.cc 中，如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> scheduler_functions one_thread_per_connection_scheduler_functions=</span><br><span class="line">&#123;</span><br><span class="line">    <span class="number">0</span>,                                  <span class="comment">// max_threads</span></span><br><span class="line">    <span class="literal">NULL</span>,                               <span class="comment">// init</span></span><br><span class="line">    init_new_connection_handler_thread, <span class="comment">// init_new_connection_thread</span></span><br><span class="line">    create_thread_to_handle_connection, <span class="comment">// add_connection</span></span><br><span class="line">    <span class="literal">NULL</span>,                               <span class="comment">// thd_wait_begin</span></span><br><span class="line">    <span class="literal">NULL</span>,                               <span class="comment">// thd_wait_end</span></span><br><span class="line">    <span class="literal">NULL</span>,                               <span class="comment">// post_kill_notification</span></span><br><span class="line">    one_thread_per_connection_end,      <span class="comment">// end_thread</span></span><br><span class="line">    <span class="literal">NULL</span>,                               <span class="comment">// end</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>因此对add_connection 的调用将调用到函数：create_thread_to_handle_connection，该函数位于myqld.cc 中。该函数如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">create_thread_to_handle_connection</span><span class="params">(THD *thd)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    mysql_mutex_assert_owner(&amp;LOCK_thread_count);</span><br><span class="line">    <span class="keyword">if</span> (blocked_pthread_count &gt; wake_pthread)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 唤醒空闲的缓存的线程 */</span></span><br><span class="line">        waiting_thd_list-&gt;push_back(thd);</span><br><span class="line">        wake_pthread++;</span><br><span class="line">        mysql_cond_signal(&amp;COND_thread_cache);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">char</span> error_message_buff[MYSQL_ERRMSG_SIZE];</span><br><span class="line">        <span class="comment">/* Create new thread to handle connection */</span></span><br><span class="line">        <span class="keyword">int</span> error;</span><br><span class="line">        inc_thread_created();</span><br><span class="line">        thd-&gt;prior_thr_create_utime= thd-&gt;start_utime= my_micro_time();</span><br><span class="line">        <span class="keyword">if</span> ((error= mysql_thread_create(key_thread_one_connection,</span><br><span class="line">                                          &amp;thd-&gt;real_id, &amp;connection_attrib,</span><br><span class="line">                                          handle_one_connection,</span><br><span class="line">                                          (<span class="keyword">void</span>*) thd)))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">/* 创建线程失败了，则进行一系列的错误处理，然后返回*/</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        add_global_thread(thd);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">该函数逻辑也很清晰，如果存在已经空闲的线程，则唤醒空闲的线程来处理这个链接，否则创建一个新的线程来处理这个链接，至此，主线程逻辑已经结束，它又回去监听新的网络链接去了。  </span><br><span class="line"></span><br><span class="line">新线程将执行函数handle_one_connection。该函数位于文件sql/sql_connect.cc 中，什么也不做，只是简单的调用函数do_handle_one_connection。do_handle_one_connection 位于文件sql/sql_connect.cc 中。该函数做如下几件事情：  </span><br><span class="line"> - 初始化线程；</span><br><span class="line"> - 初始化THD 结构(这是一个非常重要的结构，一个链接、对应一个线程，对应一个THD)；</span><br><span class="line"> - 用户授权；</span><br><span class="line"> - 处理所有的在这个链接上的查询；</span><br><span class="line"> - 结束线程(会将线程缓存下来用于下一个链接的处理)。</span><br><span class="line"></span><br><span class="line">接下来结合代码具体分析，该函数代码如下：为了体现核心的逻辑，我们略去了一些代码。  </span><br><span class="line">```C++</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">do_handle_one_connection</span><span class="params">(THD *thd_arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    THD *thd= thd_arg;</span><br><span class="line">    <span class="comment">//初始化线程，主要是将线程pthread_detach，同时进行一些其他的初始化。</span></span><br><span class="line">    MYSQL_CALLBACK_ELSE(thread_scheduler, init_new_connection_thread, (), <span class="number">0</span>);</span><br><span class="line">    <span class="comment">//外层循环为线程的主体逻辑，以后可用于放在线程缓存中。</span></span><br><span class="line">    <span class="keyword">for</span> (;;)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">bool</span> rc;</span><br><span class="line">        NET *net= &amp;thd-&gt;net;</span><br><span class="line">        mysql_socket_set_thread_owner(net-&gt;vio-&gt;mysql_socket);</span><br><span class="line">        <span class="comment">//这个函数会进行用户授权，通过这个函数的授权，用户才能接着继续执行。他会调用以下函数；</span></span><br><span class="line">        thd_prepare_connection()</span><br><span class="line">            |-login_connection()</span><br><span class="line">                |-check_connection()</span><br><span class="line">                    |-acl_authenticate()</span><br><span class="line">        rc= thd_prepare_connection(thd);</span><br><span class="line">        <span class="keyword">if</span> (rc)</span><br><span class="line">            <span class="keyword">goto</span> end_thread;</span><br><span class="line">        <span class="comment">//这个循环是该线程处理该客户端连接的核心。就是循环调用函数do_command</span></span><br><span class="line">        <span class="keyword">while</span> (thd_is_connection_alive(thd))</span><br><span class="line">        &#123;</span><br><span class="line">            mysql_audit_release(thd);</span><br><span class="line">            <span class="keyword">if</span> (do_command(thd))</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        end_connection(thd);</span><br><span class="line">end_thread:</span><br><span class="line">        close_connection(thd);</span><br><span class="line">        <span class="keyword">if</span> (MYSQL_CALLBACK_ELSE(thread_scheduler, end_thread, (thd, <span class="number">1</span>), <span class="number">0</span>))</span><br><span class="line">            <span class="keyword">return</span>;                     <span class="comment">// Probably no-threads</span></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">        If end_thread() returns, we are either running with</span></span><br><span class="line"><span class="comment">        thread-handler=no-threads or this thread has been schedule to</span></span><br><span class="line"><span class="comment">        handle the next connection.</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">        thd= current_thd;</span><br><span class="line">        thd-&gt;thread_stack= (<span class="keyword">char</span>*) &amp;thd;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由上边的分析，可以看到，链接建立之后，核心的就是循环调用函数do_command 了。该函数位于文件<br>sql/sql_parse.cc 中，该函数读取TCP 连接上的数据包，根据MySQL 客户端和服务器之间的通信协议解析出数据包的内容，执行里边的命令。它的核心代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">do_command</span><span class="params">(THD *thd)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    thd-&gt;lex-&gt;current_select= <span class="number">0</span>;</span><br><span class="line">    my_net_set_read_timeout(net, thd-&gt;variables.net_wait_timeout);</span><br><span class="line">    thd-&gt;clear_error();               <span class="comment">// Clear error message</span></span><br><span class="line">    thd-&gt;get_stmt_da()-&gt;reset_diagnostics_area();</span><br><span class="line">    net_new_transaction(net);</span><br><span class="line">    thd-&gt;m_server_idle= <span class="literal">true</span>;</span><br><span class="line">    packet_length= my_net_read(net);</span><br><span class="line">    thd-&gt;m_server_idle= <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (packet_length == packet_error)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//一系列的错误处理，然后返回。篇幅原因，这里省略了。</span></span><br><span class="line">        return_value= FALSE;</span><br><span class="line">        <span class="keyword">goto</span> out;</span><br><span class="line">    &#125;</span><br><span class="line">    packet= (<span class="keyword">char</span>*) net-&gt;read_pos;</span><br><span class="line">    packet[packet_length]= <span class="string">'\0'</span>;                <span class="comment">/* safety */</span></span><br><span class="line">    command= (<span class="keyword">enum</span> enum_server_command) (uchar) packet[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">if</span> (command &gt;= COM_END)</span><br><span class="line">        command= COM_END; <span class="comment">// Wrong command</span></span><br><span class="line">    <span class="comment">/* Restore read timeout value */</span></span><br><span class="line">    my_net_set_read_timeout(net, thd-&gt;variables.net_read_timeout);</span><br><span class="line">    return_value= dispatch_command(command, thd, packet+<span class="number">1</span>, (uint) (packet_length<span class="number">-1</span>));</span><br><span class="line">out:</span><br><span class="line">    <span class="comment">/* The statement instrumentation must be closed in all cases. */</span></span><br><span class="line">    DBUG_ASSERT(thd-&gt;m_digest == <span class="literal">NULL</span>);</span><br><span class="line">    DBUG_ASSERT(thd-&gt;m_statement_psi == <span class="literal">NULL</span>);</span><br><span class="line">    DBUG_RETURN(return_value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该函数最核心的就是两步：my_net_read 和dsipatch_command 函数。  </p>
+<p>前一个函数从客户端获取完整的数据包(如果包太大，客户端分开传送的，那么它会把包读取完整的)，解压缩它，并去掉一些头部字段。一旦完成，我们得到字节数组，其中包含客户端发送的内容。第一个字节很重要，因为它标识了消息的类型。我们将把它和其余的数据包传递给dispatch_command 函数。例如我们的一个查询:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> test1;</span><br></pre></td></tr></table></figure></p>
+<p>那么将会收到如下参数，当然了，不同的体系结构thd，packet+1 会有所不同。如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dispatch_command (COM_QUERY, <span class="number">0x33b5940</span>, packet=<span class="number">0x338e9e1</span> <span class="string">"select * from test1"</span>, packet_length=<span class="number">19</span>)</span><br></pre></td></tr></table></figure></p>
+<p>该函数位于sql/sql_parse.cc 中，该函数有700 多行，其主要功能是：对每个客户端传过来的命令进行处理。虽然很长，但是代码结构非常清晰，具体如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">dispatch_command</span><span class="params">(<span class="keyword">enum</span> enum_server_command command, THD *thd,</span></span></span><br><span class="line"><span class="function"><span class="params"><span class="keyword">char</span>* packet, uint packet_length)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    NET *net= &amp;thd-&gt;net;</span><br><span class="line">    ...............</span><br><span class="line">    thd-&gt;profiling.start_new_query();</span><br><span class="line">    thd-&gt;set_command(command);</span><br><span class="line">    .............</span><br><span class="line">    thd-&gt;set_query_id(next_query_id());</span><br><span class="line">    inc_thread_running();</span><br><span class="line">    ...............</span><br><span class="line">    <span class="keyword">switch</span> (command) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> COM_INIT_DB:</span><br><span class="line">        <span class="keyword">case</span> COM_REGISTER_SLAVE:</span><br><span class="line">        <span class="keyword">case</span> COM_CHANGE_USER:</span><br><span class="line">        <span class="keyword">case</span> COM_STMT_EXECUTE:</span><br><span class="line">        。。。。。。。。。。</span><br><span class="line">        <span class="keyword">case</span> COM_QUERY:</span><br><span class="line">        <span class="keyword">case</span> COM_FIELD_LIST: <span class="comment">// This isn't actually needed</span></span><br><span class="line">        <span class="keyword">case</span> COM_QUIT:</span><br><span class="line">        <span class="keyword">case</span> COM_BINLOG_DUMP_GTID:</span><br><span class="line">        <span class="keyword">case</span> COM_BINLOG_DUMP:</span><br><span class="line">        <span class="keyword">case</span> COM_REFRESH:</span><br><span class="line">        <span class="keyword">case</span> COM_SHUTDOWN:</span><br><span class="line">        <span class="keyword">case</span> COM_STATISTICS:</span><br><span class="line">        <span class="keyword">case</span> COM_PING:</span><br><span class="line">        <span class="keyword">case</span> COM_PROCESS_INFO:</span><br><span class="line">        <span class="keyword">case</span> COM_PROCESS_KILL:</span><br><span class="line">        <span class="keyword">case</span> COM_SET_OPTION:</span><br><span class="line">        &#123;</span><br><span class="line">            status_var_increment(thd-&gt;status_var.com_stat[SQLCOM_SET_OPTION]);</span><br><span class="line">            uint opt_command= uint2korr(packet);</span><br><span class="line">            <span class="keyword">switch</span> (opt_command) </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">case</span> (<span class="keyword">int</span>) MYSQL_OPTION_MULTI_STATEMENTS_ON:</span><br><span class="line">                <span class="keyword">case</span> (<span class="keyword">int</span>) MYSQL_OPTION_MULTI_STATEMENTS_OFF:</span><br><span class="line">                <span class="keyword">default</span>:</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> COM_DEBUG:</span><br><span class="line">        <span class="keyword">case</span> COM_SLEEP:</span><br><span class="line">        <span class="keyword">case</span> COM_CONNECT: <span class="comment">// Impossible here</span></span><br><span class="line">        <span class="keyword">case</span> COM_TIME: <span class="comment">// Impossible from client</span></span><br><span class="line">        <span class="keyword">case</span> COM_DELAYED_INSERT:</span><br><span class="line">        <span class="keyword">case</span> COM_END:</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">done:</span><br><span class="line">    thd-&gt;update_server_status();</span><br><span class="line">    thd-&gt;protocol-&gt;end_statement();</span><br><span class="line">    query_cache_end_of_result(thd);</span><br><span class="line">    thd-&gt;set_command(COM_SLEEP);</span><br><span class="line">    MYSQL_END_STATEMENT(thd-&gt;m_statement_psi, thd-&gt;get_stmt_da());</span><br><span class="line">    ......................</span><br><span class="line">    dec_thread_running();</span><br><span class="line">    thd-&gt;packet.shrink(thd-&gt;variables.net_buffer_length); <span class="comment">// Reclaim some memory</span></span><br><span class="line">    free_root(thd-&gt;mem_root,MYF(MY_KEEP_PREALLOC));</span><br><span class="line">    ......................</span><br><span class="line">    thd-&gt;profiling.finish_current_query();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>就是一系列的case，一共27 个，针对每一种情况执行对应的case。例如：客户端执行use test，则表示要改变当前的数据库，然后就命中COM_INIT_DB 这个case 了。如果客户端要执行预编译好的SQL 语句，则命中COM_STMT_EXECUTE 这个case 了，再比如，客户端执行select * from test1，则命中COM_QUERY(通用查询，MySQL 中不是select 才叫查询。MySQL 中很多操作，比如update，insert 等都叫一次查询。)这个case 了。我们知道，MySQL 是插件式存储引擎，那么接下来我们以一种场景为例来说明MySQL Server 层如何与存储引擎层进行交互。显然，必须MySQL Server 层定义好API，然后存储引擎层去实现这些API，那么MySQL Server 层肯定需要将语句的执行计划对应到对API 的调用上。这只是我们的分析，具体看看是不是这样呢？现在以插入一条数据为例进行分析：  </p>
+<p>如上分析，也将命中COM_QUERY 这个case，这个case 下，主要是做一些sql 语句处理前的准备，然后调用函数mysql_parse 来处理sql 语句。其核心就是mysql_parse。该函数位于sql/sql_parse.cc 中，负责具体的sql 处理，其核心逻辑有两个：因为sql 的词法分析、语法分析、查询重写、查询优化、物理执行计划生成、执行物理计划需要很长时间，因此，数据库系统通常会对查询进行缓存，当一个查询(广义的查询)来了之后首先会查看缓存，如果命中，则直接返回，如果没有命中查询缓存，则进行下一步的处理即：sql 的分析、查询计划的生成、执行等。   </p>
+<p>下边针对没有命中查询缓存的情况进行分析：<br>首先调用parse_sql，该函数只是简单的调用函数MYSQLparse，MYSQLparse 其实会在预处理阶段被替换为yyparse，yyparse 就是gnu 的Bison 生成的语法解析器的入口，该函数会生成语法树，MySQL 的词法分析是自己做的，该函数执行之后，SQL 语句的语法分析结果会被放在TDH 的LEX 这个对象中，该对象包含了sql 语句的信息，例如：什么样的sql 语句，查询的那些表，where 条件信息，选择那些列等等。   </p>
+<p>对sql 分析完成之后，如果分析成功，则会进行查询重写，注意：查询缓存只处理SELECT，我们也不会对SELECT进行查询重写。<strong>而且一定要区分开查询重写与查询优化完全是两码事哈，查询优化还早着呢</strong>。<br>经过sql 分析和查询重写，然后就是对其进行执行了。这一步由函数mysql_execute_command 来完成，位于sql/sql_parse.cc 中，需要详细分析，该函数非常长，大约2800 多行，虽然很长，但是逻辑也非常清晰，就是一堆case，这堆case 就是对应sql 语法分析器分析出来的要执行的sql 命令。由此可见，代码的处理结构还是非常的清晰的。例如：在语法分析中的一个代码片段(词法分析、语法分析的相关知识可以查阅相关书籍)：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">1748</span>:</span><br><span class="line">    &#123;</span><br><span class="line">        LEX *lex= Lex;</span><br><span class="line">        lex-&gt;sql_command= SQLCOM_SHOW_TABLE_STATUS;</span><br><span class="line">        lex-&gt;select_lex.db= (yyvsp[(<span class="number">3</span>) - (<span class="number">4</span>)].simple_string);</span><br><span class="line">        <span class="keyword">if</span> (prepare_schema_table(YYTHD, lex, <span class="number">0</span>, SCH_TABLES))</span><br><span class="line">            MYSQL_YYABORT;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">1749</span>:</span><br><span class="line">    &#123;</span><br><span class="line">        LEX *lex= Lex;</span><br><span class="line">        lex-&gt;sql_command= SQLCOM_SHOW_OPEN_TABLES;</span><br><span class="line">        lex-&gt;select_lex.db= (yyvsp[(<span class="number">3</span>) - (<span class="number">4</span>)].simple_string);</span><br><span class="line">        <span class="keyword">if</span> (prepare_schema_table(YYTHD, lex, <span class="number">0</span>, SCH_OPEN_TABLES))</span><br><span class="line">            MYSQL_YYABORT;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="keyword">case</span> <span class="number">1750</span>:</span><br><span class="line">......</span><br></pre></td></tr></table></figure></p>
+<p>如上：例如在语法分析中，语法分析器发现要执行的SQL 语句是SQLCOM_SHOW_OPEN_TABLES，那么在函数mysql_execute_command 中也会有对应的case 来处理这个命令的。例如在函mysql_execute_command 中就有对应的如下代码段：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">.................</span><br><span class="line"><span class="keyword">case</span> SQLCOM_SHOW_TABLE_STATUS:</span><br><span class="line"><span class="keyword">case</span> SQLCOM_SHOW_OPEN_TABLES:</span><br><span class="line">.........</span><br><span class="line"><span class="keyword">case</span> SQLCOM_SELECT:</span><br><span class="line">&#123;</span><br><span class="line">    thd-&gt;status_var.last_query_cost= <span class="number">0.0</span>;</span><br><span class="line">    thd-&gt;status_var.last_query_partial_plans= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ((res= select_precheck(thd, lex, all_tables, first_table)))</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    res= execute_sqlcom_select(thd, all_tables);</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line">.......</span><br></pre></td></tr></table></figure></p>
+<p>为了逻辑清晰，在此总结一下MySQL 服务器的骨架代码(后续还会分析如何与存储引擎的API 进行交互)。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MySQL服务器主线程</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    mysqld_main()</span><br><span class="line">    &#123;</span><br><span class="line">        my_init();</span><br><span class="line">        udf_init();</span><br><span class="line">        .....</span><br><span class="line">        init_slave();</span><br><span class="line">        network_init();</span><br><span class="line">        .....</span><br><span class="line">        handle_connections_sockets()</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">while</span>()</span><br><span class="line">            &#123;<span class="comment">//循环监听socket上的连接，对于每个连接，创建一个线程去处理该链接上的查询。</span></span><br><span class="line">                select();</span><br><span class="line">                accept();</span><br><span class="line">                create_new_thread()</span><br><span class="line">                &#123;</span><br><span class="line">                    create_thread_to_handle_connection()</span><br><span class="line">                    &#123;</span><br><span class="line">                        mysql_thread_create(,, ,handle_one_connection,(<span class="keyword">void</span>*) thd);</span><br><span class="line">                        <span class="comment">//在此，主线程又进入对socket的监听，等待新连接的到来，而新线程处理该链接。</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="comment">//end of create_new_thread</span></span><br><span class="line">            &#125; <span class="comment">//end of while</span></span><br><span class="line">        &#125; <span class="comment">// end of handle_connections_sockets</span></span><br><span class="line">    &#125; <span class="comment">//end of mysqld_main</span></span><br><span class="line">&#125;<span class="comment">// end of main</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//MySQL服务器处理链接的线程开始执行</span></span><br><span class="line"><span class="comment">//如上，MySQL开始处理新的链接，执行函数handle_one_connection</span></span><br><span class="line">handle_one_connection()</span><br><span class="line">&#123;</span><br><span class="line">    do_handle_one_connection()</span><br><span class="line">    &#123;</span><br><span class="line">        ......</span><br><span class="line">        thd_prepare_connection(); <span class="comment">//检查用户权限，看看是否允许链接</span></span><br><span class="line">        <span class="keyword">while</span> () <span class="comment">//循环处理该连接上的各种命令(各种服务器管理命令、SQL命令等)</span></span><br><span class="line">        &#123;</span><br><span class="line">            do_command(thd)</span><br><span class="line">            &#123;</span><br><span class="line">                my_net_read(); <span class="comment">//读取完整的客户端命令</span></span><br><span class="line">                ...... <span class="comment">//解析客户端的命令</span></span><br><span class="line">                dispatch_command(<span class="keyword">enum</span> enum_server_command)<span class="comment">//命令分发</span></span><br><span class="line">                &#123;<span class="comment">//注意：客户端和服务端之间的命令分为两层，该函数只识别第一层命令。</span></span><br><span class="line">                    <span class="keyword">switch</span> (command) </span><br><span class="line">                    &#123;</span><br><span class="line">                        ........</span><br><span class="line">                        <span class="keyword">case</span> COM_STMT_EXECUTE:</span><br><span class="line">                        ..........</span><br><span class="line">                        <span class="keyword">case</span> COM_QUERY:</span><br><span class="line">                        ..........</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* dispatch_command中处理第一层命令，即：mysql客户端和服务端通信协议中粒度比较粗的命令，</span></span><br><span class="line"><span class="comment">* 即: enum_server_command中定义的命令，这些命令是针对整个MySQL服务器而言的，例如：</span></span><br><span class="line"><span class="comment">* COM_REGISTER_SLAVE: 注册从属服务器</span></span><br><span class="line"><span class="comment">* COM_CHANGE_USER: 改变当前的链接用户</span></span><br><span class="line"><span class="comment">* COM_QUERY: 让服务器处理一个查询(注意: MySQL中的查询是广义的，包含：DDL和DML等语句)</span></span><br><span class="line"><span class="comment">* COM_SHUTDOWN: 服务器的关闭</span></span><br><span class="line"><span class="comment">* COM_PROCESS_KILL: kill的处理</span></span><br><span class="line"><span class="comment">* 以上只是举了几个简单的例子，enum_server_command的完整定义在mysql_comm.h中。</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* 对于COM_QUERY，MySQL会对各种SQL语句进行解析。解析出SQL相关的命令(enum_sql_command)</span></span><br><span class="line"><span class="comment">* 来进行执行，这个是由函数mysql_execute_command来完成的。enum_sql_command枚举的定义</span></span><br><span class="line"><span class="comment">* 在sql_cmd.h中。可见MySQL从代码上就是逐渐分层，sql的处理虽然重要，但只是一个MySQL服务</span></span><br><span class="line"><span class="comment">* 器的一个模块。具体enum_server_command和enum_sql_command的定义可以查看对应的.h文件。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//接着分析链接线程中dispatch_command函数最为重要的一个case分支,case COM_QUERY:</span></span><br><span class="line"><span class="keyword">case</span> COM_QUERY:</span><br><span class="line">&#123;</span><br><span class="line">    MYSQL_QUERY_START();</span><br><span class="line">    mysql_parse()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (query_cache_send_result_to_client(thd, rawbuf, length) &lt;= <span class="number">0</span>)</span><br><span class="line">        &#123;   <span class="comment">//没有命中查询缓存</span></span><br><span class="line">            <span class="comment">//对sql语句进行词法分析,语法分析,上边说的enum_sql_command就在这里解析出来的。</span></span><br><span class="line">            parse_sql();</span><br><span class="line">            mysql_rewrite_query(); <span class="comment">//必要时进行查询重写,注意: select不会重写。</span></span><br><span class="line">            .......</span><br><span class="line">            mysql_execute_command(THD *thd)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">switch</span> (lex-&gt;sql_command)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">case</span> SQLCOM_SHOW_STATUS_PROC:</span><br><span class="line">                    <span class="keyword">case</span> SQLCOM_SHOW_PROFILE:</span><br><span class="line">                    ........</span><br><span class="line">                    <span class="keyword">case</span> SQLCOM_SELECT:</span><br><span class="line">                    .........</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//查询命中,做点处理,写日志</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>至此，服务器的大体骨架就清楚了，接下来研究MySQL 服务器如何同存储引擎曾进行交互。  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据库/" rel="tag"># 数据库</a>
+          
+            <a href="/tags/MySQL内核/" rel="tag"># MySQL内核</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/23/python/1-install_python3/" rel="next" title="python3 安装">
+                <i class="fa fa-chevron-left"></i> python3 安装
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">xufubo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-MySQL-源码目录介绍"><span class="nav-number">1.</span> <span class="nav-text">1 MySQL 源码目录介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-BUILD-目录"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 BUILD 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-client-目录"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 client 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-cmake-目录"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 cmake 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-cmd-line-utils-目录"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 cmd-line-utils 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-dbug-目录"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 dbug 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-Docs-目录"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 Docs 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-7-extra-目录"><span class="nav-number">1.7.</span> <span class="nav-text">1.7 extra 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-8-include-目录"><span class="nav-number">1.8.</span> <span class="nav-text">1.8 include 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-9-libevent-目录"><span class="nav-number">1.9.</span> <span class="nav-text">1.9 libevent 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-10-libmysql-目录"><span class="nav-number">1.10.</span> <span class="nav-text">1.10 libmysql 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-11-libmysqld-目录"><span class="nav-number">1.11.</span> <span class="nav-text">1.11 libmysqld 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-12-man-目录"><span class="nav-number">1.12.</span> <span class="nav-text">1.12 man 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-13-mysql-test-目录"><span class="nav-number">1.13.</span> <span class="nav-text">1.13 mysql-test 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-14-mysys-目录"><span class="nav-number">1.14.</span> <span class="nav-text">1.14 mysys 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-15-mysys-ssl-目录"><span class="nav-number">1.15.</span> <span class="nav-text">1.15 mysys_ssl 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-16-packaging-目录"><span class="nav-number">1.16.</span> <span class="nav-text">1.16 packaging 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-17-plugin-目录"><span class="nav-number">1.17.</span> <span class="nav-text">1.17 plugin 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-18-regex-目录"><span class="nav-number">1.18.</span> <span class="nav-text">1.18 regex 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-19-scripts-目录"><span class="nav-number">1.19.</span> <span class="nav-text">1.19 scripts 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-20-sql-目录"><span class="nav-number">1.20.</span> <span class="nav-text">1.20 sql 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-21-sql-bench-目录"><span class="nav-number">1.21.</span> <span class="nav-text">1.21 sql-bench 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-22-sql-common-目录"><span class="nav-number">1.22.</span> <span class="nav-text">1.22 sql-common 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-23storage-目录"><span class="nav-number">1.23.</span> <span class="nav-text">1.23storage 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-24-strings-目录"><span class="nav-number">1.24.</span> <span class="nav-text">1.24 strings 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-25-support-files"><span class="nav-number">1.25.</span> <span class="nav-text">1.25 support-files</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-26-test-目录"><span class="nav-number">1.26.</span> <span class="nav-text">1.26 test 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-27-unittest-目录"><span class="nav-number">1.27.</span> <span class="nav-text">1.27 unittest 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-28-vio-目录"><span class="nav-number">1.28.</span> <span class="nav-text">1.28 vio 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-29-win-目录"><span class="nav-number">1.29.</span> <span class="nav-text">1.29 win 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-30-zlib-目录"><span class="nav-number">1.30.</span> <span class="nav-text">1.30 zlib 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-31-libservices-目录"><span class="nav-number">1.31.</span> <span class="nav-text">1.31 libservices 目录</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-MySQL-服务器源码骨架分析"><span class="nav-number">2.</span> <span class="nav-text">2 MySQL 服务器源码骨架分析</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xufubo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
